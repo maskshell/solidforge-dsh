@@ -102,6 +102,28 @@ Arm 会做（幂等，可 `--revert --apply` 撤销）：
 
 csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv gate 的账**（csr 单跑即可）；外部引用密集或长文档才先跑 psv GATE MODE（GO/NO-GO），csr 收敛后再跑 psv full-M 作为唯一权威覆盖记录。
 
+
+### 联用链路：典型组合
+
+单技能表之后是组合表——技能组成论文 §6 的 specify→implement 流水线：
+
+| 链路 | 触发对话（示例） | 产物链 | 诚实边界 |
+| --- | --- | --- | --- |
+| `csr → bc → pd` | 「把这份设计文档收敛，然后实现它」 | convergence-record → 冻结蓝图（PRD/架构/迭代计划）→ 收敛代码 + run-record | csr 不判对错；bc 的 rightness 恒 `human_confirm_required` |
+| `psv → csr` | 「这份文档引用很多外部来源，先核实再收敛」 | gate 记录（非权威）→ convergence-record → full-M coverage-record（唯一权威） | psv 绝不 `correctness_converged`；K>0 升级人审 |
+| `psv + pas` | 「这篇论文的引用和新颖性都帮我查一遍」 | coverage-record + collision-record（两条结果轴并行） | pas 绝不 `novel_confirmed` |
+| `psv → csr → bc → pd` | 「从带引用的规格出发，交付可运行实现」 | 四条记录全链 | 异源腿 opt-in；未运行/降级如实报告 |
+
+**全链路对白走读**（`psv → csr → bc → pd`）：
+
+> 「这是一份带外部引用的需求草案 `docs/req.md`，请从它出发交付可运行实现。」
+
+1. **psv GATE MODE**——claim-extractor 抽取 load-bearing 声明 → 逐条对源裁决 → GO/NO-GO。短文档/本地引用为主时 ODP-5 判别器会跳过这一步（省 ~1.5 轮）。
+2. **csr**——同源 `doc-reviewer` 多轮对抗 + 高风险项加异源（出进程异族）。每轮 finding 逐条 disposition（修复/拒绝/升级）→ `substantive_converged`。**它收敛的是过程轴；需求对不对由你确认。**
+3. **bc**——plan-reviewer 外环 + 确定性内环（constraints-check）→ 产出并**冻结**意图蓝图。冻结后守卫拒绝任何编辑；改动只能走修订通道。
+4. **pd**——按蓝图 RED/GREEN 并行派发子代理 → 双环收敛 → 断路器看护 → 终态产出 run-record（`process_converged` 与恒定的 `rightness` 分家）。
+5. **psv full-M（收尾，仅规则 13 文档）**——csr 收敛后对最终文本做权威逐声明覆盖记录。
+
 ## 7. 调参与常见问题
 
 **调参**（`loop_state.py init` 旗标）：内环上限 `M=8`、同指纹阈值 `N=3`、token 上限 2M、时间上限 1800s、成本上限 5.0、步数上限 200。时间轴最可靠；token 是估算。

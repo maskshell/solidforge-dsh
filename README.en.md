@@ -53,6 +53,28 @@ bash scripts/install.sh        # installs the agent preset → $DSH_HOME/.agent-
 
 Step-by-step onboarding: **[USER_GUIDE.en.md](USER_GUIDE.en.md)**.
 
+## Combining the skills: typical chains
+
+The five skills are not islands — they compose the paper's §6 specify→implement pipeline. Four typical combinations:
+
+| Chain | When | One-line flow |
+| --- | --- | --- |
+| `csr → bc → pd` | A requirements/design doc needs to become working code | Adversarially converge the doc → freeze the Intent Blueprint → TDD parallel implementation |
+| `psv → csr` | Citation-dense docs with external sources (rule 13) | Per-claim source GO/NO-GO (gate) → doc convergence → authoritative full-M coverage record |
+| `psv + pas` | Self-checking a paper/research doc | The two outcome axes in parallel: citation verification + novelty collision detection |
+| `psv → csr → bc → pd` | A full pipeline from a citation-bearing spec | See the walkthrough below |
+
+**Full-chain example** (say it in a solidforge session):
+
+> "Here is a requirements draft `docs/req.md` with external citations — deliver a working implementation from it."
+
+1. **psv GATE MODE** — load-bearing GO/NO-GO on the external citations (short / mostly-local-citation docs skip it; the ODP-5 discriminator decides);
+2. **csr** — same-source + heterogeneous multi-round adversarial convergence of the doc (process axis; whether the requirements are RIGHT stays yours);
+3. **bc** — produce and freeze the Intent Blueprint (PRD/architecture/iteration plan; `process_converged` machine-checkable, `rightness` always `human_confirm_required`);
+4. **pd** — TDD parallel implementation + dual-ring convergence + run record; high-risk items can add the hetero leg (opt-in).
+
+Every ring's verdict is recorded (convergence-record / coverage-record / run-record); a hetero leg that didn't run or degraded is reported honestly — never silently green.
+
 ## Five core concepts (progressively)
 
 1. **Dual-ring convergence**: the deterministic inner ring (lint/types/tests/architecture contracts) must be green before the outer ring; the outer ring is same-source adversarial review with per-finding dispositions (fix/reject/escalate), fully audited.

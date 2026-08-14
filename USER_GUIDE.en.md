@@ -96,6 +96,28 @@ When it runs (protocol): the hetero leg is **opt-in** for high-stakes items only
 
 csr's ODP-5 discriminator: short docs / predominantly local-citation docs skip the psv gate (csr alone); external-citation-heavy or long docs run psv GATE MODE first (GO/NO-GO), and the authoritative full-M psv record follows csr convergence.
 
+
+### Combining skills: typical chains
+
+After the per-skill table, the composition table — the skills form the paper's §6 specify→implement pipeline:
+
+| Chain | Trigger utterance (example) | Artifact chain | Honest boundary |
+| --- | --- | --- | --- |
+| `csr → bc → pd` | "Converge this design doc, then implement it" | convergence-record → frozen blueprint (PRD/arch/iteration plan) → converged code + run-record | csr never judges rightness; bc's rightness stays `human_confirm_required` |
+| `psv → csr` | "This doc cites many external sources — verify first, then converge" | gate record (non-authoritative) → convergence-record → full-M coverage-record (the only authoritative one) | psv never emits `correctness_converged`; K>0 escalates to a human |
+| `psv + pas` | "Check this paper's citations AND its novelty claims" | coverage-record + collision-record (the two outcome axes in parallel) | pas never emits `novel_confirmed` |
+| `psv → csr → bc → pd` | "From this citation-bearing spec, deliver a working implementation" | all four records, end to end | hetero leg opt-in; not-run/degraded reported honestly |
+
+**Full-chain walkthrough** (`psv → csr → bc → pd`):
+
+> "Here is a requirements draft `docs/req.md` with external citations — deliver a working implementation from it."
+
+1. **psv GATE MODE** — the claim-extractor enumerates load-bearing claims → per-claim adjudication against fetched sources → GO/NO-GO. Short / mostly-local-citation docs skip this step (ODP-5 discriminator, saves ~1.5 rounds).
+2. **csr** — same-source `doc-reviewer` multi-round adversarial review + the hetero leg for high-risk items (out-of-process, different family). Per-round findings get per-finding dispositions (fix/reject/escalate) → `substantive_converged`. **It converges the PROCESS axis; whether the requirements are right stays yours.**
+3. **bc** — plan-reviewer outer ring + deterministic inner ring (constraints-check) → produce and FREEZE the Intent Blueprint. Once frozen, the guard denies edits; changes go through the revision channel only.
+4. **pd** — RED/GREEN subagents dispatched in parallel against the blueprint → dual-ring convergence → breakers watching → a run-record at the terminal status (`process_converged` strictly separated from the constant `rightness`).
+5. **psv full-M (closing, rule-13 docs only)** — after csr convergence, the authoritative per-claim coverage record over the final text.
+
 ## 7. Tuning and FAQ
 
 **Tuning** (`loop_state.py init` flags): inner cap `M=8`, thrash threshold `N=3`, token cap 2M, time cap 1800s, cost cap 5.0, step cap 200. The time axis is the reliable one; tokens are an estimate.

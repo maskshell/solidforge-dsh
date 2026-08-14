@@ -53,6 +53,28 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
 
 完整的循序渐进上手：**[USER_GUIDE.md](USER_GUIDE.md)**。
 
+## 技能联用：典型链路
+
+五个技能不是孤岛——它们组成论文 §6 的 specify→implement 流水线。四组典型组合：
+
+| 链路 | 适用场景 | 一句话流程 |
+| --- | --- | --- |
+| `csr → bc → pd` | 有需求/设计文档，要落成可运行代码 | 文档对抗收敛 → 冻结意图蓝图 → TDD 并行实现收敛 |
+| `psv → csr` | 文档引用密集、外部来源多（规则 13） | 逐声明对源 GO/NO-GO（gate）→ 文档收敛 → 权威 full-M 覆盖记录 |
+| `psv + pas` | 论文/研究文档自检 | 两条结果轴并行：引用核查 + 新颖性碰撞检测 |
+| `psv → csr → bc → pd` | 从带引用的规格起步的完整流水线 | 见下方全链路对白 |
+
+**全链路示例**（在 solidforge 会话里说）：
+
+> 「这是一份带外部引用的需求草案 `docs/req.md`，请从它出发交付可运行实现。」
+
+1. **psv GATE MODE**——对外部引用做 load-bearing GO/NO-GO（短文档/本地引用为主可跳过，ODP-5 判别器决定）；
+2. **csr**——同源 + 异源多轮对抗收敛需求文档（过程轴；它不判断需求"对不对"，那是你）；
+3. **bc**——产出并冻结意图蓝图（PRD/架构/迭代计划；`process_converged` 机器可查，`rightness` 恒 `human_confirm_required`）；
+4. **pd**——TDD 并行实现 + 双环收敛 + 运行记录；高风险项可加异源评审（opt-in）。
+
+每一环的裁决都留痕（convergence-record / coverage-record / run-record），异源腿未运行或降级时如实报告，绝不静默绿。
+
 ## 五个核心概念（循序渐进）
 
 1. **双环收敛**：确定性内环（lint/类型/测试/架构契约）绿了才进外环；外环是同源对抗评审，逐 finding 裁决（修复/拒绝/升级），记录全程留痕。
