@@ -1182,7 +1182,7 @@ def main():
     if not provider_names:
         print(
             "error: no heterogeneous provider configured. Arm one: "
-            "(1) drop profiles/<name>.json (see the shipped zhipu.json / minimax.json "
+            "(1) drop profiles/<name>.json (see the shipped zai-coding-cn.json / minimax-cn.json "
             "as worked examples, substrate dsh), (2) set HETERO_PROFILE=<name[,name2]> "
             "(or HETERO_DOC_PROFILE for the csr doc leg) in <project>/.env.solidforge, "
             "<project>/.env, or <preset-root>/.env.solidforge, or pass --profile directly. "

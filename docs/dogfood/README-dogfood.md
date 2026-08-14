@@ -113,6 +113,14 @@ harness. Heterogeneity is a different LLM, not a different harness. Fixed:
 - Wiring suites re-pass with the substrate dispatch + fail-fast-cleanup branch covered
   (`hetero_review_wiring.py`).
 
+> **SUPERSEDED (later consolidation, 2026-08-14):** the `pi-ai.json` placeholder
+> default named above was an INTERMEDIATE state — it was later removed (unarmed =
+> fail-fast arming prompt, no placeholder profile ships), the credential vars became
+> ROUTE-DERIVED (`ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY`, pi-ai's own
+> convention), and the armed profiles became the catalog routes `zai-coding-cn` /
+> `minimax-cn` (+ the `qwen-token-plan-cn` placeholder). Follow the CURRENT arming
+> steps in USER_GUIDE §5, not the historical ones above.
+
 
 ## Round 4 — dual-hetero re-run under the DSH-native substrate (post-adjudication)
 
