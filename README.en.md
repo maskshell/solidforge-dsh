@@ -49,7 +49,7 @@ bash scripts/install.sh        # installs the agent preset → $DSH_HOME/.agent-
    ```
 
 3. Say "implement X in parallel, TDD" — the convergence loop takes over: dual rings, breakers, rollback, run records, all automatic.
-4. (Optional) activate the three structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
+4. (Optional) activate the four structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
 
 Step-by-step onboarding: **[USER_GUIDE.en.md](USER_GUIDE.en.md)**.
 
@@ -102,7 +102,7 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 | Five skills | `preset/skills/{parallel-development,blueprint-crafting,cross-source-review,primary-source-verification,prior-art-search}/` | The convergence loop, the specify side, document convergence (csr, process-axis), the two outcome-axis verifiers (psv/pas, per-claim against fetched sources) |
 | 22 role agents | `preset/agents/*.agent.md` | Role-prompt corpus dispatched via the `subagent` tool |
 | Deterministic infra | `preset/skills/*/infra/` | stdlib-only Python gates/state machine/schemas + test suites |
-| Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool (activation: see the User Guide) |
+| Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool, the `/solidforge` and `/arm-tools` commands (activation: see the User Guide) |
 | arm-tools | `preset/commands/arm-tools.md` | Project-side provisioning (Layer 2) |
 
 ## Honest disclosure

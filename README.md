@@ -49,7 +49,7 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
    ```
 
 3. 对会话说「并行实现 X，TDD」，收敛循环接管——双环、断路器、回滚与运行记录全部自动。
-4. （可选）在 cordis 会话里激活三个结构化插件（见 [使用指南](USER_GUIDE.md) §激活插件）。
+4. （可选）在 cordis 会话里激活四个结构化插件（见 [使用指南](USER_GUIDE.md) §激活插件）。
 
 完整的循序渐进上手：**[USER_GUIDE.md](USER_GUIDE.md)**。
 
@@ -102,7 +102,7 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
 | 五个技能 | `preset/skills/{parallel-development,blueprint-crafting,cross-source-review,primary-source-verification,prior-art-search}/` | 收敛循环、specify 侧、文档收敛（csr，过程轴）、两条结果轴验证（psv/pas，逐声明对源核查） |
 | 22 个角色代理 | `preset/agents/*.agent.md` | 经 `subagent` 工具派发的角色提示语料 |
 | 确定性基础设施 | `preset/skills/*/infra/` | 纯 stdlib Python 门禁/状态机/schema + 测试套件 |
-| 结构化插件 | `plugins/*.host.js` | 工具事件门禁、rightness 不变量、异源评审工具（激活方式见使用指南） |
+| 结构化插件 | `plugins/*.host.js` | 工具事件门禁、rightness 不变量、异源评审工具、`/solidforge` 与 `/arm-tools` 命令（激活方式见使用指南） |
 | arm-tools | `preset/commands/arm-tools.md` | 项目侧供给（Layer 2） |
 
 ## 诚实声明

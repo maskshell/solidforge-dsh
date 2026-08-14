@@ -21,11 +21,12 @@ git clone https://github.com/maskshell/solidforge-dsh.git && cd solidforge-dsh
 bash scripts/install.sh     # → $DSH_HOME/.agent-presets/solidforge/ (idempotent)
 ```
 
-- **Session-level activation**: pick the **solidforge** preset when starting a session. The session gets the five skills, 22 role agents, the arm-tools command, and the SolidForge persona.
-- **Structural plugins (optional, recommended)**: three dynamic Cordis plugins turn the gates and invariants into structural enforcement (their code lives outside your workspace — the agent cannot edit it):
+- **Session-level activation**: pick the **solidforge** preset when starting a session. The session gets the five skills, 22 role agents, and the SolidForge persona; the `/solidforge` and `/arm-tools` slash commands become available once the `commands` plugin runs (below).
+- **Structural plugins (optional, recommended)**: four dynamic Cordis plugins turn the gates and invariants into structural enforcement (their code lives outside your workspace — the agent cannot edit it):
   - `loop-gates` — fast gate / blueprint guard / terminal counters on every edit/write (`tools/pre-execute` deny + `tools/post-execute` block feedback);
   - `run-record` — the `solidforge_run_record` tool, forcing `rightness: human_confirm_required`;
-  - `hetero-review` — the `solidforge_hetero_review` tool, one-call out-of-process heterogeneous review.
+  - `hetero-review` — the `solidforge_hetero_review` tool, one-call out-of-process heterogeneous review;
+  - `commands` — the `/solidforge` (skill-abbreviation cheat sheet + discipline one-liner) and `/arm-tools` (arm procedure injection) slash commands. DSH's command registry is plugin-owned (`ctx.commands.register`, not filesystem-discovered), so the preset's `commands/arm-tools.md` is not auto-mounted — this plugin is the channel that exposes it.
 
   Activation: in a cordis-toolset session (e.g. the `cordis` preset), `cordis_define` + `cordis_run` each of `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js` (baked absolute preset root). **Why not bundled in the preset**: the row that would enable defining them in-preset (`tool-cordis`) registers process-global providers and collides with the `cordis` preset in a multi-preset process — the same deliberate omission as the `standard` preset.
 - Without the plugins everything still works: the gate scripts are directly callable from `infra/` (advisory mode).
@@ -136,6 +137,12 @@ Abbreviation map (full names and abbreviations both trigger):
 | `bc` | blueprint-crafting | `pas` | prior-art-search |
 | `csr` | cross-source-review | | |
 
+### How to reference them in DSH
+
+- **Skills are model-side**: write the full name or abbreviation in your prompt (e.g. `pd`, `psv → csr`) and the agent loads the matching SKILL.md through the skill tool. DSH does **not** expose skills as `/pd`-style slash commands (unlike Claude Code's `/skill-name`) — just write the name.
+- **The two slash commands** come from the `commands` plugin (§1): `/solidforge` injects the abbreviation table above plus the discipline one-liner into the agent; `/arm-tools` injects the full arming procedure from `commands/arm-tools.md`. They feed content to the agent — they are not the skills themselves.
+- The most reliable trigger remains writing the chain abbreviations into the prompt, e.g. `psv → csr → psv → bc → pd`.
+
 ## 7. Tuning and FAQ
 
 **Tuning** (`loop_state.py init` flags): inner cap `M=8`, thrash threshold `N=3`, token cap 2M, time cap 1800s, cost cap 5.0, step cap 200. The time axis is the reliable one; tokens are an estimate.
@@ -143,6 +150,7 @@ Abbreviation map (full names and abbreviations both trigger):
 **FAQ**:
 
 - *"no heterogeneous provider configured"* — expected: the fail-fast default. Arm per §5, or consciously forgo heterogeneity.
+- *"/solidforge and /arm-tools don't resolve"* — the `commands` plugin is not activated in this session; `cordis_define` + `cordis_run` `plugins/commands.host.js` per §1. Skills are unaffected (write the name/abbreviation directly).
 - *"profile X (route Y) needs the credential env var $Z"* — the key is missing from the three-tier chain; the var name is route-derived (§5).
 - *Hetero leg `hetero-subprocess-timeout`* — cold start is transient; raise `--timeout` or drop a tier per the docs — never remap the route alias to dodge it.
 - *A gate tool is missing* — that gate degrades with a coverage note, never fakes green; `--with-tools` fills the gaps.

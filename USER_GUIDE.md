@@ -23,11 +23,12 @@ bash scripts/install.sh     # → $DSH_HOME/.agent-presets/solidforge/（幂等�
 
 然后：
 
-- **会话级激活**：在 DSH 中新建会话时选择 **solidforge** preset。该会话自动获得五个技能、22 个角色代理、arm-tools 命令与 SolidForge 人格。
-- **结构化插件（可选但推荐）**：三个动态 Cordis 插件把门禁与不变量变成结构强制（代码在你的工作区之外，代理改不了）：
+- **会话级激活**：在 DSH 中新建会话时选择 **solidforge** preset。该会话自动获得五个技能、22 个角色代理与 SolidForge 人格；`/solidforge`、`/arm-tools` 两个斜杠命令需 `commands` 插件运行后可用（见下）。
+- **结构化插件（可选但推荐）**：四个动态 Cordis 插件把门禁与不变量变成结构强制（代码在你的工作区之外，代理改不了）：
   - `loop-gates` —— 每次 edit/write 触发快速门 / 蓝图守卫 / 终态计数器（`tools/pre-execute` deny + `tools/post-execute` block 反馈）；
   - `run-record` —— `solidforge_run_record` 工具，强制 `rightness: human_confirm_required`；
-  - `hetero-review` —— `solidforge_hetero_review` 工具，一键出进程异源评审。
+  - `hetero-review` —— `solidforge_hetero_review` 工具，一键出进程异源评审；
+  - `commands` —— `/solidforge`（技能缩写速查 + 纪律一句话）与 `/arm-tools`（武装流程注入）两个斜杠命令。DSH 的命令注册表归插件所有（`ctx.commands.register`，非文件系统发现），所以 preset 的 `commands/arm-tools.md` 不会被自动挂载——这个插件就是它透出的通道。
   
   激活方式：在一个带 cordis 工具集的会话（如 cordis preset 会话）里，对
   `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js`（已烘焙绝对预设根路径）逐个
@@ -142,6 +143,12 @@ csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv ga
 | `bc` | blueprint-crafting | `pas` | prior-art-search |
 | `csr` | cross-source-review | | |
 
+### 在 DSH 里怎么引用
+
+- **技能是模型侧的**：在提示词里写全名或缩写（如 `pd`、`psv → csr`），代理经 skill 工具从目录加载对应 SKILL.md。DSH **不会**把技能透出成 `/pd` 这样的斜杠命令（与 Claude Code 的 `/skill-name` 不同）——直接写名字即可。
+- **两个斜杠命令**由 `commands` 插件提供（§1 激活）：`/solidforge` 把上面的缩写对照与纪律一句话注入代理；`/arm-tools` 把 `commands/arm-tools.md` 的完整武装流程注入代理。它们是"把内容喂给代理"的命令，不是技能本身。
+- 最可靠的触发方式仍是把链式缩写直接写进提示词，例如：`psv → csr → psv → bc → pd`。
+
 ## 7. 调参与常见问题
 
 **调参**（`loop_state.py init` 旗标）：内环上限 `M=8`、同指纹阈值 `N=3`、token 上限 2M、时间上限 1800s、成本上限 5.0、步数上限 200。时间轴最可靠；token 是估算。
@@ -149,6 +156,7 @@ csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv ga
 **常见问题**：
 
 - *「no heterogeneous provider configured」*——正常：fail-fast 默认。按 §5 武装，或明确知道自己不需要异源。
+- *「/solidforge、/arm-tools 打不出来」*——`commands` 插件未在本会话激活；按 §1 对 `plugins/commands.host.js` 做 `cordis_define` + `cordis_run`。技能本身不受影响（直接写名字/缩写即可）。
 - *「profile X (route Y) needs the credential env var $Z」*——三层链里没找到密钥；变量名是 route 派生的，见 §5。
 - *异源腿 `hetero-subprocess-timeout`*——冷启动瞬态；按文档提高 `--timeout` 或降档重试，**不要**改路由别名规避（暖调用深度受损）。
 - *门禁工具缺失*——对应门降级并如实报告（coverage 注记），绝不假装绿；`--with-tools` 补齐。
