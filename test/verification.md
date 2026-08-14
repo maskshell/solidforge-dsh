@@ -102,3 +102,33 @@ cross-source-review, the latent hazard) converted to `|` block scalars; the
 deployment parser now parses 5/5. Regression guard:
 `scripts/check-skill-frontmatter.py` (CI suite 53) enforces name==dirname and
 block-scalar descriptions.
+
+## Global plugin face (`@maskshell/solidforge`, 2026-08-14)
+
+DSH-native answer to Claude Code's plugin model: a profile-patch-layer package
+instead of preset switching. Mechanics verified from the deployment's sources
+before building: the profile's `cordis.patch.yml` is the user patch layer
+(hot-reloaded, HMR); `insert` entries mount root-level rows; root contexts are
+unscoped, and scoped `agent/pre-step` events pass their filter for unscoped
+contexts, so a root listener sees every agent's step; the Loader resolves row
+names from the profile directory's `node_modules`. The plugin registers the
+five skills into the HOST layer (any session's catalog), listens for
+whitespace-bounded `/solidforge:<name>` tokens (full names or abbreviations,
+same word-boundary shape as `dsh-tool-skill`'s gesture) and injects
+byte-compatible `<skill_content>` at the pre-step boundary, and registers
+`/solidforge` + `/arm-tools` (replacing the retired `commands.host.js`
+dynamic plugin — dynamic plugins die with the process; the package persists).
+
+Live verification (playwright, real GUI, PTC-preset session): `/solidforge`
+executed (command row + steered map + model step consuming it);
+`/solidforge:psv say hi` submitted as a plain user message → the pre-step
+listener injected `primary-source-verification` (transcript injection row)
+and the model answered in the skill's discipline ("coverage disclosure, not a
+correctness verdict"). This session's own model catalog gained all five
+skills after HMR — host-layer registration observable from a non-solidforge
+session. One install-script bug found and fixed along the way: the patch
+entry was first written as `[- insert:` (invalid YAML), silently failing
+`parsePatchList`; the writer now replaces the `[]` token itself.
+
+Tests: `packages/solidforge-plugin/tests/smoke.mjs` (self-contained fixture;
+CI suite 54). Uninstall: `scripts/install-global.sh --revert`.

@@ -1,0 +1,17 @@
+{
+  "name": "@maskshell/solidforge",
+  "version": "0.1.0",
+  "description": "SolidForge on the DeepSeek Harness — the globally installed plugin face: five skills in every session's catalog plus /solidforge:<skill> colon-gesture injection and the /solidforge, /arm-tools commands.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "license": "MIT",
+  "keywords": ["dsh-plugin", "solidforge", "convergence", "spec-gaming", "coding-agents"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maskshell/solidforge-dsh.git",
+    "directory": "packages/solidforge-plugin"
+  }
+}

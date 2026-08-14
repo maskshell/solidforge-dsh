@@ -77,13 +77,20 @@ granularity, migration for existing flat names.
 - **Subagent names** — DSH subagents are prompt-instantiated (the `subagent`
   tool), with no per-plugin name registry to namespace.
 
-## Ecosystem fallback (works today, no upstream change)
+## Ecosystem fallback — SHIPPED (2026-08-14)
 
 If upstream never adopts the grammar, a plugin can still honor
 `/solidforge:*` lines itself: the client input-trigger pipeline adjudicates
 `matchEnter` across registered sources in order, and the command source
 returns undefined for lines it cannot parse (`:` names), so a plugin-owned
-source registered later in the roster claims the line first non-undefined
-wins. The SolidForge port may ship such a source in its own package
-(`dsh-plugin` topic) as the colon-syntax path, with the grammar RFC as the
-upstream-ward companion.
+source can claim the line. **The SolidForge port now ships an even simpler
+mechanism**: the `@maskshell/solidforge` plugin (`packages/solidforge-plugin/`,
+mounted through the profile patch layer via `scripts/install-global.sh`)
+registers a root-level `agent/pre-step` waterfall listener that expands
+whitespace-bounded `/solidforge:<name>` tokens (full names or abbreviations)
+into the rendered `<skill_content>` — the same gesture boundary
+`dsh-tool-skill` uses for `/name` tokens, byte-compatible markup, zero
+upstream changes. Verified live: a PTC-preset session executed
+`/solidforge:psv say hi` and received the deterministic injection. The
+grammar RFC above remains the upstream-ward companion for making colon names
+a first-class command feature.

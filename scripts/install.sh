@@ -24,6 +24,7 @@ else
 fi
 
 mkdir -p "$DEST/plugins"
+rm -f "$DEST"/plugins/*.host.js   # stale baked plugins (e.g. retired sources) removed
 for src in "$HERE"/plugins/*.host.js; do
   name="$(basename "$src")"
   sed "s|__SOLIDFORGE_PRESET_ROOT__|$DEST|g" "$src" > "$DEST/plugins/$name"
@@ -34,10 +35,12 @@ done
 echo "== installed. Files:"
 find "$DEST" -type f | wc -l
 echo "== next steps:"
-echo "  1. Start a session on the 'solidforge' preset."
+echo "  1. Start a session on the 'solidforge' preset (or any preset — the"
+echo "     global plugin face via scripts/install-global.sh)."
 echo "  2. Define + run the structural plugins once per session (cordis tools):"
 echo "     - plugins/loop-gates.host.js   (tool-event gates)"
 echo "     - plugins/run-record.host.js   (rightness-invariant run record)"
 echo "     - plugins/hetero-review.host.js (cross-provider subprocess review)"
-echo "     - plugins/commands.host.js     (/solidforge + /arm-tools commands)"
-echo "  3. Arm a target project: the arm-tools command (or python3 \$DEST/skills/parallel-development/infra/install/arm.py <project>)."
+echo "  3. Optional global face (any session, no preset switching):"
+echo "     bash scripts/install-global.sh [profile]"
+echo "  4. Arm a target project: the arm-tools command (or python3 \$DEST/skills/parallel-development/infra/install/arm.py <project>)."

@@ -178,8 +178,8 @@ def main():
         baked = False
     plugin_files = sorted(glob.glob(os.path.join(plugin_dir, "*.host.js")))
     check(
-        len(plugin_files) == 4,
-        "four plugin sources bundled (" + str(len(plugin_files)) + ")",
+        len(plugin_files) == 3,
+        "three plugin sources bundled (" + str(len(plugin_files)) + ")",
     )
     for pf in plugin_files:
         with open(pf, encoding="utf-8") as fh:

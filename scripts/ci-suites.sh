@@ -77,6 +77,15 @@ else
   echo "PASS: scripts/check-skill-frontmatter.py"
 fi
 
+# solidforge-plugin host-half smoke (self-contained node test)
+TOTAL=$((TOTAL + 1))
+if ! out=$(node "$HERE/packages/solidforge-plugin/tests/smoke.mjs" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: packages/solidforge-plugin/tests/smoke.mjs"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: packages/solidforge-plugin/tests/smoke.mjs"
+fi
+
 echo
 echo "suites: $TOTAL run, $FAIL failed"
 [ "$FAIL" -eq 0 ]

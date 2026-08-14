@@ -18,15 +18,20 @@
 
 ```bash
 git clone https://github.com/maskshell/solidforge-dsh.git && cd solidforge-dsh
-bash scripts/install.sh     # → $DSH_HOME/.agent-presets/solidforge/ (idempotent)
+bash scripts/install.sh            # → $DSH_HOME/.agent-presets/solidforge/ (idempotent)
+bash scripts/install-global.sh     # optional: the global plugin face → every session (below)
 ```
 
-- **Session-level activation**: pick the **solidforge** preset when starting a session. The session gets the five skills, 22 role agents, and the SolidForge persona; the `/solidforge` and `/arm-tools` slash commands become available once the `commands` plugin runs (below).
-- **Structural plugins (optional, recommended)**: four dynamic Cordis plugins turn the gates and invariants into structural enforcement (their code lives outside your workspace — the agent cannot edit it):
+- **Global plugin face (optional, recommended)**: `install-global.sh` mounts `@maskshell/solidforge` into the web profile's user patch layer (`$DSH_HOME/profiles/web/cordis.patch.yml`, hot-reloaded). Once installed, sessions of ANY preset get:
+  - the five skills (host-layer registration → the `/` menu and the model catalog);
+  - colon gestures `/solidforge:parallel-development` … `/solidforge:pas` (full names or abbreviations; deterministic pre-step injection of the rendered skill body);
+  - the `/solidforge` (cheat sheet + discipline one-liner) and `/arm-tools` commands.
+  - Uninstall: `bash scripts/install-global.sh --revert`. Skill bodies are still read live from the preset directory (single source, no copy drift); honest degrade when the preset is absent.
+- **Session-level activation (the full shape)**: pick the **solidforge** preset when starting a session. The session additionally gets the SolidForge persona (abbreviation map, honesty rules) and the 22-role-agent guidance.
+- **Structural plugins (optional, recommended)**: three dynamic Cordis plugins turn the gates and invariants into structural enforcement (their code lives outside your workspace — the agent cannot edit it):
   - `loop-gates` — fast gate / blueprint guard / terminal counters on every edit/write (`tools/pre-execute` deny + `tools/post-execute` block feedback);
   - `run-record` — the `solidforge_run_record` tool, forcing `rightness: human_confirm_required`;
-  - `hetero-review` — the `solidforge_hetero_review` tool, one-call out-of-process heterogeneous review;
-  - `commands` — the `/solidforge` (skill-abbreviation cheat sheet + discipline one-liner) and `/arm-tools` (arm procedure injection) slash commands. DSH's command registry is plugin-owned (`ctx.commands.register`, not filesystem-discovered), so the preset's `commands/arm-tools.md` is not auto-mounted — this plugin is the channel that exposes it.
+  - `hetero-review` — the `solidforge_hetero_review` tool, one-call out-of-process heterogeneous review.
 
   Activation: in a cordis-toolset session (e.g. the `cordis` preset), `cordis_define` + `cordis_run` each of `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js` (baked absolute preset root). **Why not bundled in the preset**: the row that would enable defining them in-preset (`tool-cordis`) registers process-global providers and collides with the `cordis` preset in a multi-preset process — the same deliberate omission as the `standard` preset.
 - Without the plugins everything still works: the gate scripts are directly callable from `infra/` (advisory mode).
@@ -139,10 +144,11 @@ Abbreviation map (full names and abbreviations both trigger):
 
 ### How to reference them in DSH
 
-- **Skills have two channels**:
-  1. **Slash** — typing `/` in the GUI input lists the skills (from the `skill.list` catalog, grouped with commands); picking or typing a **kebab-case full name** token such as `/parallel-development` makes the host pre-step boundary **deterministically inject** the rendered skill body (no skill-tool call needed; a host command with the same name wins). Tokens match full names only — `/pd` does not hit.
-  2. **Prompt** — write the full name or abbreviation (e.g. `pd`, `psv → csr`); the persona maps abbreviations to full names and the agent loads the skill through the skill tool.
-- **The two slash commands** come from the `commands` plugin (§1): `/solidforge` injects the abbreviation table above plus the discipline one-liner into the agent; `/arm-tools` injects the full arming procedure from `commands/arm-tools.md`. They feed content to the agent — they are not the skills themselves.
+- **Skills have three channels**:
+  1. **Colon gesture (the global plugin face — any session once §1 is installed)** — type `/solidforge:parallel-development` … `/solidforge:pas` (full names or abbreviations, whitespace-bounded, anywhere in the message); the host pre-step boundary **deterministically injects** the rendered skill body. Same shape as Claude Code's `/{plugin}:{skill}` — implemented by our plugin with zero harness changes (colon command names are the upstream RFC in `docs/upstream/`).
+  2. **Slash** — typing `/` in the GUI input lists the skills (from the `skill.list` catalog, grouped with commands); picking or typing a **kebab-case full name** token such as `/parallel-development` makes the host pre-step boundary inject the rendered skill body the same way. Tokens match full names only — `/pd` does not hit.
+  3. **Prompt** — write the full name or abbreviation (e.g. `pd`, `psv → csr`); the persona maps abbreviations to full names and the agent loads the skill through the skill tool (the abbreviation map lives only in solidforge-preset sessions).
+- **The two slash commands** come from the global plugin face (§1): `/solidforge` injects the abbreviation table above plus the discipline one-liner into the agent; `/arm-tools` injects the full arming procedure from `commands/arm-tools.md`. They feed content to the agent — they are not the skills themselves.
 - The most reliable trigger remains writing the chain abbreviations into the prompt, e.g. `psv → csr → psv → bc → pd`.
 
 ## 7. Tuning and FAQ
@@ -152,7 +158,7 @@ Abbreviation map (full names and abbreviations both trigger):
 **FAQ**:
 
 - *"no heterogeneous provider configured"* — expected: the fail-fast default. Arm per §5, or consciously forgo heterogeneity.
-- *"/solidforge and /arm-tools don't resolve"* — the `commands` plugin is not activated in this session; `cordis_define` + `cordis_run` `plugins/commands.host.js` per §1. Skills are unaffected (write the name/abbreviation directly).
+- *"/solidforge and /arm-tools don't resolve"* — the global plugin face is not installed; run `bash scripts/install-global.sh` (hot-reloaded, no restart). Skills are unaffected (write the name/abbreviation directly).
 - *"profile X (route Y) needs the credential env var $Z"* — the key is missing from the three-tier chain; the var name is route-derived (§5).
 - *Hetero leg `hetero-subprocess-timeout`* — cold start is transient; raise `--timeout` or drop a tier per the docs — never remap the route alias to dodge it.
 - *A gate tool is missing* — that gate degrades with a coverage note, never fakes green; `--with-tools` fills the gaps.

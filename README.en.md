@@ -39,17 +39,20 @@ Five sentences: **green gates prove process convergence, not correctness; correc
 ```bash
 git clone https://github.com/maskshell/solidforge-dsh.git && cd solidforge-dsh
 bash scripts/install.sh        # installs the agent preset → $DSH_HOME/.agent-presets/solidforge
+bash scripts/install-global.sh # optional: the global plugin face → sessions of ANY preset
+                               # (/solidforge:<skill> colon gestures + commands + host-layer skills)
 ```
 
-1. Start a session on the **solidforge** preset in DeepSeek Harness;
-2. Arm your target project once (arch-configs, constitution, blueprint templates, `.env.solidforge.example`):
+1. (Optional) with the global plugin face installed, sessions of ANY preset can invoke skills via `/solidforge:psv`-style colon gestures or flat `/parallel-development` tokens;
+2. Start a session on the **solidforge** preset for the full shape (persona + abbreviation map + role-agent guidance);
+3. Arm your target project once (arch-configs, constitution, blueprint templates, `.env.solidforge.example`):
 
    ```bash
    python3 $DSH_HOME/.agent-presets/solidforge/skills/parallel-development/infra/install/arm.py <your-project>
    ```
 
-3. Say "implement X in parallel, TDD" — the convergence loop takes over: dual rings, breakers, rollback, run records, all automatic.
-4. (Optional) activate the four structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
+4. Say "implement X in parallel, TDD" — the convergence loop takes over: dual rings, breakers, rollback, run records, all automatic.
+5. (Optional) activate the three structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
 
 Step-by-step onboarding: **[USER_GUIDE.en.md](USER_GUIDE.en.md)**.
 
@@ -102,7 +105,8 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 | Five skills | `preset/skills/{parallel-development,blueprint-crafting,cross-source-review,primary-source-verification,prior-art-search}/` | The convergence loop, the specify side, document convergence (csr, process-axis), the two outcome-axis verifiers (psv/pas, per-claim against fetched sources) |
 | 22 role agents | `preset/agents/*.agent.md` | Role-prompt corpus dispatched via the `subagent` tool |
 | Deterministic infra | `preset/skills/*/infra/` | stdlib-only Python gates/state machine/schemas + test suites |
-| Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool, the `/solidforge` and `/arm-tools` commands (activation: see the User Guide) |
+| Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool (activation: see the User Guide) |
+| Global plugin face | `packages/solidforge-plugin/` | `@maskshell/solidforge`: host-layer skills, `/solidforge:<skill>` colon gestures, the `/solidforge` and `/arm-tools` commands (`install-global.sh` mounts it into the profile patch layer; sessions of any preset) |
 | arm-tools | `preset/commands/arm-tools.md` | Project-side provisioning (Layer 2) |
 
 ## Honest disclosure
