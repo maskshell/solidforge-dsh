@@ -1,0 +1,114 @@
+From f3a326e85a458b95961c5a1403456323e3a46131 Mon Sep 17 00:00:00 2001
+From: maskshell <analyser@gmail.com>
+Date: Fri, 14 Aug 2026 15:40:52 +0800
+Subject: [PATCH] feat(commands): allow one optional namespace: prefix in
+ slash-command names
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Command names were one flat namespace ([a-z][a-z0-9_-]*). Plugin ecosystems
+porting from Claude Code address their commands domain-scoped
+(/plugin:command), which the flat grammar cannot express: collisions are
+decided by layer order instead of by design, and the prefix carries no
+structural ownership.
+
+Extend the grammar to one optional namespace segment —
+[a-z][a-z0-9_-]*(?::[a-z][a-z0-9_-]*)? — in both the registration validation
+(COMMAND_NAME) and parseCommand() so registration and parsing stay in
+lockstep. /goal and /solidforge:psv are valid; empty segments and multiple
+colons are rejected. The client slash pipeline tokenizes on whitespace and
+resolves menu entries by exact name, so no client change is needed.
+
+Ownership enforcement (which package may claim which prefix) and skill-name
+namespacing are deliberately out of scope (follow-up RFC).
+---
+ packages/interaction/commands/src/index.ts           | 8 ++++----
+ packages/interaction/commands/src/types.ts           | 2 +-
+ packages/interaction/commands/tests/commands.spec.ts | 6 +++++-
+ 3 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/packages/interaction/commands/src/index.ts b/packages/interaction/commands/src/index.ts
+index 4e179435..5d370fdc 100644
+--- a/packages/interaction/commands/src/index.ts
++++ b/packages/interaction/commands/src/index.ts
+@@ -22,7 +22,7 @@ export type * from './types.ts'
+ 
+ export const name = 'commands'
+ 
+-const COMMAND_NAME = /^[a-z][a-z0-9_-]*$/u
++const COMMAND_NAME = /^[a-z][a-z0-9_-]*(?::[a-z][a-z0-9_-]*)?$/u
+ 
+ /** Invocation passed to one registered command handler. */
+ export interface CommandInvocation {
+@@ -38,7 +38,7 @@ export interface CommandInvocation {
+ 
+ /** Plugin-owned command registration. */
+ export interface CommandDefinition {
+-  /** Lowercase command name without the leading slash. */
++  /** Lowercase command name without the leading slash; may carry one optional `namespace:` prefix. */
+   readonly name: string
+   /** Human-readable summary used in discovery UI. */
+   readonly description: string
+@@ -56,7 +56,7 @@ export interface CommandDefinition {
+ 
+ /** Syntactically valid slash command before registry resolution. */
+ export interface ParsedCommand {
+-  /** Lowercase command name without the leading slash. */
++  /** Lowercase command name without the leading slash; may carry one optional `namespace:` prefix. */
+   readonly name: string
+   /** Exact text following the command name. */
+   readonly rawInput: string
+@@ -100,7 +100,7 @@ declare module '@deepseek-ai/cordis' {
+  * @returns The parsed command, or `undefined` when the line is not a command.
+  */
+ export function parseCommand(line: string): ParsedCommand | undefined {
+-  const match = /^\/([a-z][a-z0-9_-]*)(?=$|[\t\n\r ])/u.exec(line)
++  const match = /^\/([a-z][a-z0-9_-]*(?::[a-z][a-z0-9_-]*)?)(?=$|[\t\n\r ])/u.exec(line)
+   if (match === null) return undefined
+   const name = match[1]
+   /* v8 ignore next -- the first capture is required whenever the regular expression matches */
+diff --git a/packages/interaction/commands/src/types.ts b/packages/interaction/commands/src/types.ts
+index 32f1dbcc..4a52ecc1 100644
+--- a/packages/interaction/commands/src/types.ts
++++ b/packages/interaction/commands/src/types.ts
+@@ -40,7 +40,7 @@ export interface CommandExecution {
+ 
+ /** Handler-free immutable command view returned to UI adapters. */
+ export interface CommandDescriptor {
+-  /** Lowercase command name without the leading slash. */
++  /** Lowercase command name without the leading slash; may carry one optional `namespace:` prefix. */
+   readonly name: string
+   /** Human-readable summary used in discovery UI. */
+   readonly description: string
+diff --git a/packages/interaction/commands/tests/commands.spec.ts b/packages/interaction/commands/tests/commands.spec.ts
+index c00f938c..37f3ad9e 100644
+--- a/packages/interaction/commands/tests/commands.spec.ts
++++ b/packages/interaction/commands/tests/commands.spec.ts
+@@ -43,11 +43,13 @@ describe('parseCommand()', () => {
+     ['/goal create the thing', { name: 'goal', rawInput: ' create the thing' }],
+     ['/goal\ncreate the thing', { name: 'goal', rawInput: '\ncreate the thing' }],
+     ['/goal_name-2\t x ', { name: 'goal_name-2', rawInput: '\t x ' }],
++    ['/solidforge:psv', { name: 'solidforge:psv', rawInput: '' }],
++    ['/solidforge:psv verify the doc', { name: 'solidforge:psv', rawInput: ' verify the doc' }],
+   ] as const)('parses %j without normalizing trailing input', (line, expected) => {
+     expect(parseCommand(line)).toEqual(expected)
+   })
+ 
+-  it.each(['goal', ' /goal', '/', '/Goal', '/goal/path', '/goal🔥'])('rejects non-command boundary %j', (line) => {
++  it.each(['goal', ' /goal', '/', '/Goal', '/goal/path', '/goal🔥', '/solidforge:', '/:psv', '/solidforge::psv'])('rejects non-command boundary %j', (line) => {
+     expect(parseCommand(line)).toBeUndefined()
+   })
+ })
+@@ -289,6 +291,8 @@ describe('CommandRuntime', () => {
+ 
+   it.each([
+     [{ ...command('Bad') }, /command name/],
++    [{ ...command('solidforge:') }, /command name/],
++    [{ ...command(':psv') }, /command name/],
+     [{ ...command('empty-description'), description: ' ' }, /description/],
+     [{ ...command('empty-hint'), input: { hint: '' } }, /input hint/],
+     [{ ...command('bad-handler'), handler: undefined }, /handler/],
+-- 
+2.55.0
+
