@@ -1,10 +1,10 @@
-# SolidForge → DeepSeek Harness: Concept Mapping
+# Concept Mapping: SolidForge for Claude Code → SolidForge (DeepSeek Harness)
 
-One table per surface. Left column: SolidForge (Claude Code plugin). Right column: the DSH port (`solidforge` preset) and how the mapping was re-derived.
+One table per surface. Left column: SolidForge for Claude Code (upstream). Right column: SolidForge on the DeepSeek Harness (this project, the `solidforge` preset) and how the mapping was re-derived.
 
 ## Harness seams
 
-| SolidForge (Claude Code) | SolidForge-DSH (this port) | Notes |
+| SolidForge for Claude Code | SolidForge on DeepSeek Harness (this project) | Notes |
 | --- | --- | --- |
 | Plugin (`skills/`, `agents/`, `hooks/`, `commands/`) | Agent preset `~/.dsh/.agent-presets/solidforge/` (`skills/`, `agents/`, `commands/`, `plugins/`) | A preset is the DSH unit that carries skills + role prompts + composition. |
 | `/plugin install` + enable | Select the preset for a session | The composition mounts once per session under a standing scope. |
@@ -20,7 +20,7 @@ One table per surface. Left column: SolidForge (Claude Code plugin). Right colum
 
 ## The paper's disciplines
 
-| Paper concept | In upstream SolidForge | In this port |
+| Paper concept | In SolidForge for Claude Code | In this project |
 | --- | --- | --- |
 | Axis A — flow-control completeness | Dual-ring convergence loop (fast gate + arch-contract gate, state machine, snapshot rollback) | Identical mechanics: same `loop_state.py` state machine, same gates, ported verbatim (stdlib-only Python). |
 | Axis B — verification-source decoupling | Cross-provider `claude -p` subprocess (`hetero_review.py`), profiles deepseek/qwen/bigmodel/minimax | **Re-derived twice**: (1) the DSH orchestrator IS DeepSeek, so `deepseek` is removed and the heterogeneous set is any different-family route; (2) the substrate is DSH-native — `substrate: dsh` spawns a fresh stateless `dsh --profile headless` subprocess with a throwaway DSH_HOME pinning a different provider/model (same harness, different LLM, out of process); the upstream `claude -p` mechanism survives only as a labeled external-harness opt-in (`substrate: claude-code`), never the default. The boundary is preserved, not bridged — no global in-process multi-provider router. |

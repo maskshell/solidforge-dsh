@@ -1,4 +1,4 @@
-# SolidForge-DSH User Guide
+# SolidForge User Guide
 
 > [中文版](USER_GUIDE.md). Organized as: install → run your first convergence → go deeper on demand. Prerequisite: a working DeepSeek Harness (`dsh` on PATH, `$DSH_HOME` initialized).
 

@@ -5,7 +5,7 @@ description: cross-source-review (csr) — a same-family (同源, fresh-context)
 
 # Cross Source Review
 
-> **DSH port.** Role agents are the preset's `agents/*.agent.md` prompts (spawn via the `subagent` tool); the different-family leg (`hetero_doc_review.py`) spawns an out-of-process CLI subprocess — in DSH the orchestrator is DeepSeek, so the heterogeneous default is `claude` (native auth), qwen3/bigmodel/minimax via profiles.
+> **DeepSeek Harness.** Role agents are the preset's `agents/*.agent.md` prompts (spawn via the `subagent` tool); the different-family leg (`hetero_doc_review.py`) spawns an out-of-process `dsh --profile headless` subprocess pinned to a different model family (catalog routes; the default is FAIL-FAST when unarmed, and the `claude -p` substrate is a labeled external-harness opt-in).
 
 Drives **same-family** (fresh-context) + **different-family** (cross-family) LLM multi-round review to **substantive convergence** on doc-shaped artifacts — a requirements input before `blueprint-crafting`, a design doc, a wiki page. It is the missing convergence layer upstream of `blueprint-crafting` (which is process-axis, same-family only) and reusable externally (e.g. fedaot wiki review).
 

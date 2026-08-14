@@ -6,7 +6,7 @@ description: |
 
 # Blueprint Crafting
 
-> **DSH port.** Role agents are the preset's `agents/*.agent.md` prompts (spawn via the `subagent` tool); the deterministic convergence stays `infra/scripts/produce.py` (stdlib-only, unchanged).
+> **DeepSeek Harness.** Role agents are the preset's `agents/*.agent.md` prompts (spawn via the `subagent` tool); the deterministic convergence stays `infra/scripts/produce.py` (stdlib-only, unchanged).
 
 Produces frozen, convergence-checked upstream artifacts — product spec, architecture design, iteration plan, executable summary, and research — for `parallel-development` to consume as authoritative references. The two skills form a **specify then implement** pipeline.
 

@@ -1,6 +1,6 @@
-# SolidForge-DSH
+# SolidForge
 
-**"Tests are green" should never equal "you got it right".** SolidForge-DSH is the DeepSeek Harness-native implementation of the reference implementation behind *[Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops](docs/papers/spec-gaming-orthogonal-axis.md)* (snapshotted with the repo; cite via the [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) and [CITATION.cff](CITATION.cff); the paper is a draft). It splits coding-agent reliability into **two axes** and cages both with deterministic gates, adversarial review, and heterogeneous verification.
+**"Tests are green" should never equal "you got it right".** SolidForge (this repository) is the DeepSeek Harness-native implementation of the reference implementation behind *[Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops](docs/papers/spec-gaming-orthogonal-axis.md)* (snapshotted with the repo; cite via the [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) and [CITATION.cff](CITATION.cff); the paper is a draft). It splits coding-agent reliability into **two axes** and cages both with deterministic gates, adversarial review, and heterogeneous verification.
 
 [![deterministic-suites](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml/badge.svg)](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml)
 
@@ -12,7 +12,7 @@
 
 Autonomous coding loops have a structurally invisible failure class: **the agent writes its own tests and grades its own work.** "Green tests" merely satisfy a proxy specification the agent itself constructed — delete the failing test, rewrite the assertion to match the code, swallow the triggering exception with `try/catch`… the code can be all-green yet miss your intent entirely. Worse, **same-source review cannot reach it**: a reviewer sharing the agent's training data shares its blind spots.
 
-SolidForge-DSH answers with two axes — both are required:
+SolidForge answers with two axes — both are required:
 
 | Axis | Defends against | Mechanism |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 
 ## Honest disclosure
 
-This project is evidence of **realizability**, not **efficacy** — the two-axis defense evaluation (paper §8.3) remains open. Upstream [SolidForge](https://github.com/maskshell/solidforge) is the paper's reference implementation (a Claude Code plugin); this repo is its **re-derived port** to the DeepSeek Harness (key difference: heterogeneity = a different LLM on the SAME harness via an out-of-process `dsh headless` subprocess, not importing Claude Code; see [docs/port-design.md](docs/port-design.md)). This repo's own README was converged with the ported psv→csr pipeline; the full trail (including two heterogeneous-oracle false-positive cases) is in [docs/dogfood/](docs/dogfood/).
+This project is evidence of **realizability**, not **efficacy** — the two-axis defense evaluation (paper §8.3) remains open. **Naming convention: in this project, "SolidForge" means THIS repository (the DeepSeek Harness-native implementation); the paper §6 and the upstream repo originally used "SolidForge" for the Claude Code plugin, which these docs consistently call upstream [SolidForge for Claude Code](https://github.com/maskshell/solidforge) (a Claude Code plugin).** The paper's original reference implementation is upstream [SolidForge for Claude Code](https://github.com/maskshell/solidforge) (a Claude Code plugin); this repo is its **re-derived port** to the DeepSeek Harness (key difference: heterogeneity = a different LLM on the SAME harness via an out-of-process `dsh headless` subprocess, not importing Claude Code; see [docs/port-design.md](docs/port-design.md)). This repo's own README was converged with the ported psv→csr pipeline; the full trail (including two heterogeneous-oracle false-positive cases) is in [docs/dogfood/](docs/dogfood/).
 
 ## Verification
 

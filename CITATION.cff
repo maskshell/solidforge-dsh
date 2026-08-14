@@ -11,7 +11,7 @@ authors:
 date-released: 2026-08-07
 repository-code: "https://github.com/maskshell/solidforge-dsh"
 url: "https://github.com/maskshell/solidforge-dsh/raw/main/docs/papers/spec-gaming-orthogonal-axis.pdf"
-abstract: "Autonomous coding agents increasingly execute long-horizon loops of generation, verification, and repair. This paper argues that specification gaming is a fourth failure axis — orthogonal to context rot, error compounding, and goal drift at the level of defense mechanism — and proposes the Process/Outcome split plus verification-source decoupling as the engineering discipline; SolidForge-DSH is its DeepSeek Harness-native reference implementation."
+abstract: "Autonomous coding agents increasingly execute long-horizon loops of generation, verification, and repair. This paper argues that specification gaming is a fourth failure axis — orthogonal to context rot, error compounding, and goal drift at the level of defense mechanism — and proposes the Process/Outcome split plus verification-source decoupling as the engineering discipline; SolidForge (this repository) is its DeepSeek Harness-native reference implementation."
 keywords:
   - specification gaming
   - autonomous coding agents

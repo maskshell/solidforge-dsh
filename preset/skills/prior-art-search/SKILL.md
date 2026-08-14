@@ -5,7 +5,7 @@ description: prior-art-search (pas) — a read-only, search-grounded, per-novelt
 
 # Novelty Coverage
 
-> **DSH port.** Role prompts live in the preset's `agents/*.agent.md`; the search adjudication stays `infra/scripts/coverage_driver.py` (stdlib-only).
+> **DeepSeek Harness.** Role prompts live in the preset's `agents/*.agent.md`; the search adjudication stays `infra/scripts/coverage_driver.py` (stdlib-only).
 
 A read-only, **search-grounded**, per-novelty-claim collision detector for a doc-shaped artifact (a design paper, a research doc, a spec). It opens the OUTCOME axis's *novelty* surface that neither `cross-source-review` (csr), `primary-source-verification` (psv), nor blueprint-crafting's `researcher` reach: csr converges a doc's PROCESS axis but does not search for prior art; psv FETCHES each *cited* source (backward, cited) but does not hunt *uncited* prior art; the `researcher` GATHERS sources forward for authoring (the opposite direction). prior-art-search is the missing **backward, uncited-prior-art collision** check — it SEARCHES the prior-art corpus for each novelty claim and reports collisions honestly.
 

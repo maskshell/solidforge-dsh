@@ -1,4 +1,4 @@
-# SolidForge-DSH 使用指南
+# SolidForge 使用指南
 
 > [English version](USER_GUIDE.en.md)。本指南按"装上 → 跑通第一个收敛 → 按需加深"的顺序组织。阅读前提：一个可用的 DeepSeek Harness（`dsh` 在 PATH 上，`$DSH_HOME` 已初始化）。
 

@@ -6,7 +6,7 @@ description: |
 
 # Parallel Development
 
-> **DeepSeek Harness port.** This skill is the DSH port of SolidForge's convergence loop. Harness-specific bindings: role agents are plain prompt files under the preset's `agents/` directory (`agents/<name>.agent.md`) — spawn them with the `subagent` tool by inlining that prompt; the deterministic gates (`fast_gate.py`, `blueprint_guard.py`, `counters.py`) are wired as `tools/pre-execute` / `tools/post-execute` listeners by the `solidforge-loop-gates` plugin and also callable directly from this skill's `infra/`; project state lives in `.solidforge/loop/` (env override `$SOLIDFORGE_PROJECT_DIR`, default cwd); the preset root is `$SOLIDFORGE_PRESET_ROOT`. See the port's `docs/port-design.md` for the paper-level re-derivation.
+> **DeepSeek Harness.** This skill is SolidForge's convergence loop running on the DeepSeek Harness. Harness-specific bindings: role agents are plain prompt files under the preset's `agents/` directory (`agents/<name>.agent.md`) — spawn them with the `subagent` tool by inlining that prompt; the deterministic gates (`fast_gate.py`, `blueprint_guard.py`, `counters.py`) are wired as `tools/pre-execute` / `tools/post-execute` listeners by the `solidforge-loop-gates` plugin and also callable directly from this skill's `infra/`; project state lives in `.solidforge/loop/` (env override `$SOLIDFORGE_PROJECT_DIR`, default cwd); the preset root is `$SOLIDFORGE_PRESET_ROOT`. See the port's `docs/port-design.md` for the paper-level re-derivation.
 
 ## Core Principles
 

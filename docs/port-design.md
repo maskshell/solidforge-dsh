@@ -1,11 +1,11 @@
-# SolidForge-DSH: Port Design & Re-derivation
+# SolidForge: Port Design & Re-derivation
 
 This document is the port's design rationale: how each discipline of the paper
 *spec-gaming-orthogonal-axis.md* is realized on the DeepSeek Harness, and where
 the port re-derives (rather than copies) the reference implementation.
 
-The upstream reference implementation is SolidForge (a Claude Code plugin). This
-port is the `solidforge` agent preset in `~/.dsh/.agent-presets/solidforge/`,
+The upstream reference implementation is **SolidForge for Claude Code** (a Claude Code plugin). This
+project — SolidForge on the DeepSeek Harness — is the `solidforge` agent preset in `~/.dsh/.agent-presets/solidforge/`,
 developed from this workspace. A mechanical mapping table lives in
 [claude-code-to-dsh-map.md](claude-code-to-dsh-map.md); this document is the
 argument-level re-derivation.

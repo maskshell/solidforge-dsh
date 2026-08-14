@@ -5,7 +5,7 @@ description: primary-source-verification (psv) — a read-only, source-grounded,
 
 # Primary Source Verification
 
-> **DSH port.** The claim-extraction / verification role prompts live in the preset's `agents/*.agent.md` (spawn via the `subagent` tool); the deterministic adjudication stays `infra/scripts/coverage_driver.py` (stdlib-only, unchanged).
+> **DeepSeek Harness.** The claim-extraction / verification role prompts live in the preset's `agents/*.agent.md` (spawn via the `subagent` tool); the deterministic adjudication stays `infra/scripts/coverage_driver.py` (stdlib-only, unchanged).
 
 A read-only, **source-grounded**, per-claim verifier for a doc-shaped artifact. It opens the OUTCOME axis's *admissible* surface that `cross-source-review` (csr) cannot reach: csr converges a doc's PROCESS axis but its legs verify citations by MODEL RECALL (they share the model's blind spot on cited works); psv FETCHES each cited primary source and adjudicates the claim against the fetched TEXT. The fetched source — not a model — is the oracle.
 

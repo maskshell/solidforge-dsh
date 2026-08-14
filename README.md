@@ -1,6 +1,6 @@
-# SolidForge-DSH
+# SolidForge
 
-**让"测试绿了"不再等于"你做对了"。** SolidForge-DSH 是 [《Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops》](docs/papers/spec-gaming-orthogonal-axis.md)（论文随仓快照；引用请用 [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) 与 [CITATION.cff](CITATION.cff)，论文为草稿状态）参考实现的 DeepSeek Harness 原生版：把编码代理的可靠性拆成**两条轴**，用确定性门 + 对抗评审 + 异源验证把两条轴都关进笼子。
+**让"测试绿了"不再等于"你做对了"。** SolidForge（本仓库）是 [《Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops》](docs/papers/spec-gaming-orthogonal-axis.md)（论文随仓快照；引用请用 [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) 与 [CITATION.cff](CITATION.cff)，论文为草稿状态）参考实现的 DeepSeek Harness 原生版：把编码代理的可靠性拆成**两条轴**，用确定性门 + 对抗评审 + 异源验证把两条轴都关进笼子。
 
 [![deterministic-suites](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml/badge.svg)](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml)
 
@@ -12,7 +12,7 @@
 
 自主编码循环有一个隐蔽的失效类：**代理自己写测试、自己判通过**。"测试绿了"只是对**代理自己构造的代理规格**的满足——删掉失败测试、把断言改成和实现一致、`try/catch` 吞掉触发循环的异常……代码可以全绿，却完全偏离你的意图。更糟的是：**同源评审救不了它**——评审者和被评审者共享训练数据，也就共享盲点。
 
-SolidForge-DSH 的对策是两根轴，缺一不可：
+SolidForge 的对策是两根轴，缺一不可：
 
 | 轴 | 防什么 | 手段 |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
 
 ## 诚实声明
 
-本项目是**可实现性**的证据，不是**有效性**的证明——两轴防御评估（论文 §8.3）仍是开放问题。上游 [SolidForge](https://github.com/maskshell/solidforge) 是论文的参考实现（Claude Code 插件）；本仓库是它在 DeepSeek Harness 上的**重推导移植**（关键差异：异源 = 同 Harness 异 LLM 的 `dsh headless` 出进程子进程，而非拖入 Claude Code；详见 [docs/port-design.md](docs/port-design.md)）。本仓库自身的 README 曾用移植后的 psv→csr 管线自举收敛，完整轨迹（含两起异源 oracle 假阳性案例）在 [docs/dogfood/](docs/dogfood/)。
+本项目是**可实现性**的证据，不是**有效性**的证明——两轴防御评估（论文 §8.3）仍是开放问题。**词汇约定：在本项目中，"SolidForge" 即指本仓库（DeepSeek Harness 原生实现）；论文 §6 与上游仓库原以 "SolidForge" 指代 Claude Code 插件，本文档一律改称 [SolidForge for Claude Code](https://github.com/maskshell/solidforge)。** 论文的原始参考实现是 SolidForge for Claude Code（Claude Code 插件）；本仓库是它在 DeepSeek Harness 上的**重推导移植**（关键差异：异源 = 同 Harness 异 LLM 的 `dsh headless` 出进程子进程，而非拖入 Claude Code；详见 [docs/port-design.md](docs/port-design.md)）。本仓库自身的 README 曾用移植后的 psv→csr 管线自举收敛，完整轨迹（含两起异源 oracle 假阳性案例）在 [docs/dogfood/](docs/dogfood/)。
 
 ## 验证
 
