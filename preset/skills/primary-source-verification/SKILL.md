@@ -1,6 +1,17 @@
 ---
 name: primary-source-verification
-description: primary-source-verification (psv) — a read-only, source-grounded, per-claim verifier that FETCHES each cited primary source and adjudicates a doc's factual/citation claims (verified / refuted / narrowed / unverifiable), emitting an honest coverage disclosure (`oracle_verified_under_known_coverage`). Use it when a doc's citations need checking against the actual sources — "verify this doc's citations", "fact-check this spec's arXiv claims". Produces a per-claim verdict packet + a coverage-record; NEVER `correctness_converged`. NOT for code review (parallel-development), spec authoring (blueprint-crafting), doc process-convergence (cross-source-review), or research gathering (blueprint-crafting researcher). Does NOT judge whether the doc is RIGHT (outcome-axis — human). Phase A activation is EXPLICIT invocation (load this skill by name). GATE MODE (2026-08): load-bearing-subset GO/NO-GO run before csr — gate record non-authoritative; the full-M run after csr is the ONLY authoritative record.
+description: |
+  primary-source-verification (psv) — a read-only, source-grounded, per-claim verifier that FETCHES
+  each cited primary source and adjudicates a doc's factual/citation claims (verified / refuted /
+  narrowed / unverifiable), emitting an honest coverage disclosure
+  (`oracle_verified_under_known_coverage`). Use it when a doc's citations need checking against the
+  actual sources — "verify this doc's citations", "fact-check this spec's arXiv claims". Produces a
+  per-claim verdict packet + a coverage-record; NEVER `correctness_converged`. NOT for code review
+  (parallel-development), spec authoring (blueprint-crafting), doc process-convergence
+  (cross-source-review), or research gathering (blueprint-crafting researcher). Does NOT judge
+  whether the doc is RIGHT (outcome-axis — human). Phase A activation is EXPLICIT invocation (load
+  this skill by name). GATE MODE (2026-08): load-bearing-subset GO/NO-GO run before csr — gate record
+  non-authoritative; the full-M run after csr is the ONLY authoritative record.
 ---
 
 # Primary Source Verification

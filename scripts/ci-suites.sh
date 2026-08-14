@@ -67,6 +67,16 @@ else
   echo "PASS: cross-source-review/converge_fixtures/verify.py"
 fi
 
+# skill frontmatter guard (repo-level: the deployment's strict YAML parser
+# silently drops skills whose inline descriptions contain ': ')
+TOTAL=$((TOTAL + 1))
+if ! out=$("$PY" "$HERE/scripts/check-skill-frontmatter.py" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: scripts/check-skill-frontmatter.py"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: scripts/check-skill-frontmatter.py"
+fi
+
 echo
 echo "suites: $TOTAL run, $FAIL failed"
 [ "$FAIL" -eq 0 ]

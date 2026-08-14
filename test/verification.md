@@ -82,3 +82,23 @@ qwen.json, zai-coding-cn.json. End-to-end smoke: both providers rc=0 via fresh
 review of README.md: 14 findings, 1 real blocker + 7 warnings fixed, 4 rejected
 as a second oracle-false-positive class (stale-finding misreads), trail in
 `docs/dogfood/README-csr-hetero-round4.json` + `README-dogfood.md` round 4.
+
+## Skill slash-surface verification + frontmatter fix (2026-08-14)
+
+Verified against the shipped `dsh-client-ui-skill` / `dsh-tool-skill` packages and
+live in the running GUI (playwright): DSH skills ARE slash-surfaced — the `/`
+input-trigger source lists `skill.list` candidates, and a `/name` token anywhere
+in the user message is deterministically expanded at the host pre-step boundary.
+This corrected an earlier wrong claim that skills were model-side only.
+
+Live GUI check then exposed a REAL catalog bug: only 3 of the 5 preset skills
+appeared in the `/` menu. Root cause, reproduced with the deployment's own
+`yaml` parser: `primary-source-verification` and `prior-art-search` carried
+inline single-line `description:` values containing ": " (e.g. "GATE MODE
+(2026-08): …", "Phase A: EXPLICIT …"), which the strict parser rejects
+("nested mappings are not allowed in compact mappings") and the skill
+provider SILENTLY drops. Fix: all three single-line descriptions (incl.
+cross-source-review, the latent hazard) converted to `|` block scalars; the
+deployment parser now parses 5/5. Regression guard:
+`scripts/check-skill-frontmatter.py` (CI suite 53) enforces name==dirname and
+block-scalar descriptions.

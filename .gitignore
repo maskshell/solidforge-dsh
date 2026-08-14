@@ -15,3 +15,4 @@ __pycache__/
 # into armed projects. This workspace's own armed copies stay local, never tracked.
 .env.solidforge.example
 docs/intent-blueprints/
+.playwright-cli/
