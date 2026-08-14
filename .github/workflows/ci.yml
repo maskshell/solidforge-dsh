@@ -1,0 +1,21 @@
+name: deterministic-suites
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  suites:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: venv with jsonschema (closes the jsonschema-gated fixture check)
+        run: |
+          python3 -m venv .venv-ci
+          .venv-ci/bin/pip install -q jsonschema
+      - name: deterministic suites
+        run: bash scripts/ci-suites.sh .venv-ci/bin/python3

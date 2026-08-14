@@ -54,7 +54,11 @@ REQUIRED_FILES = {
         "the substrate divergence log (rule 7 copy-pattern trail)"
     ),
     "infra/scripts/converge.py": "the deterministic convergence-policy engine",
-    "infra/scripts/profiles/deepseek.json": "the default different-family provider template",
+    "infra/scripts/profiles/zai-coding-cn.json": "worked dsh-substrate profile (catalog route; the default is FAIL-FAST, not a template)",
+    "infra/scripts/profiles/minimax-cn.json": "worked dsh-substrate profile (catalog route)",
+    "infra/scripts/profiles/qwen-token-plan-cn.json": "dsh-substrate placeholder (multi-family gateway route)",
+    "infra/scripts/profiles/claude.json": "external-harness opt-in (native auth)",
+    "infra/scripts/profiles/qwen.json": "external-harness opt-in (Anthropic-compatible repointing)",
     "infra/scripts/converge_fixtures/converged.json": "fixture: BOTH prongs pass",
     "infra/scripts/converge_fixtures/stalemate.json": "fixture: prong_b fails",
     "infra/scripts/converge_fixtures/core_claims_uncovered.json": (

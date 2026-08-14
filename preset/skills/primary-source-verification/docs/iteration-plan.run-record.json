@@ -1,0 +1,20 @@
+{
+  "artifact_type": "iteration-plan",
+  "process_converged": true,
+  "rightness": "human_confirm_required",
+  "inner_ring": {
+    "passed": true,
+    "blockers": 0,
+    "findings": 0,
+    "profile": ""
+  },
+  "outer_ring": {
+    "passed": true,
+    "blockers": 0,
+    "findings": 3
+  },
+  "coverage": [],
+  "caveats": [
+    "rightness is human_confirm_required by design (outcome axis); a green process_converged is NOT outcome-axis success — do not misread the two (field isolation, arch-design §5)"
+  ]
+}

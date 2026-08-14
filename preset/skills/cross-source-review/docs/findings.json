@@ -1,0 +1,53 @@
+{
+  "outcome_axis_respected": true,
+  "findings": [
+    {
+      "defect_id": "novel-1",
+      "severity": "warning",
+      "kind": "gap",
+      "location": "CSR-I3/CSR-I4 vs proposal §3 pluggable seams",
+      "evidence": "proposal §3 makes the pluggable-seam contract (findings-schema-as-parameter, 同源-leg-as-callback) a Phase-A MUST; the plan originally split it across CSR-I3/CSR-I4 without an owning DoD.",
+      "suggestion": "CSR-I4 OWNS the pluggable seam — addressed: CSR-I4 scope + deliverables now expose findings-schema as a parameter + 同源 leg as a callback."
+    },
+    {
+      "defect_id": "novel-2",
+      "severity": "warning",
+      "kind": "gap",
+      "location": "§10/§6 vs proposal §7 rule-5 doc-audit",
+      "evidence": "proposal §7 requires a USER_GUIDE.md + bc/pd Scope Guard routing-hint doc-audit; the plan had no owning task/acceptance criterion.",
+      "suggestion": "Added a §10 cross-cutting doc-audit task + §6 acceptance criterion (anchored to proposal §7 rule 5)."
+    },
+    {
+      "defect_id": "novel-3",
+      "severity": "warning",
+      "kind": "gap",
+      "location": "CSR-I1 severity enum",
+      "evidence": "The plan restricted severity to {blocker, warning}, dropping bc's coverage severity (the reviewer's honest-disclosure mechanism, rule 3); the coverage-gap KIND is a defect, not the disclosure.",
+      "suggestion": "CSR-I1 preserves severity {blocker, warning, coverage}; coverage severity ≠ coverage-gap kind — addressed."
+    },
+    {
+      "defect_id": "novel-4",
+      "severity": "warning",
+      "kind": "blind-spot",
+      "location": "CSR-I5 gate (1) dogfood",
+      "evidence": "The dogfood gate needs the 异源 leg (real API); no skip path for CI/no-token was defined.",
+      "suggestion": "Gate (1) skips gracefully when no API tokens; a recorded dogfood log substitutes — addressed."
+    },
+    {
+      "defect_id": "novel-5",
+      "severity": "warning",
+      "kind": "gap",
+      "location": "CSR-I4 DoD vs proposal §3 substantive-convergence (two prongs)",
+      "evidence": "proposal §3 defines substantive convergence as TWO prongs (core-claims-coverage AND no-new-Blocker); the DoD only operationalized the no-new-Blocker prong.",
+      "suggestion": "CSR-I4 DoD + CSR-I5 gate (3) now exercise BOTH prongs (a no-blocker-but-uncovered-core-claim fixture yields substantive_converged=false) — addressed."
+    },
+    {
+      "defect_id": "novel-6",
+      "severity": "coverage",
+      "kind": "blind-spot",
+      "location": "CSR-I3 copy-pattern source claims",
+      "evidence": "Disclosure: hetero_review.py internals (DEGRADE path, multi-provider merge, FLAG-SURFACE MANIFEST) and proposal.convergence.md FX-04/FX-05 were not deeply audited in the review pass. (Independently confirmed present by the bc author: DEGRADABLE_CC_SUBTYPES/_parse_cc_substrate_error, the per_provider loop, and the FLAG-SURFACE MANIFEST docstring block.)",
+      "suggestion": "No plan fix; disclosure only. proposal.convergence.md is a sibling process-log, not in the authority_chain (correct)."
+    }
+  ]
+}

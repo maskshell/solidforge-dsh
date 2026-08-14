@@ -121,7 +121,7 @@ def run():
     # the unpacked findings list. So the contract is: envelope well-formed AND
     # each findings[i] is $defs/finding-valid. Mirrors pd's
     # check_wrapper_returns_typed_findings (hetero_review_wiring.py).
-    dry_args = ["--dry-run", "--artifact", "SKILL.md", "--profile", "deepseek"]
+    dry_args = ["--dry-run", "--artifact", "SKILL.md", "--profile", "qwen"]
     rc, out, err = _run_wrapper(dry_args)
     if rc != 0:
         findings.append(
@@ -209,7 +209,7 @@ def run():
             "--artifact",
             "SKILL.md",
             "--profile",
-            "deepseek",
+            "qwen",
         ]
     )
     malform_caught = False
