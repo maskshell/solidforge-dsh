@@ -86,6 +86,16 @@ else
   echo "PASS: packages/solidforge-plugin/tests/smoke.mjs"
 fi
 
+# npm release-metadata gate (license/name/files/README/workflow consistency;
+# the deterministic backstop for the 2026-08-14 wrong-license publish)
+TOTAL=$((TOTAL + 1))
+if ! out=$("$PY" "$HERE/scripts/check-release-metadata.py" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: scripts/check-release-metadata.py"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: scripts/check-release-metadata.py"
+fi
+
 echo
 echo "suites: $TOTAL run, $FAIL failed"
 [ "$FAIL" -eq 0 ]
