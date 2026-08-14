@@ -1,0 +1,18 @@
+{
+  "artifact": "docs/papers/spec-gaming-orthogonal-axis.pub-readiness.md",
+  "authority": "docs/papers/spec-gaming-orthogonal-axis.md (cited by line/section)",
+  "legs": {"same_family": "solidforge:doc-reviewer", "different_family": "hetero_doc_review.py --profile deepseek"},
+  "rounds_run": 2,
+  "substantive_converged": true,
+  "new_blocker_trend": [1, 0],
+  "round_1": {
+    "same_family": "1 blocker (B1) + 3 warnings (W1/W2/W3)",
+    "hetero": "3 warnings (same as B1/W1/W3, independently confirmed) + 1 coverage note",
+    "both_legs_converged_on": ["§3.3 L86 is a SECOND carrier of the unqualified universal (F1 said 'Only §1' — false)", "'logically necessary' is §3.1 not §3.3 (F2 cross-ref wrong)", "F7 overstated absence of academic novelty checks vs §7's actual coverage"],
+    "same_family_only": ["F5 'surfaced only in §3.1' false — stipulation foregrounded in Abstract L20/§1 L32"],
+    "adopted_and_fixed": "6 fixes applied (F1 +§3.3 L86; F2 cross-ref→§3.1; F5 reframed; F7 narrowed; F6 cov-note added; P14 added)"
+  },
+  "round_2": {"same_family": "6/6 fixes confirmed, 0 new blockers", "result": "clean"},
+  "key_substantive_outcome": "The review's F1 blocker is STRONGER than first stated: the paper's unqualified 'heterogeneous oracles forced out of process' universal appears in BOTH §1 L39 AND §3.3 L86 (the prior abs-contr-1 backlog missed §3.3). The must-fix for the paper qualifies BOTH locations, not just §1.",
+  "coverage_notes": "All 14 P-claims (P1–P14) citation-verified against the paper across R1+R2. Normative/advisory claims (verdict, F5 framing, F7 recommendation, 'should fix') respected as outcome-axis (human); psv adjudicates only the factual/citation P-claims.",
+}

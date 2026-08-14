@@ -1,0 +1,47 @@
+{
+  "verdict": "pass",
+  "degraded": false,
+  "degraded_providers": [],
+  "findings_count": 4,
+  "findings": [
+    {
+      "defect_id": "f1-univ-scope-1",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "F1 finding — pub-readiness.md §F1 (L26–30), scope claim 'Only §1 carries the unqualified universal' and the proposed fix",
+      "evidence": "Review doc: 'Only §1 carries the unqualified universal → internal inconsistency', and the proposed fix qualifies §1 [paper:L39] only. The paper contradicts the 'Only §1' scope claim: §3.3 L86 states the same unqualified universal — 'the agent harness forces heterogeneous oracles out of process precisely because in-process reviewers cannot differ in blind-spot set' — in a sentence that in the same breath cites '(§4.4)', where §4.4 L139 scopes the boundary 'for model-based heterogeneous oracles' and carves the in-process fetched-source exception. F1 enumerates §1/§4.4/§5 and never mentions §3.3, so applying the proposed fix as written leaves §3.3 still contradicting §4.4/§5 — the paper's central inconsistency survives the sole blocker fix.",
+      "suggestion": "Extend F1 to name §3.3 L86 as a second carrier of the unqualified universal and include it in the fix (qualify 'forces heterogeneous oracles out of process' with 'for model-based heterogeneous oracles')."
+    },
+    {
+      "defect_id": "f2-logic-necessary-cite-1",
+      "severity": "warning",
+      "kind": "citation-error",
+      "location": "F2 finding — pub-readiness.md L34, parenthetical '(“logically necessary”, §3.3)'",
+      "evidence": "Review doc: 'stipulates the strong-form self-certification conjecture as load-bearing for the necessity framing (\"logically necessary\", §3.3)'. The phrase 'logically necessary' occurs exactly once in the paper, at §3.1 L65 — 'Axis B shifts from logically necessary to strongly advisable' — not in §3.3; §3.3 (L79–86) contains only 'logically bounded above' (L86). The mis-attribution is propagated from the reconvergence JSON backlog entry s8-conj-gap-1 ('the \"logically necessary\" (§3.3) claim'), which a citation-adjudication artifact like this one should have caught.",
+      "suggestion": "Re-cite as '(“logically necessary”, §3.1 L65)' or quote the phrase with its true location."
+    },
+    {
+      "defect_id": "f7-academic-absence-1",
+      "severity": "warning",
+      "kind": "authority-chain-break",
+      "location": "F7 finding — pub-readiness.md L59–62 (novelty due-diligence)",
+      "evidence": "Review doc: '§7's peer review is an INDUSTRIAL horizontal comparison (Spec Kit / Loki / zeroshot / LoopX). No systematic ACADEMIC novelty collision-check has been run against the paper's own novelty claims (two-axis frame; Process/Outcome schema split; salient/latent distinction).' The paper's §7 does check exactly those three claims against academic prior work: L187 'None, however, anchors on a frozen specification, exposes the schema-level Process/Outcome distinction, or names specification gaming as a failure class' (Process/Outcome split vs AgentCoder/MetaGPT/ChatEval); L191 'our contribution is not the oracle concept but the explicit two-axis organization (§3.3) and the salient/latent distinction' (vs CodeT/AlphaCodium/self-consistency/Barr 2015); L193 'The contribution relative to LLM-as-judge is the coding-loop-specific framing… not the discovery of same-source bias' (vs Zheng 2023). The doc over-claims total absence; what is true is that no systematic prior-art SEARCH beyond §7's cited-work positioning has been run.",
+      "suggestion": "Rephrase to 'no systematic academic prior-art search beyond the cited-work positioning already performed in §7' — the recommendation to run solidforge:prior-art-search stands unchanged."
+    },
+    {
+      "defect_id": "cov-ext-source-1",
+      "severity": "coverage",
+      "kind": "coverage-gap",
+      "location": "pub-readiness.md 'What is publication-grade' (L66) and P10–P13 / F6 provenance claims",
+      "evidence": "Honest disclosure (rule 3), not an artifact defect: I verified every [paper:Lxx] citation and the [reconv:...] backlog references against the paper text and spec-gaming-orthogonal-axis.loopx-reconvergence.json (abs-contr-1 / s8-conj-gap-1 / s3phys-premise-1 / s6-two-cases-1 all present as cited), but I could not independently re-fetch the paper's external primary sources (arXiv/ACM TACL/IEEE Xplore metadata behind the References list) in this leg. The doc's assertion 'Citation grounding (psv-verified across prior passes)' was verified only as a frontmatter RECORD of the 2026-07-31 psv run (N=7/W=1/K=0), not by re-running psv.",
+      "suggestion": "For a publication-readiness claim, either attach the psv run record as the grounding evidence or re-run solidforge:primary-source-verification on the References before submission."
+    }
+  ],
+  "coverage": [
+    "Honest disclosure (rule 3), not an artifact defect: I verified every [paper:Lxx] citation and the [reconv:...] backlog references against the paper text and spec-gaming-orthogonal-axis.loopx-reconvergence.json (abs-contr-1 / s8-conj-gap-1 / s3phys-premise-1 / s6-two-cases-1 all present as cited), but I could not independently re-fetch the paper's external primary sources (arXiv/ACM TACL/IEEE Xplore metadata behind the References list) in this leg. The doc's assertion 'Citation grounding (psv-verified across prior passes)' was verified only as a frontmatter RECORD of the 2026-07-31 psv run (N=7/W=1/K=0), not by re-running psv."
+  ],
+  "malformation": "",
+  "providers": [
+    "deepseek"
+  ]
+}

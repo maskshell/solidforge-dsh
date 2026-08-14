@@ -1,0 +1,74 @@
+{
+  "schema": "infra/schemas/convergence-record.schema.json",
+  "skill": "solidforge:cross-source-review",
+  "artifact": "docs/papers/spec-gaming-orthogonal-axis.md",
+  "artifact_type": "position paper",
+  "authority": "self-contained (cited primary literature; independently spot-checked by orchestrator + concurrent psv run)",
+  "reconvergence_of": "2026-07-08 pass (4-round, substantive-converged). This record documents the 2026-07-31 reconvergence after post-2026-07-08 edits (the admissibility / recall-grounding / fetched-source-exception cluster introduced in §4.1/§4.2/§4.4).",
+  "size_tier": "long",
+  "cap": 5,
+  "rounds_run": 3,
+  "substantive_converged": true,
+  "stalemate": false,
+  "outcome_axis_respected": true,
+  "convergence_basis": "Core claims C1-C11 coverage-verified. New-Blocker trend R1=0 → R2=1 (conjecture non-propagation, self-inflicted by the adopted D4 advisory, fixed in-round) → R2-hetero-retry verdict 'pass' (0 blockers) → R3 same-family confirmatory 'SUBSTANTIVELY CONVERGED' (0 new blockers). Convergence rests on two independent clean legs on the fixed artifact — hetero 'pass' (deepseek) + same-family confirmatory — matching the 2026-07-08 precedent (R3-hetero-pass + R4-same-family-confirmatory). The lone R3 advisory (§6 salient/latent mislabel exposed by the §4.3 intent-blueprint sharpening) was adopted post-verdict; advisory findings never block. The single R2 blocker was a propagation gap from an adopted advisory, not a fresh defect in the doc's substance.",
+  "core_claims": [
+    {"id": "C1", "claim": "Specification gaming is a 4th failure mode orthogonal to context-rot/error-compounding/goal-drift at the defense-mechanism level (non-subsumable; not statistical independence).", "status": "coverage-verified"},
+    {"id": "C2", "claim": "Irreducibility via three complementary lines (topological, causal, operational). §3.2(ii) root-cause narrowed to 'not diminishable by the three-mode defenses' (Pan mitigates — proposes, not solves).", "status": "coverage-verified"},
+    {"id": "C3", "claim": "Two-axis frame (flow-control completeness × verification-source decoupling); Axis A bounded above by intrinsic + salient; latent demands Axis B.", "status": "coverage-verified"},
+    {"id": "C4", "claim": "Decoupling discriminator (blind-spot-set criterion); agent-authored formal spec collapses to same-source; recall-grounding collapse; fetched-source tier is adjudication-dependent (deterministic=tier-3 strong, model-mediated=tier-2 partial). 'Independent same-provider reviewer' is a pseudo-decoupling trap.", "status": "coverage-verified"},
+    {"id": "C5", "claim": "Process/Outcome split schema invariant; rightness agent-unwritable; per-run conservative-max over per-claim admissibility; NO terminal 'confirmed' value by design (permanent conservative guard). SolidForge conservative path.", "status": "coverage-verified"},
+    {"id": "C6", "claim": "Salient (auditable proxy tampering) defensible by Axis A structural discipline — which presupposes an externally-authored intent blueprint (§6); latent (non-auditable proxy-adequacy violation) requires a heterogeneous oracle.", "status": "coverage-verified"},
+    {"id": "C7", "claim": "Single-provider process-scoped harnesses enforce the two-axis separation under current architecture; contingent (§8.6), not architecturally necessary.", "status": "coverage-verified"},
+    {"id": "C8", "claim": "Self-certification paradox — a working conjecture, NOW stipulated strong-form for the analysis (§3.1) with weak-form sensitivity noted (Axis B necessary→advisable, structure survives); conjecture-conditional propagated to Abstract/§1.", "status": "coverage-verified"},
+    {"id": "C9", "claim": "SolidForge = existence-proof-of-realizability, not evidence; COI disclosed; 'consistent with' not 'confirms'; realizability != efficacy.", "status": "coverage-verified"},
+    {"id": "C10", "claim": "CaMeL complementarity (disjoint failure surfaces: prompt injection vs proxy optimization; privilege isolation != verification-source decoupling).", "status": "coverage-verified"},
+    {"id": "C11", "claim": "Outcome claims bifurcate by admissibility (fetched-source-adjudicable atomic vs interpretive). Collapse tracks verdict grounding (recall vs fetch) not only authorship. A fetched-source oracle need not cross providers but covers only the admissible slice; its decoupling strength is bounded by the adjudication step.", "status": "coverage-verified"}
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "same_source": {"blockers": 0, "advisory": 6, "adopted": 6, "rejected": 0, "highlights": ["F1 §4.1 fetched-source landed in tier-3 strong-decoupling class", "F2 §5 'Axis B ≡ external oracle' disambiguated (external-to-process vs in-process-decoupled)", "F3 §3.2(iii) oracle list marked 'e.g.,' + fetched-source added", "F4 §4.2 rightness = per-run conservative-max over per-claim partition", "F5 §4.1 recall-collapse conjecture marker (parity with §4.4/§3.1)", "F6 §6 SolidForge ring reconciliation (formal ∪ cross-provider)"]},
+      "hetero": {"provider": "deepseek", "verdict": "pass", "degraded": false, "blockers": 0, "advisory": 3, "coverage": 1, "adopted": 4, "rejected": 0, "highlights": ["D1 §4.3 type/lint/build 'formal oracles' term polyvalence → relabeled 'deterministic gates'; proof-strength subset = formal tier", "D2 §4.4 fetched-source adjudication mechanism bounded (deterministic=strong/verbatim; model-mediated=partial) — the deepest catch", "D3 §7 negative-claim methodology scoped (public docs 2026-07; absence bounded)", "D4 §3.1 conjecture-sensitivity clause added (necessity conditional on strong form)"]}
+    },
+    {
+      "round": 2,
+      "same_source": {"blockers": 1, "advisory": 1, "coverage": 1, "adopted": 2, "rejected": 0, "highlights": ["R2-D4 [BLOCKER]: D4 sensitivity clause said 'necessity not established' while Abstract/§1/§3.2(iii)/§3.3/§4.1 still asserted unconditional 'cannot reach latent' — non-propagation contradiction (self-inflicted by adopted D4). Fixed by stipulating the strong form in §3.1 + scoping Abstract/§1 central claims.", "R2-D2 [advisory]: §4.1 over-classified fetched-source as tier-3 strong while §4.4 says model-mediated=partial. Fixed: tier made adjudication-dependent; §5 aligned.", "R2-CIT [coverage]: citations deferred to orchestrator spot-checks (resolved, see independent_citation_spotchecks)."]},
+      "hetero": {"provider": "deepseek", "verdict": "degraded-then-pass", "degraded_first_attempt": "hetero-subprocess-timeout (cold pro-tier review on ~60KB doc post-17-edits; retried with raised wall-clock per ADR #43 — timeout raised, profile NOT remapped)", "retry_verdict": "pass", "retry_degraded": false, "blockers": 0, "advisory": 2, "coverage": 1, "adopted": 3, "rejected": 0, "highlights": ["R3-D1 §4.3 salient-classification rules presuppose an intent-blueprint only introduced in §6 — circularity; pulled intent-blueprint into §4.3 as precondition", "R3-D2 [coverage] heterogeneous-oracle own failure modes (false-positive/disagreement/cascade) unexamined → §8.7 open problem", "R3-D3 §4.2 rightness has no terminal 'confirmed' state; reframed as permanent conservative guard (reinforces anti-gaming thesis)", "Confirmed R2-D4 + R2-D2 fixes held (no restatement)."]}
+    },
+    {
+      "round": 3,
+      "same_source": {"blockers": 0, "advisory": 1, "coverage": 1, "adopted": 1, "rejected": 0, "convergence_statement": "SUBSTANTIVELY CONVERGED — zero new blockers. R2-D4 strong-form stipulation cleanly licenses every surviving absolute reachability claim; R3-D1/D2/D3 introduce no contradiction; C1-C11 covered.", "highlights": ["Verified R2-D4 stipulation licenses §3.2(iii)/§3.3 absolute claims; no internal contradiction", "F1 [advisory, adopted post-verdict]: §6 line 167 drift-check mislabeled a latent-adequacy pattern as 'salient at the structural layer' (exposed by R3-D1 §4.3 sharpening) — corrected to distinguish auditable-salient from adequacy-latent", "F2 [coverage]: citation re-verification deferred to orchestrator spot-checks (resolved)."]},
+      "hetero": "not run — R2-hetero-retry already returned verdict 'pass' (0 blockers) on the R2-D4/D2-fixed artifact; R3 same-family confirmatory (0 blockers) satisfies the ≥2-clean-leg bar without a redundant 3rd cross-family call (2026-07-08 precedent)."
+    }
+  ],
+  "findings_trend": [
+    {"round": 1, "new_blockers": 0, "total_findings_adopted": 10},
+    {"round": 2, "new_blockers": 1, "total_findings_adopted": 5},
+    {"round": 3, "new_blockers": 0, "total_findings_adopted": 1}
+  ],
+  "independent_citation_spotchecks": [
+    {"claim": "Liu et al. 'Lost in the Middle' — TACL 2024, DOI 10.1162/tacl_a_00638", "source": "ACL Anthology 2024.tacl-1.9 / MIT Press DOI", "verdict": "VERIFIED (citation); MECHANISM OVERCLAIM caught by the psv pass — NOT by cross-source-review nor by this orchestrator's spot-check: §2 said 'attention's U-shaped distribution' but the source measures PERFORMANCE over context position, not attention weights; psv reworded to 'U-shaped performance curve over context position'. A concrete case where the fetched-source oracle (psv) reached an admissible-slice factual claim the process-axis review could not.", "resolved": true},
+    {"claim": "Amodei et al. (2016) Concrete Problems in AI Safety — arXiv:1606.06565", "source": "arXiv:1606.06565", "verdict": "VERIFIED — correct ID/authors; 'reward hacking as one of five' correct.", "resolved": true},
+    {"claim": "Pan 2022 reward misspecification — arXiv:2201.03544", "source": "arXiv:2201.03544", "verdict": "VERIFIED (narrowed) — capability-scaling divergence confirmed; Pan PROPOSES anomaly-detection mitigation with baseline detectors (does not claim to solve). Doc already says 'propose ... partial, weak' — accurate, no edit.", "resolved": true},
+    {"claim": "Manheim & Garrabrant 2018 Goodhart variants — arXiv:1803.04585", "source": "arXiv:1803.04585", "verdict": "VERIFIED — correct ID/authors; 4-variant taxonomy (regressional/extremal/causal/adversarial) confirmed.", "resolved": true},
+    {"claim": "CaMeL — arXiv:2503.18813 (dual-LLM prompt-injection defense; no 'specification gaming')", "source": "arXiv:2503.18813", "verdict": "VERIFIED — correct ID; dual-LLM (trusted+untrusted/privileged+quarantined) confirmed; full-text search RECONFIRMS 'specification gaming' does not appear (2026-07-08 purge upheld).", "resolved": true},
+    {"claim": "Industrial peers §7: Spec Kit / zeroshot / Osmani / Loki Mode", "source": "GitHub URLs + Osmani blog (fetched)", "verdict": "ALL VERIFIED LIVE — Spec Kit (constitution + converge primitive + single-agent, ~125k stars); zeroshot (blind validation + fail-closed cross-provider, ~1.7k); Osmani loop-engineering (live, 2026-06, 'cognitive surrender' named); Loki Mode (tamper-evident Evidence Receipt Facts/Assessments + multi-reviewer council). No dead URLs / wrong attributions.", "resolved": true},
+    {"claim": "Claude Code 'fable' tier (§4.4)", "source": "harness model roster (environment-confirmed)", "verdict": "VERIFIED — Fable 5 (claude-fable-5) is a live tier alongside haiku/sonnet/opus.", "resolved": true},
+    {"note": "CO-EQUAL VERIFICATION AXIS — solidforge:primary-source-verification (psv) pass (2026-07-31; coverage disclosed in frontmatter note item 11; no separate record file in-repo): per-claim fetch+adjudicate of 8 admissible citation claims — N=7 verified / W=1 narrowed-then-fixed (the Liu §2 mechanism overclaim above) / K=0 unverifiable of M=8. psv is the PRIMARY citation-verification pass (a fetched-source oracle on the admissible slice, per the doc's own §4.2/C11); the orchestrator's 6-citation spot-check above CORROBORATES it (overlapping subset), not vice-versa. psv caught the Liu overclaim that neither cross-source-review nor the spot-check did."}
+  ],
+  "coverage_notes": [
+    "PROCESS-AXIS convergence only. OUTCOME-axis (does the thesis correctly characterize specification gaming, and is verification-source decoupling the RIGHT discipline?) is human-only and explicitly out of scope.",
+    "The central load-bearing claim (C8/C1) now explicitly STIPULATES the strong-form self-certification conjecture rather than presenting necessity as established; under the weak form Axis B softens from necessary to advisable, but the two-axis structure survives. This is the honest framing, not a weakening of the contribution.",
+    "C11 (admissibility partition + fetched-source exception) — the new cluster introduced by the post-2026-07-08 edits — is now fully propagated: §4.1 (adjudication-dependent tier), §4.2 (admissibility + per-run conservative-max + no-terminal-state), §4.4 (adjudication bound), §5 (disambiguated), §3.2(iii) (oracle list), §6 (ring reconciliation).",
+    "Two precondition-assumptions documented in-round, not hidden: (a) schema-invariant harness-integrity — agent write-access scoped away from harness/plugin paths (§4.2); (b) 'cross-provider' as a heuristic proxy for blind-spot divergence — provider→blind-spot mapping unvalidated (§6, Open Problem §8.4).",
+    "SolidForge (§6) remains existence-proof-of-realizability, NOT efficacy — no controlled benchmark isolating spec-gaming defense (Open Problem §8.3); heterogeneous-oracle own failure modes now flagged (Open Problem §8.7).",
+    "Round cost note: the R2 different-family leg timed out on first attempt (cold pro-tier review on a ~60KB doc after 17 coherence edits); retried with a raised wall-clock (900s, background) per ADR #43 — the profile alias was NOT remapped to dodge the timeout.",
+    "Two-axis verification of this artifact (the doc dogfoods its own thesis): cross-source-review = PROCESS-AXIS convergence (consistency/coverage, this record); the external psv pass = the fetched-source oracle on the ADMISSIBLE citation slice (§4.2/C11, `oracle_verified_under_known_coverage`). These are orthogonal verification axes — psv caught the Liu §2 mechanism overclaim; process-axis review caught the C11 propagation gaps; neither subsumes the other. Citation correctness thus rests on psv (primary) + orchestrator spot-check (corroborating); outcome-axis (interpretive) correctness remains human-only."
+  ],
+  "advisory_findings_outstanding": [],
+  "files_touched": [
+    "docs/papers/spec-gaming-orthogonal-axis.md (reconverged artifact; status → draft-cross-source-converged)",
+    "docs/papers/spec-gaming-orthogonal-axis.convergence.json (this record — supersedes the 2026-07-08 record)"
+  ]
+}

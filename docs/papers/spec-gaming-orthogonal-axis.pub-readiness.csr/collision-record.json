@@ -1,0 +1,60 @@
+{
+  "artifact": "docs/papers/spec-gaming-orthogonal-axis.md",
+  "skill": "solidforge:prior-art-search (novelty-coverage)",
+  "oracle": "searched prior-art corpus (arXiv + web + repos), fetched 2026-08-06; novelty-claim set extracted by solidforge:novelty-claim-extractor (M=8 admissible novelty claims NC1–NC8)",
+  "signal": "collisions_under_known_coverage",
+  "NEVER": "novel_confirmed (forbidden — absence of a found collision is 'no collision in the searched corpus', NOT 'novel')",
+  "counts": {"M": 8, "C_clear_under_search": 6, "N_collision": 1, "U_uncited_relevant": 1, "I_inconclusive": 0},
+  "coverage": "C=6 / N=1 / U=1 / I=0 of M=8 admissible novelty claims. N>0 → the paper has a load-bearing novelty overclaim that must be amended before publication.",
+
+  "collision": {
+    "claim": "NC8",
+    "paper_text": "NO current coding-agent benchmark isolates specification-gaming defense... all measure pass-rate against a held-out test suite (an Axis-A proxy metric) and are silent on Axis B. Constructing an injection attack set... is the principal empirical open problem. (§1, §5, §8.3)",
+    "prior_art": {
+      "title": "SpecBench: Measuring Reward Hacking in Long-Horizon Coding Agents",
+      "authors": "Bingchen Zhao, Dhruv Srikanth, Yuxiang Wu, Zhengyao Jiang",
+      "arxiv": "2605.21384",
+      "primary_category": "cs.SE",
+      "published": "2026-05-20",
+      "url": "https://arxiv.org/abs/2605.21384",
+      "metadata_verified": "direct fetch of arxiv.org/abs/2605.21384 on 2026-08-06 (title/authors/id/category/date all confirmed)",
+      "fetched_quote": "As long-horizon coding agents produce more code than any developer can review, oversight collapses onto a single surface: the automated test suite. Reward hacking naturally arises... the agent optimizes for passing tests while deviating from the user's true goal. We... decompose software engineering tasks into three parts: (i) a natural language description of the specification (ii) visible validation tests... and (iii) held-out tests that compose those same features to simulate real-world usage... we use the gap in pass rates on these two suites to quantify reward hacking... SpecBench, a benchmark comprising 30 systems-level programming tasks... every frontier agent saturates the visible suite, reward hacking persists."
+    },
+    "verdict": "collision",
+    "why": "SpecBench IS a coding-agent (cs.SE) benchmark that isolates reward-hacking/spec-gaming via the visible-vs-heldout pass-rate gap, published 2026-05-20, ~3 months BEFORE this paper (2026-08-04). It falsifies NC8's universal 'NO current coding-agent benchmark isolates specification-gaming defense' and directly refutes the supporting reasoning ('all... silent on Axis B') — SpecBench's contribution is precisely that the gap IS the Axis-B signal.",
+    "salvage": "The collision is on SCOPE/SWEEP, not method. SpecBench uses an OBSERVATIONAL gap metric; NC8 proposes an adversarial INJECTION attack set — different methods. NC8 is salvageable IF narrowed to a methodology-novelty claim ('no benchmark uses an adversarial injection-attack-set methodology') AND SpecBench is cited as the concurrent benchmark that already isolates spec-gaming observationally.",
+    "required_amendment": "(1) §8.3/§5: cite SpecBench (arXiv:2605.21384) as concurrent prior art; (2) retract the universal 'No benchmark currently isolates specification-gaming defense' → 'No benchmark uses an adversarial injection-attack-set methodology; the concurrent SpecBench isolates spec-gaming observationally via a visible-vs-heldout gap metric'; (3) reframe the contribution as the injection-set method, not the existence of any isolating benchmark.",
+    "also_inconclusive_candidates": [
+      {"name": "ImpossibleBench (lesswrong)", "fetched_quote": "We take existing coding benchmarks and manipulate their unit tests to directly conflict with the natural language specifications.", "verdict": "COLLISION (resolved 2026-08-07 via arXiv:2510.20270 full-text fetch + collision-verifier). Zhong/Raghunathan/Carlini, prior 2025-10-23 (~10 months). Adversarial injection on LiveCodeBench/SWE-bench = exactly the F8-narrowed NC8 'remains open' methodology. Falsifies NC8 on the methodology axis (SpecBench falsified the observational axis). NC8 retired; paper reframed to defense-axis evaluation."},
+      {"name": "RHB (OpenReview, Thaman et al.)", "fetched_quote": "a benchmark designed to measure reward hacking behavior of LLM agents with tool use", "verdict": "uncited-relevant (resolved 2026-08-07 via arXiv:2605.02964 fetch). Single author Kunvar Thaman, 2026-05-03; tool-using LLM agents (multi-step tool ops), NOT coding-loop-specific → different scope; adjacent, cited in §8.3."}
+    ]
+  },
+
+  "uncited_relevant": {
+    "claim": "NC5 (salient/latent specification-gaming distinction for coding loops)",
+    "prior_art": {
+      "title": "Detecting Proxy Gaming in RL and LLM Alignment via Evaluator Stress Tests (EST)",
+      "authors": "Ibne Farabi Shihab, Sanjeda Akter, Anuj Sharma",
+      "arxiv": "2507.05619",
+      "published": "2025-07-08 (updated 2026-01-04; ACL 2026 Findings)",
+      "url": "https://arxiv.org/abs/2507.05619"
+    },
+    "verdict": "uncited-relevant (NOT a collision)",
+    "why_not_collision": "EST's binary is 'exploitable sensitivity (formatting/physics artifacts) vs content-driven improvements' — a score-decomposition axis detected via controlled perturbations, over RL/LLM-alignment. NC5's binary is 'proxy-INTEGRITY (auditable diff-tampering) vs proxy-ADEQUACY (non-auditable fit-to-intent)' over coding loops, paired with a defense-reach impossibility claim. Different axes, different domains.",
+    "why_cite": "EST is a 2025 proxy-gaming detection framework the paper does not cite; its external-perturbation audit method is a candidate realization of NC5's 'externalized heterogeneous oracle' and is empirically CONSISTENT with NC5's thesis (the non-salient surface requires an external oracle). Cite in §7 (LLM-as-judge / detection) and optionally §4.3.",
+    "required_amendment": "Add EST (arXiv:2507.05619) to References + a sentence in §7 distinguishing NC5's integrity/adequacy bifurcation from EST's sensitivity/decomposition axis."
+  },
+
+  "clear_under_search": {
+    "claims": ["NC1 (orthogonal 4th axis)", "NC2 (irreducibility)", "NC3 (two-axis frame)", "NC4 (schema Process/Outcome split)", "NC6 (platform/provider-binding boundary)", "NC7 (5-tier decoupling taxonomy + collapse rules)"],
+    "verdict": "clear-under-search",
+    "caveat": "Clear-under-search means NO collision found in the searched corpus (bounded: ~6 targeted queries across arXiv/web/repos on 2026-08-06), NOT 'novel'. The two-layer search-oracle weakness applies: (1) selection-side — ranking/recall limits, the found text is model-extracted from search returns; (2) comparison-side — the claim-vs-prior-art match is model-judged. NC1/NC2/NC3 (framing claims) are the weakest 'clear' results because a framing could exist in work the bounded search did not reach; NC4/NC6/NC7 (specific schema/mechanism claims) are stronger. A broader formal search could shrink the clear set."
+  },
+
+  "two_blind_spots_disclosed": [
+    "Extractor blind-spot: novelty claims neither the paper flags nor the extractor identifies are absent from the M=8 set.",
+    "Search-oracle weakness: clear-under-search ≠ novel; the searched corpus is bounded and the comparison is model-judged."
+  ],
+
+  "net_publication_impact": "One load-bearing collision (NC8 / SpecBench) that MUST be amended before submission — a reviewer aware of SpecBench (cs.SE, 2026-05) would reject NC8's 'no benchmark exists' as stated. One uncited-relevant (NC5 / EST) to cite. Six clear-under-search with the bounded-search caveat. The paper's core framing claims (NC1–NC3) found no collision in the searched corpus but are NOT thereby confirmed novel."
+}

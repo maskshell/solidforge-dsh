@@ -1,0 +1,30 @@
+{
+  "artifact": "docs/papers/spec-gaming-orthogonal-axis.pub-readiness.md",
+  "oracle": "docs/papers/spec-gaming-orthogonal-axis.md (local paper; both the cited source and the fetched oracle)",
+  "signal": "oracle_verified_under_known_coverage",
+  "NEVER": "correctness_converged (forbidden — review's normative recommendations + the interpretive contradiction judgment stay human)",
+  "counts": {"M": 14, "N_verified": 14, "W_narrowed": 0, "R_refuted": 0, "K_unverifiable": 0},
+  "verdicts": {
+    "P1": {"v": "verified", "line": 39, "q": "any genuinely heterogeneous oracle is forced out of process (unqualified)"},
+    "P14": {"v": "verified", "line": 86, "q": "the agent harness forces heterogeneous oracles out of process precisely because in-process reviewers cannot differ in blind-spot set (unqualified; sentence cites §4.4)"},
+    "P2": {"v": "verified", "line": 139, "q": "for model-based heterogeneous oracles + in-process fetched-source exception with strong decoupling"},
+    "P3": {"v": "verified", "line": 157, "q": "external to the process for model-based oracles; in-process-but-decoupled for a deterministically-adjudicated fetched-source oracle"},
+    "P4": {"v": "verified", "line": 20, "q": "Abstract (iv) uses 'enforce this separation... implementation-level invariant' — literal 'forced out of process' absent"},
+    "P5": {"v": "verified", "line": 65, "q": "conjecture load-bearing + 'We flag, rather than hide, that this is stipulative' + weak-form fallback to 'strongly advisable'"},
+    "P6": {"v": "verified", "line": 201, "q": "§8 seven items enumerated; none proposes testing/falsifying the conjecture (NEGATIVE claim — no counterexample in fetched text)"},
+    "P7": {"v": "verified", "line": 73, "q": "'physical manifestations of two properties — probabilistic nature + bounded attention' asserted; Pan/Manheim cited for the spec-gaming side, not the reduction (NEGATIVE — no citation for the reduction)"},
+    "P8": {"v": "verified", "line": 49, "q": "'we synthesize this taxonomy from that body of work rather than adopt it from a single named source'"},
+    "P9": {"v": "verified", "line": 163, "q": "'in two cases concretely instantiate' without naming the two (NEGATIVE — no naming in fetched text)"},
+    "P10": {"v": "verified", "line": 227, "q": "Repository: ws-ai/solidforge (private)"},
+    "P11": {"v": "verified", "line": 2, "q": "authors: TBD"},
+    "P12": {"v": "verified", "line": 5, "q": "frontmatter note: multi-paragraph csr/psv/convergence process log"},
+    "P13": {"v": "verified", "line": 43, "q": "'We do not present a benchmark evaluation... injection attack set... principal open problem (§8)'"}
+  },
+  "caveats": [
+    "P6, P7(negative), P9 are negative claims; 'verified' = no counterexample in the fetched text, not proof of global absence (psv comparison blind-spot).",
+    "The INTERPRETIVE contradiction claim (§1+§3.3 unqualified universals vs §4.4+§5 scoped statements) was deliberately EXCLUDED from psv scope — psv verified only that each quoted phrase occurs as stated; whether they constitute a contradiction is an outcome-axis judgment (human).",
+    "P13: line 43 cites '(§8)', line 155 cites '(§8.3)' for the same injection-set open problem — minor referential looseness, not a defect.",
+    "verified = 'no contradiction in fetched text for the literal occurrence/qualification', not proof none exists."
+  ],
+  "net": "The review's factual substrate is fully source-grounded. The strongest substantive outcome (csr-caught, psv-confirmed substrate): the paper's unqualified 'heterogeneous oracles forced out of process' universal lives at BOTH §1 L39 and §3.3 L86 — so the must-fix qualifies BOTH, not just §1."
+}

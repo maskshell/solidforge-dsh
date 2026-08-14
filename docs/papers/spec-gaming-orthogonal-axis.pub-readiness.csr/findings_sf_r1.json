@@ -1,0 +1,10 @@
+{
+  "round": 1, "leg": "same-family", "blocker_count": 1,
+  "findings": [
+    {"id":"B1","severity":"blocker","location":"artifact F1","summary":"F1 'Only §1 carries the unqualified universal' is FALSE: §3.3 also carries it ('forces heterogeneous oracles out of process'). Proposed fix patches §1 L39 but leaves the §3.3 instance live. Inherited from reconv JSON abs-contr-1.","fix":"F1 must list BOTH §1 L39 AND §3.3 as locations of the unqualified universal; proposed fix qualifies both."},
+    {"id":"W1","severity":"warning","location":"artifact F2","summary":"F2 cross-ref ('logically necessary', §3.3) wrong — phrase is §3.1; §3.3 uses 'logically bounded'.","fix":"cross-ref → §3.1, or drop."},
+    {"id":"W2","severity":"warning","location":"artifact F5","summary":"F5 'surfaced only in §3.1' false — stipulation in Abstract L20/§1 L32/§3.1 L65/§4.1/§4.4 (foregrounded). Defensible core narrows to: title silent + Abstract opening asserts precision before the stipulation clause.","fix":"reframe F5 — not 'buried', but 'title silent; Abstract opening precedes the stipulation clause'."},
+    {"id":"W3","severity":"warning","location":"artifact F7","summary":"F7 'no systematic ACADEMIC novelty check' understates §7's academic coverage (CaMeL/AgentCoder/MetaGPT/ChatEval/mutation-testing/Barr/CodeT/AlphaCodium/LLM-as-judge each distinguished). F7 conflated industrial subsection with §7 whole.","fix":"narrow F7 to 'no FORMAL systematic review (PRISMA-style)'."}
+  ],
+  "coverage_notes": "All 13 P-claims citation-VERIFIED. P4 refinement correct (Abstract L20 lacks literal 'forced out of process'). F3/F4/F6 verify cleanly."
+}

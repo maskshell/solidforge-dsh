@@ -1,0 +1,18 @@
+{
+  "artifact": "docs/papers/spec-gaming-orthogonal-axis.md",
+  "delta": "publication-fix round (F1 + F8 + F2/F3/F4), driven by the pub-readiness review (csr+psv) + prior-art-search (collision-record)",
+  "legs": {"same_family": "solidforge:doc-reviewer", "different_family": "hetero_doc_review.py --profile deepseek"},
+  "rounds_run": 1,
+  "substantive_converged_on_delta": true,
+  "delta_blocker_count": 0,
+  "round_1": {
+    "same_family": "5/5 fixes confirmed (F1 §1+§3.3, F8 §8.3/§5/§1/§7/Refs, F2 §8.8, F3, F4); 0 new blockers; 2 warnings + 2 coverage",
+    "same_family_adopted": ["W1 §6(ii) 'controlled benchmark' → 'controlled adversarial-injection benchmark' (+ parallel 'principal future work' tightening) — applied", "W2 §8.3 removed name-only ImpossibleBench/RHB (no References entries; inconclusive snippet-only) → generic 'other concurrent reward-hacking benchmarks whose scope is still being characterized' — applied", "C1 frontmatter updated: last_updated 2026-08-06 + pubfix note appended — applied", "C2 arXiv metadata re-verification → deferred to the psv citation check"],
+    "hetero": "verdict pass, 5 warning/coverage, 0 blockers",
+    "hetero_preexisting_not_delta": ["sf-1 §4.3 intent-blueprint 'made concrete in §6' vs §6 content (structural-gap)", "sf-2 §7 mutation-testing 'non-AI-specific' vs 'candidate for §4.3 slot' (read as contradiction; weak — 'candidate' ≠ 'full solution')", "sf-4 §3.2(iii) ceiling vs §3.2(i) locus (structural-gap)", "sf-5 industrial-peer public-docs claims (coverage, already bounded in-text)"],
+    "hetero_delta_tension": "sf-3 — Abstract 'cannot diminish (§3.2(ii))' vs F3's hedged physical-reduction premise. LEFT AS-IS: the Abstract already frames irreducibility as 'three complementary lines of argument... not independent formal proofs' (contribution i), so the central claim is hedged at the framing level; §3.2(ii)'s own premise is now hedge-flagged. Mild, acceptable."
+  },
+  "preexisting_backlog_for_future_paper_hardening": ["sf-1 §4.3↔§6 intent-blueprint concretization", "sf-2 §7 mutation-testing wording", "sf-4 §3.2(iii)↔(i) ceiling/locus", "sf-5 industrial-peer independent re-verification"],
+  "key_outcome": "F8 (SpecBench collision amendment) is internally consistent across §1/§5/§8.3/Abstract — the universal 'No benchmark currently isolates specification-gaming defense' is fully retracted; the paper's empirical contribution is reframed as the adversarial injection-set methodology, with SpecBench cited as the concurrent observational benchmark. F1 resolves the abs-contr-1 internal contradiction at both §1 and §3.3.",
+  "outcome_axis": "substantive_converged ≠ correctness_converged; thesis correctness stays human-only."
+}

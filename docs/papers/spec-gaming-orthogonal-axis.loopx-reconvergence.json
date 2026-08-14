@@ -1,0 +1,35 @@
+{
+  "parent_paper": "docs/papers/spec-gaming-orthogonal-axis.md",
+  "delta": "LoopX amendment — §7 4th peer paragraph + revised summary sentence; §4.4 *Control-plane-external enforcement locus.* note",
+  "amendment_draft": "docs/papers/spec-gaming-orthogonal-axis.loopx-amendment.md",
+  "loopx_evidence_trail": "docs/papers/loopx-research.md + loopx-research.psv/coverage-record.json (N31/W12/R3/K0)",
+  "legs": {"same_family": "solidforge:doc-reviewer", "different_family": "hetero_doc_review.py --profile deepseek"},
+  "rounds": 2,
+  "substantive_converged_on_delta": true,
+  "delta_blocker_trend": [2, 0],
+  "round_1": {
+    "same_family_blockers": ["B1 frame-vs-injection-set overclaim", "B2 universal §4.4 claim extended to multi-runtime peer"],
+    "same_family_warnings": ["W1 'primary-source verification shows' voice-break", "W2 undefined in-kernel/out-of-kernel terminology"],
+    "hetero_blockers": [],
+    "hetero_delta_warning": "s7-lx-enum-1 enum values paraphrased not verified (paper claims all-citations-verified)",
+    "fixes_applied": ["B1: 'deployed instance of §5 two-axis eval (§8.3)' → 'two-axis evaluation separation (frame), not §8.3 injection set'", "B2: 'they each implement §4.4' → 'cohort approximates from different architectural positions'", "W1: dropped voice-break", "W2: 'in-kernel/out-of-kernel' → 'plane-mediated path / actions not mediated by its gates'", "s7-lx-enum-1: enum → surface_only/outcome_gap/outcome_progress/primary_goal_outcome; matched-arms → same case/source/model/reasoning/timeout/no-feedback"]
+  },
+  "round_2": {
+    "same_family_r1_fixes_confirmed": "5/5",
+    "new_delta_blockers": 0,
+    "residual_warning_resolved": "r2-w1 'two-axis frame' term overload → reworded to 'two-axis evaluation separation'",
+    "coverage_note": "LoopX repo claims satisfied by the recorded psv run (N31/W12/R3/K0), not re-fetched by the csr legs"
+  },
+  "preexisting_findings_backlog_NOT_from_delta": {
+    "note": "Surfaced incidentally by the hetero whole-paper pass. PRE-EXISTING (predate and are independent of the LoopX delta). Recorded for a separate paper-core hardening pass; NOT blocking the LoopX amendment.",
+    "blocker": [
+      {"id": "abs-contr-1", "location": "Abstract + §1 contribution (iv)", "issue": "'in-process reviewers are necessarily same-source, so any genuinely heterogeneous oracle is forced out of process' is unqualified; §4.4's fetched-source in-process exception (deterministic-match = strong decoupling per §4.1) is a genuinely heterogeneous oracle NOT forced out of process. Fix: qualify with 'model-based' (matching §4.4's own scoped conclusion 'for model-based heterogeneous oracles')."}
+    ],
+    "warnings": [
+      {"id": "s8-conj-gap-1", "location": "§8 Open Problems", "issue": "§3.1 flags the self-certification conjecture as the load-bearing stipulation for the 'logically necessary' (§3.3) claim, yet §8 has no item on empirically testing/falsifying it. Suggest §8.8: same-family-fresh-context vs cross-family verdict divergence on known latent-proxy-gap test sets."},
+      {"id": "s3phys-premise-1", "location": "§3.2(ii)", "issue": "'The three intrinsic modes are physical manifestations of two properties — probabilistic nature + bounded attention' is the load-bearing premise for causal-disjointness, asserted with no citation/argument (and §2 declined to source the three-mode taxonomy). Support it or hedge as analytical assumption like §3.1's conjecture."},
+      {"id": "s6-two-cases-1", "location": "§6 opening", "issue": "'consistent with — and in two cases concretely instantiate — the claims of §3–§4' never identifies which two cases. Name them (e.g., Process/Outcome split + cross-provider heterogeneous ring)."}
+    ]
+  },
+  "outcome_axis": "correctness of the paper's thesis remains human-only (substantive_converged ≠ correctness_converged)"
+}
