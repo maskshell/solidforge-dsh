@@ -8,7 +8,8 @@ One table per surface. Left column: SolidForge for Claude Code (upstream). Right
 | --- | --- | --- |
 | Plugin (`skills/`, `agents/`, `hooks/`, `commands/`) | Agent preset `~/.dsh/.agent-presets/solidforge/` (`skills/`, `agents/`, `commands/`, `plugins/`) | A preset is the DSH unit that carries skills + role prompts + composition. |
 | `/plugin install` + enable | Select the preset for a session | The composition mounts once per session under a standing scope. |
-| `$CLAUDE_PLUGIN_ROOT` | `$SOLIDFORGE_PRESET_ROOT` | Baked into the plugin sources at install time; skills resolve their own base dir via the skill tool. |
+| `$CLAUDE_PLUGIN_ROOT` | `$SOLIDFORGE_PRESET_ROOT` | Baked into the plugin sources at install time; skills resolve their own base dir via the `skill-filesystem` provider's `baseUrl` wiring (not the skill tool). |
+| Skills (SKILL.md, Claude Code native) | The same five skills in the preset's `skills/`, listed in the GUI `/` menu and injectable via a `/name` token (see below) | DSH skill invocation is a slash pipeline, not a per-skill command: the client `skill` input-trigger source feeds the `/` menu from `skill.list`, and the host pre-step boundary (`dsh-tool-skill`) expands any whitespace-delimited `/name` token naming a user-invocable skill into the rendered `<skill_content>` — menu picks, hand-typed tokens, and TUI/ACP prompts all take the same path. A host command wins over a same-named skill; prompt-only abbreviations (`pd`/`bc`/`csr`/`psv`/`pas`) are persona-mapped to full names. |
 | `$CLAUDE_PROJECT_DIR` | `$SOLIDFORGE_PROJECT_DIR` (fallback: cwd) | Same semantics: project root for gates and loop state. |
 | `.claude/parallel-dev/loop-state.json` | `.solidforge/loop/loop-state.json` | Loop state + runs + snapshots moved under `.solidforge/loop/`. |
 | Project memory `CLAUDE.md` | `AGENTS.md` (DSH auto-injects it) | arm.py appends the L1 Constitution + Gate-Toolchain note to `AGENTS.md`. |

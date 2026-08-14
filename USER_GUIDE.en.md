@@ -139,7 +139,9 @@ Abbreviation map (full names and abbreviations both trigger):
 
 ### How to reference them in DSH
 
-- **Skills are model-side**: write the full name or abbreviation in your prompt (e.g. `pd`, `psv → csr`) and the agent loads the matching SKILL.md through the skill tool. DSH does **not** expose skills as `/pd`-style slash commands (unlike Claude Code's `/skill-name`) — just write the name.
+- **Skills have two channels**:
+  1. **Slash** — typing `/` in the GUI input lists the skills (from the `skill.list` catalog, grouped with commands); picking or typing a **kebab-case full name** token such as `/parallel-development` makes the host pre-step boundary **deterministically inject** the rendered skill body (no skill-tool call needed; a host command with the same name wins). Tokens match full names only — `/pd` does not hit.
+  2. **Prompt** — write the full name or abbreviation (e.g. `pd`, `psv → csr`); the persona maps abbreviations to full names and the agent loads the skill through the skill tool.
 - **The two slash commands** come from the `commands` plugin (§1): `/solidforge` injects the abbreviation table above plus the discipline one-liner into the agent; `/arm-tools` injects the full arming procedure from `commands/arm-tools.md`. They feed content to the agent — they are not the skills themselves.
 - The most reliable trigger remains writing the chain abbreviations into the prompt, e.g. `psv → csr → psv → bc → pd`.
 
