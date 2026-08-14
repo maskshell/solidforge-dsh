@@ -106,7 +106,7 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 | 22 role agents | `preset/agents/*.agent.md` | Role-prompt corpus dispatched via the `subagent` tool |
 | Deterministic infra | `preset/skills/*/infra/` | stdlib-only Python gates/state machine/schemas + test suites |
 | Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool (activation: see the User Guide) |
-| Global plugin face | `packages/solidforge-plugin/` | `@maskshell/solidforge`: host-layer skills, `/solidforge:<skill>` colon gestures, the `/solidforge` and `/arm-tools` commands (`install-global.sh` mounts it into the profile patch layer; sessions of any preset) |
+| Global plugin face | `packages/solidforge-plugin/` | `@maskshell/solidforge`: host-layer skills, `/solidforge:<skill>` colon gestures, the additive discipline section (`install-global.sh` mounts it into the profile patch layer; sessions of any preset); the `/solidforge` / `/arm-tools` / `/solidforge-status` commands are provided by the solidforge PRESET row |
 | arm-tools | `preset/commands/arm-tools.md` | Project-side provisioning (Layer 2) |
 
 ## Honest disclosure

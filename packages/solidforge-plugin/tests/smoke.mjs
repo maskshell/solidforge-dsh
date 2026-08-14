@@ -34,12 +34,17 @@ function mockCtx() {
   const ctx = {
     registrations: [],
     commands: [],
+    toolRegistrations: [],
+    sections: [],
     listeners: new Map(),
     effects: [],
     logger: { warn() {} },
     get(name) {
       if (name === 'skills') return { register: (reg) => { ctx.registrations.push(reg); return () => {} } }
       if (name === 'commands') return { register: (def) => { ctx.commands.push(def); return () => {} } }
+      if (name === 'systemPrompt') return { section: (section) => { ctx.sections.push(section); return () => {} } }
+      if (name === 'tools') return { register: (def) => { ctx.toolRegistrations.push(def); return () => {} } }
+      if (name === 'subprocess') return { resolveExecutable: async (cmd) => cmd, spawn: () => { throw new Error('spawn must not run in this test') } }
       return undefined
     },
     on(name, listener) {
@@ -85,8 +90,8 @@ function userMessage(text) {
       assert.equal(reg.resourceBase.kind, 'directory')
     }
 
-    assert.equal(ctx.commands.length, 2, 'two commands registered')
-    assert.deepEqual(ctx.commands.map((c) => c.name).sort(), ['arm-tools', 'solidforge'])
+    assert.equal(ctx.commands.length, 3, 'three commands registered')
+    assert.deepEqual(ctx.commands.map((c) => c.name).sort(), ['arm-tools', 'solidforge', 'solidforge-status'])
 
     // colon gesture, full name
     const listener = preStep(ctx)
@@ -123,6 +128,49 @@ function userMessage(text) {
   }
 }
 
+// ── opt-in switches: persona section ────────────────────────────────────────
+{
+  const home = buildFixture()
+  const previous = process.env.DSH_HOME
+  process.env.DSH_HOME = home
+  try {
+    const ctx = mockCtx()
+    mod.apply(ctx, { persona: true })
+    assert.equal(ctx.sections.length, 1, 'one additive discipline section')
+    assert.equal(ctx.sections[0].name, 'solidforge:discipline')
+    assert.equal(ctx.sections[0].order, 50)
+    assert.ok(ctx.sections[0].text.includes('Axis A — flow-control completeness'))
+    assert.ok(ctx.sections[0].text.includes('pd = parallel-development'))
+    assert.equal(ctx.toolRegistrations.length, 0, 'gates stay off by default')
+  } finally {
+    process.env.DSH_HOME = previous
+    rmSync(home, { recursive: true, force: true })
+  }
+}
+
+// ── opt-in switches: gates registration ─────────────────────────────────────
+{
+  const home = buildFixture()
+  const previous = process.env.DSH_HOME
+  process.env.DSH_HOME = home
+  try {
+    const ctx = mockCtx()
+    mod.apply(ctx, { gates: true })
+    assert.equal(ctx.toolRegistrations.length, 2, 'run-record + hetero-review tools registered')
+    assert.deepEqual(ctx.toolRegistrations.map((t) => t.name).sort(), ['solidforge_hetero_review', 'solidforge_run_record'])
+    assert.ok(ctx.listeners.has('tools/pre-execute'), 'pre-execute gate listener registered')
+    assert.ok(ctx.listeners.has('tools/post-execute'), 'post-execute gate listener registered')
+    // both switches together
+    const ctx2 = mockCtx()
+    mod.apply(ctx2, { persona: true, gates: true })
+    assert.equal(ctx2.sections.length, 1, 'persona section present with gates too')
+    assert.equal(ctx2.toolRegistrations.length, 2, 'gates present with persona too')
+  } finally {
+    process.env.DSH_HOME = previous
+    rmSync(home, { recursive: true, force: true })
+  }
+}
+
 // ── honest degrade: preset missing ──────────────────────────────────────────
 {
   const empty = mkdtempSync(join(tmpdir(), 'solidforge-empty-'))
@@ -132,7 +180,7 @@ function userMessage(text) {
     const ctx = mockCtx()
     mod.apply(ctx)
     assert.equal(ctx.registrations.length, 0, 'no skills registered without the preset')
-    assert.equal(ctx.commands.length, 2, 'commands still registered')
+    assert.equal(ctx.commands.length, 3, 'commands still registered')
     const armHandler = ctx.commands.find((c) => c.name === 'arm-tools').handler
     let steered = null
     const result = armHandler({ agent: { steer: (m) => { steered = m } } })

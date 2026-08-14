@@ -105,7 +105,7 @@ bash scripts/install-global.sh # 可选：全局插件面 → 任何预设的会
 | 22 个角色代理 | `preset/agents/*.agent.md` | 经 `subagent` 工具派发的角色提示语料 |
 | 确定性基础设施 | `preset/skills/*/infra/` | 纯 stdlib Python 门禁/状态机/schema + 测试套件 |
 | 结构化插件 | `plugins/*.host.js` | 工具事件门禁、rightness 不变量、异源评审工具（激活方式见使用指南） |
-| 全局插件面 | `packages/solidforge-plugin/` | `@maskshell/solidforge`：host 层技能、`/solidforge:<skill>` 冒号手势、`/solidforge` 与 `/arm-tools` 命令（`install-global.sh` 装进 profile 补丁层，任何预设可用） |
+| 全局插件面 | `packages/solidforge-plugin/` | `@maskshell/solidforge`：host 层技能、`/solidforge:<skill>` 冒号手势、追加式纪律段（`install-global.sh` 装进 profile 补丁层，任何预设可用）；`/solidforge`/`/arm-tools`/`/solidforge-status` 命令经 solidforge 预设行提供 |
 | arm-tools | `preset/commands/arm-tools.md` | 项目侧供给（Layer 2） |
 
 ## 诚实声明

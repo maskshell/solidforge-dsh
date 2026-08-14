@@ -132,3 +132,27 @@ entry was first written as `[- insert:` (invalid YAML), silently failing
 
 Tests: `packages/solidforge-plugin/tests/smoke.mjs` (self-contained fixture;
 CI suite 54). Uninstall: `scripts/install-global.sh --revert`.
+
+## Loader contract findings (2026-08-14, follow-up to the global plugin face)
+
+Two loader contracts discovered the hard way, both now encoded in the design:
+
+1. **`inject` is the service bridge.** A patch-layer `insert` entry whose
+   plugin declares no `inject` runs in a context that sees NONE of the app's
+   services (probe: systemPrompt/skills/commands/tools/subprocess/agents all
+   undefined). Declaring `inject: ['skills', 'systemPrompt']` makes exactly
+   those services (plus the parent chain: agents, systemPrompt) visible and
+   registration works (skillsRegistered=5, sectionRegistered=true, zero
+   errors — verified via the package's `.solidforge-status.json` probe on a
+   fresh `dsh --profile web` boot).
+2. **The patch-layer context cannot see `commands`/`tools`/`subprocess` at
+   all** (they live in preset scopes). Commands therefore moved to a
+   solidforge PRESET row of the same package (`config: {commands: true,
+   gestures: false, skills: false}`), and the gates stay with the per-session
+   dynamic plugins. The profile patch layer owns skills + gestures + the
+   discipline section only.
+3. **HMR reload wedges**: the running web process's patch-layer watcher stops
+   reloading after a failed cycle (the duplicate-entry era); entry definition
+   changes alone do not re-import the package module. Fresh boots always
+   apply cleanly. A web-process restart is required after structural patch
+   changes.

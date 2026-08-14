@@ -221,6 +221,21 @@
     fetch: false
     searchTimeoutMs: 60000
 
+
+# ── global plugin face (same package, preset scope) ──────────────────────────
+
+# The @maskshell/solidforge package also mounts here (preset scope) to regain
+# the services the profile patch layer cannot see: `commands`. Skills stay
+# owned by the rows above (skills: false avoids a same-content scoped shadow);
+# gestures stay owned by the global (patch-layer) mount (gestures: false
+# avoids double injection). Gates remain the per-session dynamic plugins.
+- id: solidforge-commands
+  name: '@maskshell/solidforge'
+  config:
+    commands: true
+    gestures: false
+    skills: false
+
 # ── structural enforcement (deliberately NOT a row here) ────────────────────
 
 # The SolidForge dynamic plugins (loop-gates / run-record / hetero-review) are
