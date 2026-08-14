@@ -8,6 +8,10 @@
     ".": "./lib/index.js"
   },
   "license": "MIT",
+  "files": [
+    "lib",
+    "README.md"
+  ],
   "keywords": ["dsh-plugin", "solidforge", "convergence", "spec-gaming", "coding-agents"],
   "repository": {
     "type": "git",

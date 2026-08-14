@@ -1,0 +1,34 @@
+name: publish-npm
+
+# npm trusted publishing (OIDC): no tokens, no OTP. The npm package
+# @maskshell/solidforge trusts this repo + workflow path (configured once on
+# the npm website), so the registry validates the GitHub OIDC identity at
+# publish time. Trigger: manual dispatch, or a push of a v* tag.
+#
+# IMPORTANT: version bumps happen in packages/solidforge-plugin/package.json;
+# tag the commit `v<version>` and push to publish.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance / trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+      - name: Publish @maskshell/solidforge
+        working-directory: packages/solidforge-plugin
+        # No token: with id-token: write + trusted publishing configured on
+        # npm, the CLI performs the OIDC exchange with the registry itself.
+        run: npm publish --provenance --access public

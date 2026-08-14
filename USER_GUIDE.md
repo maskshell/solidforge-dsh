@@ -24,7 +24,7 @@ bash scripts/install-global.sh     # 可选：全局插件面 → 任何会话�
 
 然后：
 
-- **全局插件面（可选，推荐）**：`install-global.sh` 把 `@maskshell/solidforge` 装进 web profile 的用户补丁层（`$DSH_HOME/profiles/web/cordis.patch.yml`，HMR 热加载）。装好后**任何预设的会话**都直接获得：
+- **全局插件面（可选，推荐）**：`install-global.sh` 把 `@maskshell/solidforge` 装进 web profile 的用户补丁层（`$DSH_HOME/profiles/web/cordis.patch.yml`，HMR 热加载）；或 `npm install --prefix "$DSH_HOME" @maskshell/solidforge` 后手写补丁条目。装好后**任何预设的会话**都直接获得：
   - 五个技能（host 层注册 → `/` 菜单与模型目录，任何预设可见）；
   - 冒号手势 `/solidforge:parallel-development` … `/solidforge:pas`（全名或缩写均可，pre-step 边界确定性注入技能正文）；
   - 追加式 `solidforge:discipline` 人格段（`--with-persona`；两轴纪律 + 缩写映射进任何预设的系统提示）。

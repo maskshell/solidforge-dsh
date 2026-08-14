@@ -22,7 +22,7 @@ bash scripts/install.sh            # → $DSH_HOME/.agent-presets/solidforge/ (i
 bash scripts/install-global.sh     # optional: the global plugin face → every session (below)
 ```
 
-- **Global plugin face (optional, recommended)**: `install-global.sh` mounts `@maskshell/solidforge` into the web profile's user patch layer (`$DSH_HOME/profiles/web/cordis.patch.yml`, hot-reloaded). Once installed, sessions of ANY preset get:
+- **Global plugin face (optional, recommended)**: `install-global.sh` mounts `@maskshell/solidforge` into the web profile's user patch layer (`$DSH_HOME/profiles/web/cordis.patch.yml`, hot-reloaded); or `npm install --prefix "$DSH_HOME" @maskshell/solidforge` and write the patch entry by hand. Once installed, sessions of ANY preset get:
   - the five skills (host-layer registration → the `/` menu and the model catalog, any preset);
   - colon gestures `/solidforge:parallel-development` … `/solidforge:pas` (full names or abbreviations; deterministic pre-step injection of the rendered skill body);
   - the additive `solidforge:discipline` prompt section (`--with-persona`; two-axis discipline + abbreviation map in any preset's system prompt).

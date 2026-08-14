@@ -85,7 +85,8 @@ If upstream never adopts the grammar, a plugin can still honor
 returns undefined for lines it cannot parse (`:` names), so a plugin-owned
 source can claim the line. **The SolidForge port now ships an even simpler
 mechanism**: the `@maskshell/solidforge` plugin (`packages/solidforge-plugin/`,
-mounted through the profile patch layer via `scripts/install-global.sh`)
+mounted through the profile patch layer via `scripts/install-global.sh`,
+published to npm as [`@maskshell/solidforge`](https://www.npmjs.com/package/@maskshell/solidforge))
 registers a root-level `agent/pre-step` waterfall listener that expands
 whitespace-bounded `/solidforge:<name>` tokens (full names or abbreviations)
 into the rendered `<skill_content>` — the same gesture boundary
