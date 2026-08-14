@@ -9,3 +9,9 @@ __pycache__/
 .env.solidforge
 !.env.example
 !.env.solidforge.example
+
+# Armed-project artifacts: single source of truth is the preset template set
+# (preset/skills/parallel-development/infra/templates/); arm-tools provisions copies
+# into armed projects. This workspace's own armed copies stay local, never tracked.
+.env.solidforge.example
+docs/intent-blueprints/
