@@ -443,7 +443,14 @@ The same gate applies when updating an existing language (e.g., adding a tool): 
 
 ## Deterministic Infrastructure (Opt-In)
 
-The convergence loop's deterministic gates (fast-gate listener, blueprint read-only guard, breaker counters, architecture-contract scripts, snapshot/rollback) ship inside the skill at `infra/` (running from the preset root — they are NOT copied into the target project) and fire only when the `solidforge-loop-gates` plugin is running; the project-side configs are armed OPT-IN via arm-tools. Without them the loop still runs but gates are advisory. Arming and gate status: [install.md](references/install.md). Loop semantics: [convergent-loop.md](references/convergent-loop.md).
+The convergence loop's deterministic gates (fast-gate listener, blueprint
+read-only guard, breaker counters, architecture-contract scripts,
+snapshot/rollback) ship inside the skill at `infra/` (running from the preset
+root — they are NOT copied into the target project) and fire only when the
+`solidforge-loop-gates` plugin is running; the project-side configs are armed
+OPT-IN via arm-tools. Without them the loop still runs but gates are advisory.
+Arming and gate status: [install.md](references/install.md). Loop semantics:
+[convergent-loop.md](references/convergent-loop.md).
 
 ## Optional Dependencies
 

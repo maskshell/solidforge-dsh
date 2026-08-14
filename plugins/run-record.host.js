@@ -5,7 +5,7 @@
 // The invariant: `rightness` is an enum the agent cannot write. The tool forces
 // `rightness: "human_confirm_required"` on EVERY record it emits — the constant
 // is baked into this plugin code, not into any project file the agent could
-// rewrite. `process_converged` (the loop's machine-checkable axis) is taken
+// rewrite. `converged`/`dod_satisfied` (the loop's machine-checkable axes) are taken
 // verbatim from loop_state.py's own run-record emission; correctness is never
 // auto-satisfied by process success.
 
@@ -54,12 +54,10 @@ return {
 
     const tool = harness.defineTool({
       name: 'solidforge_run_record',
-      description: 'Emit the normalized run record for the current convergence-loop task. The record carries the loop\\'s machine-checkable `process_converged` axis VERBATIM from loop_state.py, plus the outcome axis `rightness`, which is a schema constant `human_confirm_required` ENFORCED BY THIS TOOL — the agent can never write a confirmed/auto-satisfied value, and no oracle verdict substitutes for human confirmation of correctness. Call it at every terminal loop status (converged / suspended / hard_terminated) so the run is auditable.',
+      description: 'Emit the normalized run record for the current convergence-loop task. The record carries the loop\\'s machine-checkable `converged` / `dod_satisfied` axes VERBATIM from loop_state.py, plus the outcome axis `rightness`, which is a schema constant `human_confirm_required` ENFORCED BY THIS TOOL — the agent can never write a confirmed/auto-satisfied value, and no oracle verdict substitutes for human confirmation of correctness. Call it at every terminal loop status (converged / suspended / hard_terminated) so the run is auditable.',
       parameters: {
         type: 'object',
-        properties: {
-          summary: { type: 'string', description: 'One-line folded summary of the run (status + gates + breaker state).' },
-        },
+        properties: {},
         required: [],
         additionalProperties: false,
       },
@@ -89,10 +87,9 @@ return {
         // The invariant. This line is the port of the paper's §4.2 schema
         // constant: no branch in this tool ever writes another value.
         const record = { ...loop, rightness: 'human_confirm_required' }
-        if (typeof args.summary === 'string' && args.summary.length > 0) record.summary = args.summary
         return {
           record,
-          rightness_note: 'rightness is human_confirm_required by design — the loop cannot write it, the tool cannot write anything else, and process_converged is never a correctness claim. Human confirmation is an out-of-band act, not a schema state.',
+          rightness_note: 'rightness is human_confirm_required by design — the loop cannot write it, the tool cannot write anything else, and a green process axis is never a correctness claim. Human confirmation is an out-of-band act, not a schema state.',
         }
       },
     })

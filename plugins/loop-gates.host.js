@@ -19,6 +19,8 @@ const PD_INFRA = PRESET_ROOT + '/skills/parallel-development/infra'
 const HOOKS = PD_INFRA + '/hooks'
 
 const MUTATING_TOOLS = new Set(['edit', 'write'])
+// per-call pre-gate failure notices, surfaced by the post-execute listener
+const gateFailures = new Map()
 const FILE_ARG_KEYS = ['file_path', 'path', 'target']
 
 function filePathOf(args) {
@@ -100,7 +102,7 @@ return {
           const reason = denyReason(guard)
           if (typeof reason === 'string') return { kind: 'deny', reason }
         } catch (error) {
-          // A gate failure must not wedge the call: fall through to allow.
+          gateFailures.set(exec.callId, (gateFailures.get(exec.callId) || '') + ' blueprint_guard.py failed to run — treated as UNVERIFIED; ')
         }
       }
       try {
@@ -111,7 +113,7 @@ return {
         const reason = denyReason(counters)
         if (typeof reason === 'string') return { kind: 'deny', reason }
       } catch (error) {
-        // fall through to allow
+        gateFailures.set(exec.callId, (gateFailures.get(exec.callId) || '') + ' counters.py failed to run — treated as UNVERIFIED; ')
       }
       return next()
     })
@@ -132,23 +134,33 @@ return {
           tool_input: { file_path: filePath },
         }, [], cwd, exec.signal)
       } catch (error) {
-        return downstream
+        const message = gateMessage(exec.callId, ' fast_gate.py failed to run — treated as UNVERIFIED (gate failure must never be silent).')
+        if (downstream.kind === 'block') {
+          return { kind: 'block', feedback: downstream.feedback, additionalContexts: [message, ...(downstream.additionalContexts ?? [])] }
+        }
+        return { ...downstream, additionalContexts: [message, ...(downstream.additionalContexts ?? [])] }
+      }
+      const notices = []
+      const preFailure = gateFailures.get(exec.callId)
+      if (typeof preFailure === 'string' && preFailure.length > 0) {
+        notices.push(gateMessage(exec.callId, preFailure.trim()))
+        gateFailures.delete(exec.callId)
       }
       if (parsed !== null && typeof parsed === 'object' && parsed.decision === 'block') {
-        const message = gateMessage(exec.callId, String(parsed.reason))
-        if (downstream.kind === 'block') {
-          return {
-            kind: 'block',
-            feedback: downstream.feedback,
-            additionalContexts: [message, ...(downstream.additionalContexts ?? [])],
-          }
-        }
+        notices.push(gateMessage(exec.callId, String(parsed.reason)))
+      }
+      if (notices.length === 0) return downstream
+      if (downstream.kind === 'block') {
         return {
-          ...downstream,
-          additionalContexts: [message, ...(downstream.additionalContexts ?? [])],
+          kind: 'block',
+          feedback: downstream.feedback,
+          additionalContexts: [...notices, ...(downstream.additionalContexts ?? [])],
         }
       }
-      return downstream
+      return {
+        ...downstream,
+        additionalContexts: [...notices, ...(downstream.additionalContexts ?? [])],
+      }
     })
   },
 }

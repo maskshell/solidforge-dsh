@@ -73,7 +73,7 @@ Arm 会做（幂等，可 `--revert --apply` 撤销）：
 
 | 字段 | 含义 | 谁写 |
 | --- | --- | --- |
-| `process_converged` | 双环是否绿、DoD 是否满足（机器可查） | 循环/脚本 |
+| `converged` / `dod_satisfied`（pd 记录；bc 记录为 `process_converged`） | 双环是否绿、DoD 是否满足（机器可查） | 循环/脚本 |
 | `rightness` | 结论是否正确 | **没人能写**——schema 常量 `human_confirm_required`；正确性是带外的人类行为 |
 
 **读懂纪律**：绿 ≠ 对。任何"跑完了所以是对的"的说法在本体系里没有 schema 出口。
@@ -121,7 +121,7 @@ csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv ga
 1. **psv GATE MODE**——claim-extractor 抽取 load-bearing 声明 → 逐条对源裁决 → GO/NO-GO。短文档/本地引用为主时 ODP-5 判别器会跳过这一步（省 ~1.5 轮）。
 2. **csr**——同源 `doc-reviewer` 多轮对抗 + 高风险项加异源（出进程异族）。每轮 finding 逐条 disposition（修复/拒绝/升级）→ `substantive_converged`。**它收敛的是过程轴；需求对不对由你确认。**
 3. **bc**——plan-reviewer 外环 + 确定性内环（constraints-check）→ 产出并**冻结**意图蓝图。冻结后守卫拒绝任何编辑；改动只能走修订通道。
-4. **pd**——按蓝图 RED/GREEN 并行派发子代理 → 双环收敛 → 断路器看护 → 终态产出 run-record（`process_converged` 与恒定的 `rightness` 分家）。
+4. **pd**——按蓝图 RED/GREEN 并行派发子代理 → 双环收敛 → 断路器看护 → 终态产出 run-record（`converged`/`dod_satisfied` 与恒定的 `rightness` 分家）。
 5. **psv full-M（收尾，仅规则 13 文档）**——csr 收敛后对最终文本做权威逐声明覆盖记录。
 
 

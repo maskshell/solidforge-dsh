@@ -16,7 +16,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
 import detect_toolchain as dt  # noqa: E402
 
-TERMINAL_STATUSES = {"suspended", "hard_terminated"}
+TERMINAL_STATUSES = {"converged", "suspended", "hard_terminated"}
 
 
 def deny(reason):
@@ -54,6 +54,12 @@ def pre():
     status = state.get("status")
     if status in TERMINAL_STATUSES:
         diag = state.get("suspend") or {}
+        if status == "converged":
+            deny(
+                "Loop is converged — the task is closed and its run-record is final. "
+                "Edits after convergence would invalidate the record; open a NEW task "
+                "(loop_state.py init --task-id <new>) for follow-up work."
+            )
         deny(
             f"Loop is {status} — edits blocked by the circuit breaker. "
             f"Diagnosis: {diag.get('diagnosis', 'n/a')}. "

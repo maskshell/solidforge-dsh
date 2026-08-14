@@ -295,6 +295,7 @@ def _load_dotenv():
     if preset:
         _load_dotenv_file(os.path.join(preset, ".env.solidforge"))
 
+
 _ENV_VAR_RE = re.compile(r"\$\{([A-Z_][A-Z0-9_]*)\}")
 
 
@@ -416,13 +417,14 @@ def _prepare_dsh_home(name, tmpl):
     # adapter is dormant until a settings section supplies profiles), while a
     # hand-declared route carries baseURL/api/models in `provider_profile`.
     providers_entry = dict(tmpl.get("provider_profile") or {})
-    cred_env = str(tmpl.get("_credential_env") or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY")
+    cred_env = str(
+        tmpl.get("_credential_env")
+        or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY"
+    )
     if cred_env:
         providers_entry.setdefault("apiKeyEnv", str(cred_env))
     if providers_entry:
-        settings["llm-pi-ai"] = {
-            "providers": {provider: providers_entry}
-        }
+        settings["llm-pi-ai"] = {"providers": {provider: providers_entry}}
     with open(os.path.join(home, "settings.yaml"), "w", encoding="utf-8") as fh:
         json.dump(settings, fh, indent=2)
     env_block = {}
@@ -430,7 +432,10 @@ def _prepare_dsh_home(name, tmpl):
     # pi-ai's own env convention (zai-coding-cn -> ZAI_CODING_CN_API_KEY,
     # minimax-cn -> MINIMAX_CN_API_KEY). `_credential_env` is only an escape
     # hatch for routes whose convention differs.
-    cred_env = str(tmpl.get("_credential_env") or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY")
+    cred_env = str(
+        tmpl.get("_credential_env")
+        or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY"
+    )
     if cred_env:
         token = os.environ.get(str(cred_env), "")
         if not token:
@@ -491,7 +496,9 @@ def _family_checks(names, profiles_dir=None):
     return errors, notes
 
 
-def _leg_plan(name, model, schema_json, prompt, budget_usd, allowed_tools, observe_hooks):
+def _leg_plan(
+    name, model, schema_json, prompt, budget_usd, allowed_tools, observe_hooks
+):
     """Substrate dispatch per provider profile.
 
     - `substrate: dsh` (the DSH port's DEFAULT): same harness, different LLM —
@@ -504,7 +511,7 @@ def _leg_plan(name, model, schema_json, prompt, budget_usd, allowed_tools, obser
     src = _resolve_profile_path(name)
     with open(src, "r", encoding="utf-8") as fh:
         tmpl = json.load(fh)
-    if tmpl.get("substrate", "claude-code") == "dsh":
+    if tmpl.get("substrate", "dsh") == "dsh":
         home, env_block = _prepare_dsh_home(name, tmpl)
         return {
             "substrate": "dsh",
@@ -693,6 +700,27 @@ def _parse_cc_substrate_error(raw):
     return subtype, errors
 
 
+def _stdout_indicates_success(raw):
+    """True iff the CC stdout envelope is a SUCCESS (subtype 'success'), regardless of the
+    process exit code or the is_error flag. CC's protocol: the result event's `subtype` is
+    authoritative — 'success' means a usable result was produced. Handles both
+    --output-format json (a single object) and stream-json (JSONL — walk for the result
+    event). Defensive: any parse failure -> False.
+
+    Ported from csr's hetero_doc_review.py (CSR-I6 dogfood fix; copy-pattern parity —
+    the two wrappers must not diverge on the same substrate event)."""
+    if not raw:
+        return False
+    obj = _try_json(raw)
+    if isinstance(obj, dict) and obj.get("subtype") == "success":
+        return True
+    for line in raw.splitlines():
+        cand = _try_json(line.strip())
+        if isinstance(cand, dict) and cand.get("subtype") == "success":
+            return True
+    return False
+
+
 def _run_claude_once(
     argv, timeout_s, dry_run, dry_findings, dry_malform=False, dry_budget=False
 ):
@@ -732,9 +760,12 @@ def _run_claude_once(
     except subprocess.TimeoutExpired:
         return {**base, "ok": False, "fingerprint": "hetero-subprocess-timeout"}
 
-    if proc.returncode != 0:
+    if proc.returncode != 0 and not _stdout_indicates_success(proc.stdout):
         # CC substrate errors (budget/turns/overwhelmed) land in STDOUT as a clean envelope;
         # stderr is empty. Parse BEFORE malforming — a recoverable cap DEGRADES, not rewrites.
+        # (A non-zero exit WITH a success envelope is a CC backend quirk: subtype is
+        # authoritative, the result is usable — short-circuit to the normal parse below.
+        # Ported from csr, CSR-I6 dogfood.)
         subtype, errors = _parse_cc_substrate_error(proc.stdout)
         if subtype in DEGRADABLE_CC_SUBTYPES:
             return {

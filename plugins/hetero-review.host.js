@@ -33,13 +33,13 @@ return {
 
     const tool = harness.defineTool({
       name: 'solidforge_hetero_review',
-      description: 'Run the OPT-IN different-family adversarial review leg: spawn hetero_review.py, which launches an out-of-process subprocess on a DIFFERENT model family — DSH-native default: a fresh stateless `dsh --profile headless` session pinned to a different provider/model route (armed profiles, e.g. zhipu/minimax); the `claude -p` substrate is a labeled external-harness opt-in only — reviewing the diff against the frozen blueprint. ADVISORY + additive: the same-source code-reviewer stays primary; use this only for high-stakes items (ADR-level decisions, security/correctness-sensitive diffs, low-confidence same-source verdicts). Findings are violation-log-shaped with per-provider tags; on budget/turn cap the leg DEGRADES (never silently picks). Credentials resolve through the three-tier env chain (.env.solidforge / .env / preset-root); unarmed routes fail fast, never silently green.',
+      description: 'Run the OPT-IN different-family adversarial review leg: spawn hetero_review.py, which launches an out-of-process subprocess on a DIFFERENT model family — DSH-native default: a fresh stateless `dsh --profile headless` session pinned to a different provider/model route (armed profiles, e.g. zai-coding-cn / minimax-cn); the `claude -p` substrate is a labeled external-harness opt-in only — reviewing the diff against the frozen blueprint. ADVISORY + additive: the same-source code-reviewer stays primary; use this only for high-stakes items (ADR-level decisions, security/correctness-sensitive diffs, low-confidence same-source verdicts). Findings are violation-log-shaped with per-provider tags; on budget/turn cap the leg DEGRADES (never silently picks). Credentials resolve from the .env file tiers (project .env.solidforge > .env > preset-root .env.solidforge) — the harness scrubs shell credential vars from plugin-spawned subprocesses, so shell-exported keys are NOT visible to this tool; unarmed routes fail fast, never silently green.',
       parameters: {
         type: 'object',
         properties: {
           diff_ref: { type: 'string', description: 'Path (or git ref) of the diff to review, e.g. the working-tree diff file or HEAD..worktree.' },
           blueprint_ref: { type: 'string', description: 'Path to the frozen Intent Blueprint (authoritative reference).' },
-          profile: { type: 'string', description: 'Provider profile name (DSH-native routes, e.g. pi-ai | zhipu | minimax; claude-code-substrate profiles only as the labeled external-harness opt-in) or comma-list for dual-/multi-different-family. Default: $HETERO_PROFILE or pi-ai.' },
+          profile: { type: 'string', description: 'Provider profile name (DSH-native catalog routes, e.g. zai-coding-cn | minimax-cn | qwen-token-plan-cn; claude-code-substrate profiles only as the labeled external-harness opt-in) or comma-list for dual-/multi-different-family. Default: $HETERO_PROFILE; unset = fail-fast arming prompt.' },
           budget_usd: { type: 'number', description: 'Runaway backstop for the subprocess (default 4.0); not real cost for non-Anthropic backends.' },
           timeout: { type: 'number', description: 'Per-subprocess wall-clock cap in seconds (default 600 or $HETERO_TIMEOUT).' },
         },
@@ -62,7 +62,7 @@ return {
       },
       async execute(args, exec) {
         const cwd = projectCwd(exec)
-        const argv = [PD_INFRA + '/scripts/hetero_review.py', '--diff', String(args.diff_ref), '--blueprint', String(args.blueprint_ref), ]
+        const argv = [PD_INFRA + '/scripts/hetero_review.py', '--embedded', '--diff', String(args.diff_ref), '--blueprint', String(args.blueprint_ref), ]
         if (typeof args.profile === 'string' && args.profile.length > 0) argv.push('--profile', args.profile)
         if (typeof args.budget_usd === 'number') argv.push('--budget-usd', String(args.budget_usd))
         if (typeof args.timeout === 'number') argv.push('--timeout', String(args.timeout))

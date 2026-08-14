@@ -13,15 +13,18 @@ from typing import Optional
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
+
 class UserCreate(BaseModel):
     username: str
     email: str
     password: str
 
+
 class UserResponse(BaseModel):
     id: int
     username: str
     email: str
+
 
 class UserService:
     async def create_user(self, data: UserCreate) -> UserResponse:
@@ -30,6 +33,7 @@ class UserService:
             raise HTTPException(status_code=400, detail="Username exists")
         user = await self.db.users.insert_one(data.dict())
         return UserResponse(id=user.inserted_id, **data.dict())
+
 
 @router.post("/", response_model=UserResponse)
 async def create_user(data: UserCreate, service: UserService = Depends(get_service)):
@@ -107,6 +111,7 @@ pub async fn create_user(
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
 
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -168,7 +173,9 @@ impl AuthService {
 ### Python/FastAPI
 
 ```python
-async def get_current_user(creds: HTTPAuthorizationCredentials = Depends(security)) -> User:
+async def get_current_user(
+    creds: HTTPAuthorizationCredentials = Depends(security),
+) -> User:
     token = creds.credentials
     payload = await AuthService.verifyToken(token)
     if not payload:
@@ -218,6 +225,7 @@ function errorResponse(code: string, message: string): ApiError {
 @pytest.fixture
 def mock_db():
     return MagicMock()
+
 
 @pytest.mark.asyncio
 async def test_create_user(mock_db):

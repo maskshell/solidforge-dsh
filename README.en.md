@@ -29,7 +29,7 @@ Frozen Intent Blueprint ──▶ parallel implementation (TDD, subagents)
                          │ Outer ring (adversarial)   same-source reviewer (primary) + hetero leg (opt-in, out-of-process)
                          └─────────┬──────────┘
                                    ▼
-        Run record: process_converged (machine-checkable) ‖ rightness (always human_confirm_required)
+        Run record: converged/dod_satisfied (machine-checkable; bc records: process_converged) ‖ rightness (always human_confirm_required)
 ```
 
 Five sentences: **green gates prove process convergence, not correctness; correctness is confirmed by a human (or a genuinely heterogeneous oracle); spec-gaming defense is structural (schema constants, event listeners, process boundaries) — never a prompt.**
@@ -90,7 +90,7 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 
 1. **Dual-ring convergence**: the deterministic inner ring (lint/types/tests/architecture contracts) must be green before the outer ring; the outer ring is same-source adversarial review with per-finding dispositions (fix/reject/escalate), fully audited.
 2. **Frozen Intent Blueprint**: PRD/architecture/acceptance criteria freeze at spec convergence; changes go through a revision channel only; a `status: frozen` guard denies edits.
-3. **Process/Outcome split**: the run record strictly separates `process_converged` from `rightness` — the latter is an enum constant `human_confirm_required` that neither the agent nor the loop can write. Green never means right, structurally.
+3. **Process/Outcome split**: the run record strictly separates the process-axis fields (pd: `converged`/`dod_satisfied`; bc: `process_converged`) from `rightness` — the latter is an enum constant `human_confirm_required` that neither the agent nor the loop can write. Green never means right, structurally.
 4. **Heterogeneous review**: high-stakes items can add an adversarial second opinion from a **different model family** (default: a fresh `dsh --profile headless` subprocess pinned to a heterogeneous route — same harness, different LLM, out of process; e.g. `zai-coding-cn`/GLM, `minimax-cn`/MiniMax-M3). The same-source ring always runs first; heterogeneity is additive.
 5. **Circuit breakers**: repeated same-fingerprint failures → escalate to the outer ring; inner cap reached → degrade/split; budget exhausted → hard-terminate with a diagnosis. The loop never spins unbounded.
 

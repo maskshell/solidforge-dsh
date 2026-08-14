@@ -39,9 +39,12 @@ RUN_RECORD_SCHEMA = os.path.join(SCHEMAS, "run-record.schema.json")
 sys.path.insert(0, SCRIPTS)
 import hetero_review as h  # noqa: E402  (unit-test the profile helpers directly)
 
+
 def _resolved_default_profile_hint():
     import os as _os
+
     return _os.environ.get("HETERO_PROFILE", "")
+
 
 try:
     import jsonschema  # type: ignore
@@ -366,7 +369,10 @@ def check_provider_template_expansion():
     try:
         d = json.load(open(tmp))
         assert d["env"]["ANTHROPIC_AUTH_TOKEN"] == "sk-conv-unit", d["env"]
-        assert d["env"]["ANTHROPIC_BASE_URL"] == "https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+        assert (
+            d["env"]["ANTHROPIC_BASE_URL"]
+            == "https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+        )
     finally:
         os.unlink(tmp)
     del os.environ["QWEN_ANTHROPIC_AUTH_TOKEN"]
@@ -398,17 +404,19 @@ def check_provider_template_expansion():
     print("  missing-token fail-fast (names the convention var): PASS")
 
 
-
-
-
 def check_family_guards():
     """_family metadata is FUNCTIONAL: same-source refusal + dual-family honesty
     (paper §4.1). Unit-style against a temp profiles dir."""
     import tempfile as _t
+
     d = _t.mkdtemp(prefix="fam_")
     try:
-        for n, fam in [("zai.json", "zhipu"), ("zai-coding-cn.json", "zhipu"),
-                       ("deepseek-r.json", "deepseek"), ("nofam.json", None)]:
+        for n, fam in [
+            ("zai.json", "zhipu"),
+            ("zai-coding-cn.json", "zhipu"),
+            ("deepseek-r.json", "deepseek"),
+            ("nofam.json", None),
+        ]:
             obj = {"substrate": "dsh", "model": "m"}
             if fam:
                 obj["_family"] = fam
@@ -416,15 +424,25 @@ def check_family_guards():
         errs, notes = h._family_checks(["zai"], d)
         assert not errs and not notes, (errs, notes)
         errs, notes = h._family_checks(["deepseek-r"], d)
-        assert errs and any("SAME-SOURCE" in e for e in errs) and not notes, (errs, notes)
+        assert errs and any("SAME-SOURCE" in e for e in errs) and not notes, (
+            errs,
+            notes,
+        )
         errs, notes = h._family_checks(["zai", "zai-coding-cn"], d)
-        assert not errs and any("no blind-spot diversity" in n for n in notes), (errs, notes)
+        assert not errs and any("no blind-spot diversity" in n for n in notes), (
+            errs,
+            notes,
+        )
         errs, notes = h._family_checks(["nofam"], d)
         assert not errs and any("guard inactive" in n for n in notes), (errs, notes)
     finally:
         import shutil as _sh3
+
         _sh3.rmtree(d, ignore_errors=True)
-    print("  family guards (same-source refuse / dual-family note / undeclared note): PASS")
+    print(
+        "  family guards (same-source refuse / dual-family note / undeclared note): PASS"
+    )
+
 
 def check_dsh_substrate_home_construction():
     """DSH-native substrate: _prepare_dsh_home builds a throwaway DSH_HOME whose
@@ -448,10 +466,13 @@ def check_dsh_substrate_home_construction():
             assert settings["agent-default-model"]["provider"] == "het-route"
             assert settings["agent-default-model"]["model"] == "het-model"
             assert settings["agent-default-model"]["reasoningEffort"] == "high"
-            assert settings["llm-pi-ai"]["providers"]["het-route"] == {"apiKeyEnv": "HETERO_UNIT_KEY"}  # catalog route: apiKeyEnv only
+            assert settings["llm-pi-ai"]["providers"]["het-route"] == {
+                "apiKeyEnv": "HETERO_UNIT_KEY"
+            }  # catalog route: apiKeyEnv only
             assert env_block["HETERO_UNIT_KEY"] == "sk-hetero"
         finally:
             import shutil as _shutil
+
             _shutil.rmtree(home, ignore_errors=True)
     finally:
         del os.environ["HETERO_UNIT_KEY"]
@@ -459,14 +480,20 @@ def check_dsh_substrate_home_construction():
     # <UPPERCASE(route)>_API_KEY — pi-ai's own env convention.
     os.environ["HET_ROUTE_API_KEY"] = "sk-derived"
     try:
-        home2, env2 = h._prepare_dsh_home("het-route", {k: v for k, v in tmpl.items() if k != "_credential_env"})
+        home2, env2 = h._prepare_dsh_home(
+            "het-route", {k: v for k, v in tmpl.items() if k != "_credential_env"}
+        )
         assert os.path.isdir(home2)
         try:
             settings2 = json.load(open(os.path.join(home2, "settings.yaml")))
-            assert settings2["llm-pi-ai"]["providers"]["het-route"]["apiKeyEnv"] == "HET_ROUTE_API_KEY"
+            assert (
+                settings2["llm-pi-ai"]["providers"]["het-route"]["apiKeyEnv"]
+                == "HET_ROUTE_API_KEY"
+            )
             assert env2["HET_ROUTE_API_KEY"] == "sk-derived"
         finally:
             import shutil as _sh2
+
             _sh2.rmtree(home2, ignore_errors=True)
     finally:
         del os.environ["HET_ROUTE_API_KEY"]
@@ -477,27 +504,49 @@ def check_dsh_substrate_home_construction():
     import contextlib
     import io as _io
     import glob as _glob
+
     before = set(_glob.glob(os.path.join(tempfile.gettempdir(), "sf-dsh-hetero-*")))
     with contextlib.redirect_stderr(_io.StringIO()):
         try:
-            h._prepare_dsh_home("het-route", {**tmpl, "_credential_env": "UNSET_HETERO_KEY"})
+            h._prepare_dsh_home(
+                "het-route", {**tmpl, "_credential_env": "UNSET_HETERO_KEY"}
+            )
         except SystemExit:
             pass
     after = set(_glob.glob(os.path.join(tempfile.gettempdir(), "sf-dsh-hetero-*")))
     assert after == before, "missing-token branch must clean up its throwaway home"
-    print("  _prepare_dsh_home (throwaway DSH_HOME + credential env + fail-fast cleanup): PASS")
+    print(
+        "  _prepare_dsh_home (throwaway DSH_HOME + credential env + fail-fast cleanup): PASS"
+    )
 
     # default is FAIL-FAST: no provider configured = an arming prompt, never a
     # silent fallback (the placeholder pi-ai.json default was removed).
     assert _resolved_default_profile_hint() == ""
     r = _run(
         HETERO,
-        ["--diff", "HEAD", "--blueprint", "t#b", "--task-id", "u", "--project-dir", tempfile.mkdtemp()],
+        [
+            "--diff",
+            "HEAD",
+            "--blueprint",
+            "t#b",
+            "--task-id",
+            "u",
+            "--project-dir",
+            tempfile.mkdtemp(),
+        ],
         tempfile.mkdtemp(),
-        {**os.environ, "HETERO_PROFILE": "", "SOLIDFORGE_PROJECT_DIR": tempfile.mkdtemp()},
+        {
+            **os.environ,
+            "HETERO_PROFILE": "",
+            "SOLIDFORGE_PROJECT_DIR": tempfile.mkdtemp(),
+        },
     )
-    assert r.returncode == 2 and "no heterogeneous provider configured" in r.stderr, (r.returncode, r.stderr)
+    assert r.returncode == 2 and "no heterogeneous provider configured" in r.stderr, (
+        r.returncode,
+        r.stderr,
+    )
     print("  default fail-fast arming prompt (no silent fallback): PASS")
+
 
 def check_dual_provider_dry_run():
     """Multi-different-family: --profile a,b runs each backend, tags findings with `provider`,

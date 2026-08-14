@@ -160,6 +160,7 @@ All must be green. `disconnect_check.py` is the structure gate; `smoke_gates.py`
 ## Convergence log
 
 ### Round 1 — adversarial review (fresh-context general-purpose reviewer)
+
 **Verdict returned: NOT-CONVERGED — 5 blockers + 8 warnings.** All findings verified against source before fixing:
 
 - **B1 (blocker, CONFIRMED):** cross-ecosystem gates `arch_contract_deps.py` (`main` L430-441) and `arch_contract_tests.py` (`main` L483-499) hardcode ecosystem loops with no `go.mod` → Go would have no functional supply-chain/test gate. **Fix:** added §"Cross-ecosystem gates" (+ parser unit tests in `arch_deps_parsers.py`/`arch_tests_parsers.py`).
@@ -178,6 +179,7 @@ All must be green. `disconnect_check.py` is the structure gate; `smoke_gates.py`
 - **Nits N1–N5 (VERIFIED, no change needed):** ADR #36 is free; link count 9+4+3=16 exact; `platforms.json` `go` entry satisfies every checker field; description fits at ~1016 chars; `arch_contract_api.py`/`counters.py`/`plugin.json`/`evals.json` correctly untouched.
 
 ### Round 2 — adversarial review (fresh-context reviewer)
+
 **Verdict returned: NOT-CONVERGED — 2 blockers + 3 warnings + 2 nits.** Two of the issues were NEW defects introduced by the round-1 fixes (the convergence loop earning its keep). All verified against source before fixing:
 
 - **B1-round2 (blocker, CONFIRMED):** the round-1 `parse_govulncheck` fix was itself wrong — `govulncheck -format json` emits **NDJSON** (a stream of typed `Message` objects), NOT a single JSON doc; the existing `_json_or_none` (`json.loads`, single-doc) crashes at runtime while a single-doc canned test passes offline → silent green (the exact failure B1 was meant to cure). **Fix:** the `check_govulncheck` wrapper line-splits stdout and decodes each line, collecting `finding` messages for the pure parser; the canned `arch_deps_parsers.py` fixture uses real multi-line NDJSON. (§"Cross-ecosystem gates".)
@@ -188,6 +190,7 @@ All must be green. `disconnect_check.py` is the structure gate; `smoke_gates.py`
 - **Nits N1/N2 (VERIFIED, no change):** `desc_keywords` substring-match against the description confirmed (`golang`/`golangci`/`go.mod` all present); `arch_contract_api.py` correctly untouched (Java+Web-scoped).
 
 ### Round 3 — adversarial review (fresh-context reviewer)
+
 **Verdict returned: NOT-CONVERGED — 1 new blocker + 2 nits.** Rounds 1→2→3 found 5→2→1 blockers (classic convergence curve; the issues narrow and deepen each round). Round-2 fixes B2 (build/vet ordering), W1 (arm.py 6 sites), W3 (severity by `FromLinter`) all verified to HOLD; the `platforms.json` entry re-verified field-by-field; the "untouched files" claim (`counters.py`/`plugin.json`/`evals.json`/`hooks.json`/`arch_contract_api.py`) spot-checked clean. The one new blocker:
 
 - **B1-round3 (blocker, CONFIRMED — the deepest cut):** the round-2 govulncheck fix decomposed the NDJSON stream correctly but left the pure parser unable to reach the vulnerability detail. A `finding` message carries only `{OSV: <id>, FixedVersion, Trace}` — `OSV` is an ID *reference*; the `summary`/`details` live ONLY on the separate `osv`-typed message emitted earlier in the stream, and Go's OSV subset has no CVSS field. So `parse_govulncheck(finding_msgs)` could emit only detail-less findings, and "severity by CVSS" is doubly impossible. **Fix:** the wrapper collects BOTH `osv` and `finding` messages, builds `dict[osv_id -> osv_entry]`, passes `(findings, osv_index)` to the pure parser which joins them (summary → `detail`); severity maps ALL govulncheck findings to `blocker` (parity with `parse_cargo_audit`; reachable vulns are real by definition); the canned fixture includes both an `osv` line and a referencing `finding` line and asserts the join. (§"Cross-ecosystem gates".)
@@ -195,6 +198,7 @@ All must be green. `disconnect_check.py` is the structure gate; `smoke_gates.py`
 - **Nit (round-3): §Verification** now names the osv↔finding join assertion for the `arch_deps_parsers.py` test. (§"Verification".)
 
 ### Round 4 — adversarial review (fresh-context reviewer)
+
 **Verdict returned: NOT-CONVERGED — 1 new warning + 2 nits.** The round-3 govulncheck OSV/Finding-correlation fix verified TECHNICALLY SOUND against the canonical `golang.org/x/vuln/internal/govulncheck` schema (the two-pass index-then-join is order-independent per the spec's "no guarantees on message order"; all findings → blocker mirrors `parse_cargo_audit`). Full internal-consistency sweep clean; enumeration sweep complete (`counters.py`/`plugin.json`/`evals.json`/`hooks.json`/`arch_contract_api.py` correctly untouched; `arch_deps_parsers.py`/`arch_tests_parsers.py` have no dispatcher table — pure per-parser tests; blueprint-crafting has no mirrored platform list). One new warning + 2 nits:
 
 - **W-round4 (warning, CONFIRMED — grep-verified):** round-1 W2's `memory-protocol.md` claim was wrong twice. (1) The enum is at **line 209** (inside a code-fence `episode_body`), not L21. (2) `memory-protocol.md:209` is `python|swift|web` (3 tokens) — it was NEVER synced with `golden-paths.md:21`'s `python|swift|web|rust|java|visual` (6 tokens). "Add `go` to both" would yield `python|swift|web|go`, deepening the drift. **Fix:** bring memory-protocol.md to full parity `python|swift|web|rust|java|visual|go` (adds `go` AND corrects the pre-existing `rust|java|visual` drift), cite L209, note both enums must stay identical. (§"Doc-enumeration edits".)
@@ -202,13 +206,17 @@ All must be green. `disconnect_check.py` is the structure gate; `smoke_gates.py`
 - **Nit-round4:** the SKILL.md description edit is load-bearing (without it, `desc_keywords` aren't substrings of the description → `disconnect_check.py:180` routing check fails AND the skill won't activate on Go). **Fix:** noted explicitly. (§"Doc-enumeration edits", SKILL.md bullet.)
 
 ### Round 5 — adversarial review (fresh-context reviewer)
+
 **Verdict returned: CONVERGED.** No new blocker, no new warning. The round-4 fixes verified (memory-protocol.md L209 parity exact; nesting note + desc_keywords load-bearing note present and accurate; govulncheck two-pass osv-index-then-join sound against the canonical schema). Full internal-consistency + enumeration sweep clean end-to-end; the "correctly untouched" set spot-checked (`counters.py`/`plugin.json`/`evals.json`/`hooks.json`/`arch_contract_api.py`/`arch_deps_parsers.py`/`arch_tests_parsers.py`/blueprint-crafting). Two non-blocking nits, both fixed in this round:
+
 - **Nit:** the ast-grip justification was factually wrong (Python DOES have an ast-grep section; only Java/Web lack one) — corrected to "the file is selectively populated per-language (Vue/TS/Rust/Swift/Python have sections; Java and Web do not). Go matches Java's absence."
+
 - **Nit:** description char-count — the reviewer's 976 used a different method; re-measured with the checker's exact `description_length()` algorithm it is **959**, and the Go entry (+57) lands at **1016**, authoritatively under 1024. Noted authoritatively in the plan.
 
 **Convergence curve (substantive findings): round 1 = 5 blockers + 8 warnings → round 2 = 2 blockers + 3 warnings → round 3 = 1 blocker + 2 nits → round 4 = 1 warning + 2 nits → round 5 = 0.** The plan is implementation-ready. The loop's value: it caught the single most damaging gap (round-1 B1 — cross-ecosystem gates would have left Go with no functional supply-chain/test gate), a class of silent-green defects in the gate parsers (round-2 NDJSON, round-3 OSV/Finding correlation), and a pre-existing doc drift (round-4 memory-protocol.md enum) — none visible from the structure checker alone, each a rule-3 violation the convergence loop exists to prevent.
 
 ### Round 6 — wiki-informed re-review (fedaot-wiki knowledge base)
+
 Rounds 1–5 verified the plan against the repo **source**. Round 6 cross-checked it against the **fedaot-wiki** — the canonical upstream the skill itself cites (`maturity.md` → `ai-coding-agent-maturity`; `extending.md` → the pathology catalog; the convergence framework). Sources read: `golang` wiki pages `go-tooling-ecosystem`, `go-project-layout-conventions`, `go-modules-toolchain`, `go-testing-philosophy`, `go-security-engineering`; `common`/`main` `ai-coding-agent-maturity` + `convergence-repair-loop`. **Verdict: NOT-CONVERGED against the wiki — 2 substantive + 3 refinements.** Source-grounded rounds verified *mechanics*; the wiki supplied *Go idioms + the canonical methodology* the source alone couldn't. All applied:
 
 - **W-wiki-1 (warning, NEW — the biggest wiki contribution):** the plan attributed layer/dependency-direction enforcement solely to `golangci-lint depguard`, omitting Go's **`internal/` compiler-enforced import boundary**. `go-project-layout-conventions`: `internal/` visibility is enforced by the *compiler* (importing from outside its parent tree is a compile failure) — a STRUCTURAL boundary STRONGER than depguard (a lint). **Fix:** design table now lists `internal/` + depguard as two complementary enforcers; go-patterns.md documents `cmd/internal/pkg` layout + inward dependency direction as the primary mechanism with depguard as the complement; `.golangci.yml` header notes depguard complements (not founds) `internal/`.

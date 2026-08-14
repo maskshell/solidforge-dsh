@@ -21,7 +21,7 @@ skill docs:
 
 | File | Role |
 | --- | --- |
-| `spec-gaming-orthogonal-axis.convergence.json` | The paper's csr convergence record (4-round reconvergence of 2026-07-31, schema-validatable) |
+| `spec-gaming-orthogonal-axis.convergence.json` | The paper's csr convergence record (3-round reconvergence of 2026-07-31, of the 4-round 2026-07-08 pass; schema-validatable) |
 | `spec-gaming-orthogonal-axis.loopx-reconvergence.json` | The LoopX-amendment reconvergence delta (§7 peer paragraph + §4.4 control-plane note) |
 | `loopx-research.md` + `loopx-research.psv/coverage-record.json` | The LoopX evidence trail the reconvergence record cites (psv N31/W12/R3 coverage) |
 | `spec-gaming-orthogonal-axis.pub-readiness.csr/` | The readiness review's own csr + psv + prior-art-collision records (per-round findings included) |

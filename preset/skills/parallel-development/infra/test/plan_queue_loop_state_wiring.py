@@ -55,9 +55,7 @@ def _loop_state(td):
 
 
 def _runs(td, item):
-    return glob.glob(
-        os.path.join(td, ".solidforge", "loop", "runs", f"{item}-*.json")
-    )
+    return glob.glob(os.path.join(td, ".solidforge", "loop", "runs", f"{item}-*.json"))
 
 
 def _setup(td):

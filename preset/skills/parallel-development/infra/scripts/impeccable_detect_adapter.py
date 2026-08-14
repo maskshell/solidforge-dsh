@@ -85,7 +85,9 @@ def find_marker_dirs(root, names, max_depth=4):
 def detect_mjs_path(root):
     """The armed Impeccable skill's detector (project-scoped install)."""
     for cand in (
-        os.path.join(root, ".solidforge", "skills", "impeccable", "scripts", "detect.mjs"),
+        os.path.join(
+            root, ".solidforge", "skills", "impeccable", "scripts", "detect.mjs"
+        ),
         # user-level fallback
         os.path.expanduser("~/.solidforge/skills/impeccable/scripts/detect.mjs"),
     ):

@@ -1,0 +1,17 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD041": false,
+  "MD024": { "siblings_only": true },
+  "MD033": {
+    "allowed_elements": [
+      "task",
+      "must-implement",
+      "context",
+      "action",
+      "observable",
+      "path",
+      "anti-pattern"
+    ]
+  }
+}

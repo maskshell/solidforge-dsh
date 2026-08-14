@@ -61,8 +61,9 @@ psv full-M: 60 verified / 0 refuted / 1 narrowed (fixed post-run) / 3 unverifiab
 
 The hetero wrappers' default substrate is now DSH-NATIVE: `substrate: dsh` spawns a
 fresh stateless `dsh --profile headless` subprocess with a throwaway DSH_HOME pinning a
-different provider/model route (default `profiles/pi-ai.json`, arming =
-route+model+`PI_AI_API_KEY`). The upstream `claude -p` mechanism is a labeled
+different provider/model route (unarmed = fail-fast arming prompt; no placeholder
+profile ships — the pi-ai.json placeholder of the intermediate state was removed in the
+naming consolidation, see below). The upstream `claude -p` mechanism is a labeled
 external-harness opt-in (`substrate: claude-code`) only — heterogeneity is a different
 LLM, not a different harness. Verified: both wrappers fail fast with the arming message
 and no subprocess spawn when the route is unarmed; wiring suites pass including the new
@@ -70,12 +71,13 @@ DSH-home construction + fail-fast-cleanup branch.
 
 ## Heterogeneous arming + live dual-hetero run (2026-08-14)
 
-User-provided keys armed two DSH-native heterogeneous profiles:
-`profiles/zhipu.json` (GLM-5.2, open.bigmodel.cn anthropic endpoint) and
-`profiles/minimax.json` (MiniMax-M3, api.minimaxi.com anthropic endpoint) — both
-`substrate: dsh`, hand-declared pi-ai routes (`api: anthropic-messages`),
-credentials in the gitignored workspace `.env.solidforge`
-(`HETERO_PROFILE=zhipu,minimax`). End-to-end smoke: both providers rc=0 via fresh
+User-provided keys armed two DSH-native heterogeneous profiles — then named
+`profiles/zhipu.json` and `profiles/minimax.json` (hand-declared pi-ai routes, later
+replaced by the catalog routes `zai-coding-cn` / `minimax-cn` with route-derived
+credential vars `ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY`; `HETERO_PROFILE`
+now names those routes). The historical names below document the evolution —
+current profiles/ dir ships claude.json, minimax-cn.json, qwen-token-plan-cn.json,
+qwen.json, zai-coding-cn.json. End-to-end smoke: both providers rc=0 via fresh
 `dsh --profile headless` subprocesses — zero foreign harness. Live dual-hetero
 review of README.md: 14 findings, 1 real blocker + 7 warnings fixed, 4 rejected
 as a second oracle-false-positive class (stale-finding misreads), trail in

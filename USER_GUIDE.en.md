@@ -67,7 +67,7 @@ Two fields, always separate:
 
 | Field | Meaning | Who writes it |
 | --- | --- | --- |
-| `process_converged` | both rings green, DoD met (machine-checkable) | the loop / scripts |
+| `converged` / `dod_satisfied` (pd records; bc records: `process_converged`) | both rings green, DoD met (machine-checkable) | the loop / scripts |
 | `rightness` | whether the conclusion is correct | **nobody can** — schema constant `human_confirm_required`; correctness is an out-of-band human act |
 
 **Reading the discipline**: green ≠ right. "It ran to completion, therefore it's correct" has no schema exit in this system.
@@ -115,7 +115,7 @@ After the per-skill table, the composition table — the skills form the paper's
 1. **psv GATE MODE** — the claim-extractor enumerates load-bearing claims → per-claim adjudication against fetched sources → GO/NO-GO. Short / mostly-local-citation docs skip this step (ODP-5 discriminator, saves ~1.5 rounds).
 2. **csr** — same-source `doc-reviewer` multi-round adversarial review + the hetero leg for high-risk items (out-of-process, different family). Per-round findings get per-finding dispositions (fix/reject/escalate) → `substantive_converged`. **It converges the PROCESS axis; whether the requirements are right stays yours.**
 3. **bc** — plan-reviewer outer ring + deterministic inner ring (constraints-check) → produce and FREEZE the Intent Blueprint. Once frozen, the guard denies edits; changes go through the revision channel only.
-4. **pd** — RED/GREEN subagents dispatched in parallel against the blueprint → dual-ring convergence → breakers watching → a run-record at the terminal status (`process_converged` strictly separated from the constant `rightness`).
+4. **pd** — RED/GREEN subagents dispatched in parallel against the blueprint → dual-ring convergence → breakers watching → a run-record at the terminal status (`converged`/`dod_satisfied` strictly separated from the constant `rightness`).
 5. **psv full-M (closing, rule-13 docs only)** — after csr convergence, the authoritative per-claim coverage record over the final text.
 
 

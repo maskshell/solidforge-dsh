@@ -1,5 +1,5 @@
 {
-  "_comment": "Provider template — Claude (Anthropic official endpoint). In the DSH port the ORCHESTRATOR is DeepSeek, so Claude is heterogeneous by construction: no BASE_URL override, the claude CLI's own credentials route the call. No _token_env: the wrapper skips token injection and the CLI uses its native auth. ROUTING ONLY (no secret). See model-routing.md. ADR #40. EXTERNAL-HARNESS OPT-IN: substrate claude-code spawns the Claude Code CLI — a FOREIGN harness dragged into a DSH run. It is retained only for backends that expose no DSH adapter; the DSH-native default is profiles/pi-ai.json (substrate dsh).",
+  "_comment": "Provider template — Claude (Anthropic official endpoint). In the DSH port the ORCHESTRATOR is DeepSeek, so Claude is heterogeneous by construction: no BASE_URL override, the claude CLI's own credentials route the call. No `_credential_env`: native auth — the wrapper skips token injection and the CLI uses its own credentials. ROUTING ONLY (no secret). See model-routing.md. ADR #40. EXTERNAL-HARNESS OPT-IN: substrate claude-code spawns the Claude Code CLI — a FOREIGN harness dragged into a DSH run. It is retained only for backends that expose no DSH adapter; the DSH-native default is no placeholder default (substrate dsh).",
   "_provider": "claude",
   "model": "opus",
   "_native_auth": true,

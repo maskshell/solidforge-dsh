@@ -19,7 +19,7 @@ models/     -> pure domain types; depends on nothing internal
 
 ```python
 # app/repositories/user_repo.py
-from app.api.router import current_request   # WRONG: lower imports higher
+from app.api.router import current_request  # WRONG: lower imports higher
 ```
 
 ## Fix
@@ -27,6 +27,8 @@ from app.api.router import current_request   # WRONG: lower imports higher
 ```python
 # app/services/user_service.py
 from app.repositories.user_repo import load
-def get_user(uid):        # service orchestrates; api calls service
+
+
+def get_user(uid):  # service orchestrates; api calls service
     return load(uid)
 ```

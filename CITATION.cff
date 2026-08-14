@@ -19,7 +19,6 @@ keywords:
   - loop engineering
   - AI safety
 license: Apache-2.0
-status: "draft — unpublished; cite with the version date (2026-08-07) or the snapshot commit"
 preferred-citation:
   type: article
   title: "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops: The Verification-Source Decoupling Discipline"
@@ -30,4 +29,4 @@ preferred-citation:
   month: 8
   day: 7
   url: "https://github.com/maskshell/solidforge-dsh/raw/main/docs/papers/spec-gaming-orthogonal-axis.pdf"
-  status: "draft (unpublished)"
+  notes: "draft — unpublished; cite with the version date (2026-08-07) or the snapshot commit"

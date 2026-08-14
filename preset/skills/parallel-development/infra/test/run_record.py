@@ -101,9 +101,9 @@ def scenario_a_l4_evidenced():
         f"A: caveats={a['caveats_addressed']}"
     )
     assert a["human_confirm_required"] is True, "A: human confirm always required"
-    assert glob.glob(
-        os.path.join(d, ".solidforge", "loop", "runs", "probeA-*.json")
-    ), "A: run-record file not written"
+    assert glob.glob(os.path.join(d, ".solidforge", "loop", "runs", "probeA-*.json")), (
+        "A: run-record file not written"
+    )
     print("  A (l4-evidenced): PASS")
 
 

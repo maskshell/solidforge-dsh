@@ -208,12 +208,16 @@ When parallel agents write tests for the same interface (RED phase), parametrize
 # tests/unit/test_user_service.py
 import pytest
 
-@pytest.mark.parametrize("input_data,expected", [
-    ({"name": "Alice", "age": 30}, True),
-    ({"name": "", "age": 30}, False),       # empty name rejected
-    ({"name": "Bob", "age": -1}, False),    # negative age rejected
-    ({"name": "Carol", "age": 150}, False), # unreasonable age rejected
-])
+
+@pytest.mark.parametrize(
+    "input_data,expected",
+    [
+        ({"name": "Alice", "age": 30}, True),
+        ({"name": "", "age": 30}, False),  # empty name rejected
+        ({"name": "Bob", "age": -1}, False),  # negative age rejected
+        ({"name": "Carol", "age": 150}, False),  # unreasonable age rejected
+    ],
+)
 def test_user_validation(input_data, expected):
     result = validate_user(input_data)
     assert result.is_valid == expected
@@ -368,9 +372,11 @@ Test pattern:
 from fastapi.testclient import TestClient
 from app.main import app
 
+
 @pytest.fixture
 def client():
     return TestClient(app)
+
 
 # tests/test_api/test_users.py
 def test_create_user(client):
@@ -418,6 +424,7 @@ Test pattern:
 # apps/users/tests/test_models.py
 from django.test import TestCase
 from apps.users.models import User
+
 
 class UserModelTest(TestCase):
     def test_create_user(self):

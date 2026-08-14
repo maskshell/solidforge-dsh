@@ -29,7 +29,7 @@ SolidForge 的对策是两根轴，缺一不可：
               │ 外环（对抗）        │  同源 code-reviewer（主） + 异源评审（opt-in，出进程异族）
               └─────────┬──────────┘
                         ▼
-        收敛记录：process_converged（机器可查） ‖ rightness（恒 human_confirm_required，人确认）
+        收敛记录：converged/dod_satisfied（机器可查；bc 记录为 process_converged）‖ rightness（恒 human_confirm_required，人确认）
 ```
 
 五句话总结：**绿门只证明过程收敛，不证明结论正确；正确性由人（或真正异源的 oracle）确认；规格博弈的防御靠结构（schema 常量、事件监听、出进程边界），不靠提示词。**
@@ -90,7 +90,7 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
 
 1. **双环收敛**：确定性内环（lint/类型/测试/架构契约）绿了才进外环；外环是同源对抗评审，逐 finding 裁决（修复/拒绝/升级），记录全程留痕。
 2. **冻结意图蓝图**：PRD/架构/验收标准在收敛时冻结；改动只能走修订通道；蓝图被 `status: frozen` 守卫拒绝编辑。
-3. **Process/Outcome split**：运行记录把 `process_converged` 与 `rightness` 严格隔离——后者是枚举常量 `human_confirm_required`，代理与收敛循环都写不了它。绿不代对，结构上杜绝。
+3. **Process/Outcome split**：运行记录把过程轴字段（pd：`converged`/`dod_satisfied`；bc：`process_converged`）与 `rightness` 严格隔离——后者是枚举常量 `human_confirm_required`，代理与收敛循环都写不了它。绿不代对，结构上杜绝。
 4. **异源评审**：高风险项可加一条**不同模型家族**的对抗意见（默认 `dsh --profile headless` 子进程钉到异族路由——同 Harness、异 LLM、出进程；如 `zai-coding-cn`/GLM、`minimax-cn`/MiniMax-M3）。同源环永远先跑，异源只做加法。
 5. **断路器**：同指纹反复失败 → 升级外环；内环超限 → 降级拆任务；预算耗尽 → 硬终止并输出诊断。循环不会无界打转。
 

@@ -38,7 +38,12 @@ else
 fi
 
 echo "freshness:"
+if stat -c '%y' /dev/null >/dev/null 2>&1; then
+  STAT_FMT='%y'   # GNU
+else
+  STAT_FMT='%Sm'  # BSD/macOS
+fi
 for f in spec-gaming-orthogonal-axis.md spec-gaming-orthogonal-axis.pdf; do
-  printf "  %-40s %s\n" "$f" "$(stat -f '%Sm' "$KB/$f")"
+  printf "  %-40s %s\n" "$f" "$(stat -f "$STAT_FMT" "$KB/$f" 2>/dev/null || stat -c "$STAT_FMT" "$KB/$f")"
 done
 echo "note: the PDF must be at least as new as the .md; regenerate from the .tex when it is not."

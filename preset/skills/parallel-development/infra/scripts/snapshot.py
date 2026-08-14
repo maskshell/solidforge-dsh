@@ -60,9 +60,7 @@ def loop_state_set_snapshot(ref):
     # Best-effort: record into loop-state if the state script exists.
     candidates = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "loop_state.py"),
-        os.path.join(
-            project_root(), ".solidforge", "loop", "scripts", "loop_state.py"
-        ),
+        os.path.join(project_root(), ".solidforge", "loop", "scripts", "loop_state.py"),
     ]
     ls = next((c for c in candidates if os.path.exists(c)), None)
     if ls:

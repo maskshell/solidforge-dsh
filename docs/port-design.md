@@ -26,16 +26,20 @@ own the convergence loop's state and gates:
   scope boundary;
 - `produce.py` / `converge.py` / `coverage_driver.py` — the blueprint-crafting,
   cross-source-review, and primary-source/prior-art deterministic verifiers;
-- `hetero_review.py` / `hetero_doc_review.py` — the cross-provider subprocess
-  wrappers (paper §4.4's mechanism, verbatim);
+- `produce.py` / `converge.py` / `coverage_driver.py` — the blueprint-crafting,
+  cross-source-review, and primary-source/prior-art deterministic verifiers;
 - the JSON schemas carrying the Process/Outcome split — including the
   `rightness` enum with exactly one value (`human_confirm_required`).
 
 None of this references a harness; it references a project directory and env
-vars. The port renames the two env seams (`$CLAUDE_PROJECT_DIR` →
+vars. (Two exceptions, both re-derived in §4 and therefore NOT in the
+byte-for-byte set: the `hetero_*_review.py` wrappers gained the DSH-native
+`substrate: dsh` dispatch — they spawn `dsh --profile headless` and read the
+profiles' `_family` metadata; they are the port's one substantive
+re-derivation, not a rename.) The port renames the two env seams (`$CLAUDE_PROJECT_DIR` →
 `$SOLIDFORGE_PROJECT_DIR`, `$CLAUDE_PLUGIN_ROOT` → `$SOLIDFORGE_PRESET_ROOT`)
 and the state directory (`.claude/parallel-dev/` → `.solidforge/loop/`) and
-otherwise carries the programs byte-for-byte, tests included. The state machine
+otherwise carries the programs with only the documented env/path renames — with the hetero wrappers carved out as the §4 re-derivation (the upstream tree is not vendored in this repo, so byte-for-byte identity is stated, not re-checkable here). The state machine
 semantics — Thrashing → escalate, cap → degrade, budget → hard-terminate, and
 the salience defenses (test set must not shrink, no hard-coded bypass, AC→test
 name mapping) — are identical because they are the same code.
@@ -49,7 +53,9 @@ enforcement *and adds a stronger seam that DSH makes natural*:
 
 - **`solidforge-run-record` plugin** (`plugins/run-record.host.js`): a harness-side
   tool. Its `execute()` runs in the harness process, reads the loop's own
-  `process_converged` emission verbatim, and appends
+  `converged`/`dod_satisfied` emission verbatim (the paper's `process_converged`
+  concept maps to the pd record's `converged`+`dod_satisfied`; bc records carry
+  the literal `process_converged` field), and appends
   `rightness: "human_confirm_required"` — a constant baked into plugin source the
   agent cannot edit (dynamic-plugin sources live outside the session workspace
   and are immutable between activations). There is no code path in the tool that
@@ -72,7 +78,7 @@ plugin (`plugins/loop-gates.host.js`) wires:
 | --- | --- | --- |
 | `blueprint_guard.py` | `tools/pre-execute` (edit/write) | `{kind:'deny', reason}` — frozen-anchor edits are blocked before dispatch |
 | `counters.py pre` | `tools/pre-execute` (edit/write) | deny once the loop state is terminal — a stalled task cannot thrash |
-| `fast_gate.py` | `tools/post-execute` (edit/write) | `decision:block` becomes an `additionalContexts` user message; the agent self-corrects next turn, the orchestrator short-circuits the outer ring |
+| `fast_gate.py` | `tools/post-execute` (edit/write) | `decision:block` becomes an `additionalContexts` user message; the agent self-corrects next turn (the skill's orchestrator treats any block as inner-red short-circuit — agent-side rule, not plugin behavior) |
 
 The listeners invoke the same Python gate scripts with the same stdin payload
 shape, so the deterministic behavior is byte-identical to upstream. A gate
@@ -91,7 +97,8 @@ pi-ai adapter's routes: Qwen, GLM/BigModel, MiniMax, …):
 - `profiles/deepseek.json` is **removed** from the ported profile dirs (it would
   be same-source); the default becomes FAIL-FAST (`HETERO_PROFILE`/`HETERO_DOC_PROFILE` unset →
   arming prompt); the worked dsh-substrate profiles are `zai-coding-cn.json` (`_family:
-  zhipu`, effort-supported) and `minimax-cn.json` (`_family: minimax`).
+  glm`, effort-supported) and `minimax-cn.json` (`_family: minimax`), plus the
+  unarmed `qwen-token-plan-cn.json` placeholder (`_family: qwen`).
 - **The substrate re-derivation (fixed after dogfood round 3).** The first port
   pass copied the upstream mechanism verbatim — `claude -p --settings <profile>` —
   which REUSES the host harness upstream (the plugin lives inside Claude Code)
@@ -117,8 +124,11 @@ pi-ai adapter's routes: Qwen, GLM/BigModel, MiniMax, …):
   tool with the reconciliation contract (both/same-only/hetero-only/neither;
   cap-hit degrades, never silently picks).
 
-This is the port's only *substantive* re-derivation (not a rename), and it is
-the mirror image the paper itself names as tier-2 decoupling.
+This is the port's only substantive re-derivation *of the hetero mechanism*
+(not a rename), and it is the mirror image the paper itself names as tier-2
+decoupling. (§2's harness-side run-record tool and §3's event listeners are
+additions on the DSH extension seams — new pieces, not re-derivations of an
+existing mechanism.)
 
 ## 5. The agent corpus becomes prompt files
 
@@ -136,9 +146,9 @@ tools, context folding — are unchanged.
 
 - Each upstream skill's `docs/` convergence trail (historical maintainer-facing
   records) — the port keeps its own trail in this repo.
-- Claude-Code-only companion integrations (Impeccable detector, official LSP
-  plugins): their adapters are ported and degrade to coverage-noted no-ops;
-  the reference docs say so.
+- Claude-Code-only companion integrations (the Impeccable detector, and the
+  external linter adapters spectral/semgrep/vale/oasdiff/license/iac): ported
+  and degrading to coverage-noted no-ops; the reference docs say so.
 - A benchmark evaluation: like the upstream, this port is evidence of
   *realizability*, not efficacy (paper §6, §8.3).
 
@@ -148,5 +158,5 @@ tools, context folding — are unchanged.
   malformed-finding case expects the jsonschema-path error message
   ("malformed finding ... evidence"); without `jsonschema` installed the
   core-reconciliation path fires first with "findings without disposition", so
-  that one case fails. Reproduced on the unported upstream tree — inherited,
-  not a port regression. `pip install jsonschema` restores the intended path.
+  that one case fails. Reproduced on the unported upstream tree at port time — inherited,
+  not a port regression (the upstream tree is not vendored here). `pip install jsonschema` restores the intended path.

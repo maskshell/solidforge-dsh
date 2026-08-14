@@ -208,9 +208,7 @@ def t_integration_flag_rogue_and_sacred():
             fh.write("x = 2\n")
         with open(os.path.join(repo, "rogue_new.py"), "w") as fh:
             fh.write("# not mine\n")
-        os.makedirs(
-            os.path.join(repo, ".solidforge", "loop", "scripts"), exist_ok=True
-        )
+        os.makedirs(os.path.join(repo, ".solidforge", "loop", "scripts"), exist_ok=True)
         with open(
             os.path.join(repo, ".solidforge", "loop", "scripts", "loop_state.py"),
             "w",

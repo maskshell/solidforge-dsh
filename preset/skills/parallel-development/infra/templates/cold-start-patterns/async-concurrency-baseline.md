@@ -11,7 +11,7 @@ The gate flags `time.sleep`, synchronous `requests.*`, and synchronous file read
 
 ```python
 async def fetch_user(uid):
-    time.sleep(2)                 # WRONG: blocks the loop
+    time.sleep(2)  # WRONG: blocks the loop
     return requests.get(url).json()
 ```
 
@@ -19,7 +19,7 @@ async def fetch_user(uid):
 
 ```python
 async def fetch_user(uid):
-    await asyncio.sleep(0)        # cooperative, or real async client
+    await asyncio.sleep(0)  # cooperative, or real async client
     return await asyncio.to_thread(_blocking_fetch, uid)
 ```
 

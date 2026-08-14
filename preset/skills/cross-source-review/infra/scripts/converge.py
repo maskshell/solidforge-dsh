@@ -204,6 +204,46 @@ def _dedup_findings(findings):
     return list(best.values())
 
 
+def _structural_finding_check(findings, round_no):
+    """Stdlib-only malformed-input pre-check (rule 3 — never silently accept a
+    malformed finding even when the jsonschema gate is absent): every finding
+    must carry the doc-findings core fields with sane types."""
+    kinds = {
+        "contradiction",
+        "authority-chain-break",
+        "scope-creep",
+        "structural-gap",
+        "citation-error",
+        "coverage-gap",
+    }
+    severities = {"blocker", "warning", "coverage"}
+    for f in findings:
+        did = f.get("defect_id") if isinstance(f, dict) else None
+        if not isinstance(did, str) or not did:
+            raise ConvergeError(
+                f"round {round_no}: malformed finding — missing string defect_id"
+            )
+        if f.get("severity") not in severities:
+            raise ConvergeError(
+                f"round {round_no}: malformed finding {did} — severity must be "
+                "blocker/warning/coverage"
+            )
+        if f.get("kind") not in kinds:
+            raise ConvergeError(
+                f"round {round_no}: malformed finding {did} — kind must be a "
+                "doc-findings kind"
+            )
+        if not isinstance(f.get("location"), str):
+            raise ConvergeError(
+                f"round {round_no}: malformed finding {did} — location must be a string"
+            )
+        if not isinstance(f.get("evidence"), str) or not f["evidence"]:
+            raise ConvergeError(
+                f"round {round_no}: malformed finding {did} — evidence must be a "
+                "non-empty string"
+            )
+
+
 def _validate_dispositions(findings, dispositions, round_no):
     """RETENTION FIX (record-auditability) — the 1:1 disposition-coverage invariant.
 
@@ -322,6 +362,7 @@ def _reconcile_run(run, finding_schema, validator_cls):
         # coverage invariant is enforced here — a partial dispositions array is a
         # contract violation, never silent.
         record_findings = _dedup_findings(combined)
+        _structural_finding_check(record_findings, round_no)
         dispositions = list(r.get("dispositions") or [])
         _validate_dispositions(record_findings, dispositions, round_no)
         round_blocker_ids = _blocker_ids(combined)
