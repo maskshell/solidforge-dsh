@@ -1,0 +1,49 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "arch-design",
+  "authority_chain": [
+    "docs/arch-design.md"
+  ],
+  "items": [
+    {
+      "item_id": "ex4-1",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/arch-design.md#ex4"
+    },
+    {
+      "item_id": "ex4-2",
+      "seq": 1,
+      "depends_on": [
+        "ex4-1"
+      ],
+      "dod_ref": "docs/arch-design.md#ex4"
+    }
+  ],
+  "anchors": {
+    "positioning": {
+      "present": true
+    },
+    "what-it-does-not-do": {
+      "present": true
+    },
+    "layering": {
+      "present": true
+    },
+    "key-decisions-rationale": {
+      "present": true
+    },
+    "cross-boundary-contracts": {
+      "present": true
+    },
+    "parallel-boundaries": {
+      "present": true
+    },
+    "failure-modes": {
+      "present": true
+    },
+    "version-strategy": {
+      "present": true
+    }
+  }
+}

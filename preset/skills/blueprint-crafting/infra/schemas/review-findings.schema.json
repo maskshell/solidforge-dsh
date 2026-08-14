@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueprint-crafting.local/schemas/review-findings.schema.json",
+  "title": "plan-reviewer findings",
+  "description": "The schema'd output of the plan_reviewer outer-ring agent. One finding per real defect, each citing concrete evidence. defect_id references a known/planted defect when the finding matches one, else 'novel-N'. The reviewer NEVER edits files — this JSON is its sole output (diagnose/repair separation). severity follows workspace rule 4: blocker requires concrete evidence; a guess is downgraded to warning; an unchecked area is disclosed as coverage, never silenced. Validated in infra/test/plan_reviewer_precision.py.",
+  "type": "object",
+  "required": ["outcome_axis_respected", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "outcome_axis_respected": {
+      "type": "boolean",
+      "description": "The reviewer asserts it did NOT judge outcome-axis questions (product direction / research truth / aesthetic). True on every conformant review."
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"},
+      "description": "One entry per real defect (or coverage gap). Empty when the plan-model is clean."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["defect_id", "severity", "kind", "location", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The known/planted defect id this finding matches (e.g. 'FX-01'), or 'novel-N' for a reviewer-discovered defect the fixture did not declare."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "warning", "coverage"],
+          "description": "blocker = real defect blocking convergence (needs concrete evidence); warning = suspected/advisory; coverage = 'could not verify X' (honest disclosure)."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["gap", "over-engineering", "contradiction", "blind-spot"],
+          "description": "The defect category. coverage-severity findings may reuse the closest kind or 'gap'."
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where: item_id.field (e.g. 'B.scope') or file:line. Must be concrete enough to act on."
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Concrete quote from the plan-model + why it is a defect. A Blocker with no quote fails precision."
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Optional one-line fix direction. The reviewer still does NOT apply it (report-only)."
+        }
+      }
+    }
+  }
+}

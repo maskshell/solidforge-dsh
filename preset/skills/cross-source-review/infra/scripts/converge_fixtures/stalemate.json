@@ -1,0 +1,56 @@
+{
+  "artifact": "docs/stalemate-sample.md",
+  "authority_ref": "",
+  "size_tier": "short",
+  "core_claims": [
+    "claim_a"
+  ],
+  "rounds": [
+    {
+      "same_findings": [
+        {
+          "defect_id": "x",
+          "severity": "blocker",
+          "kind": "contradiction",
+          "location": "s1",
+          "evidence": "two claims conflict"
+        }
+      ],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a"
+      ],
+      "dispositions": [
+        {
+          "defect_id": "x",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        }
+      ]
+    },
+    {
+      "same_findings": [
+        {
+          "defect_id": "y",
+          "severity": "blocker",
+          "kind": "structural-gap",
+          "location": "s2",
+          "evidence": "load-bearing concept undefined"
+        }
+      ],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a"
+      ],
+      "dispositions": [
+        {
+          "defect_id": "y",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        }
+      ]
+    }
+  ]
+}

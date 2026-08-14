@@ -1,0 +1,161 @@
+{
+  "_comment": "Single source of truth for supported languages and the decision-point docs each must be routed through. Enforced by infra/test/disconnect_check.py. ADD A LANGUAGE: add an entry under 'languages' and create the files the checker then verifies. ADD A DECISION-POINT DOC that every language must touch: add it under 'decision_points' and the checker will require it for all languages. Do not edit the checker to add a language.",
+  "decision_points": {
+    "parallel-patterns.md": {
+      "via": "parallel_markers",
+      "because": "the scheduler reads this for conflict routing (loading-chain at the parallel tier)"
+    },
+    "arch-contracts.md": {
+      "via": "l4_link",
+      "because": "the arch-gate tier loads commands from here"
+    },
+    "role-agent-mapping.md": {
+      "via": "role_markers",
+      "because": "role assignment loads from here"
+    }
+  },
+  "languages": {
+    "python": {
+      "marker_file": "pyproject.toml",
+      "extension": ".py",
+      "arch_script": "arch_contract_python",
+      "arch_config": ".importlinter.ini",
+      "l4_file": "python-patterns.md",
+      "check_fn": "check_python",
+      "install_token": "import-linter",
+      "desc_keywords": [
+        "pytest",
+        "fastapi",
+        "pyproject"
+      ],
+      "parallel_markers": [
+        "pyproject",
+        "uv.lock",
+        "poetry.lock"
+      ],
+      "role_markers": [
+        ".py",
+        "pytest",
+        "fastapi"
+      ]
+    },
+    "swift": {
+      "marker_file": "Package.swift",
+      "extension": ".swift",
+      "arch_script": "arch_contract_swift",
+      "arch_config": ".swiftlint.yml",
+      "l4_file": "ios-patterns.md",
+      "check_fn": "check_swift",
+      "install_token": "swiftlint",
+      "desc_keywords": [
+        "swiftui",
+        "xctest",
+        "swift"
+      ],
+      "parallel_markers": [
+        "pbxproj",
+        "Package.swift"
+      ],
+      "role_markers": [
+        ".swift",
+        "SwiftUI"
+      ]
+    },
+    "web": {
+      "marker_file": "package.json",
+      "extension": ".ts",
+      "arch_script": "arch_contract_web",
+      "arch_config": ".dependency-cruiser.cjs",
+      "l4_file": "web-patterns.md",
+      "check_fn": "check_web",
+      "install_token": "dependency-cruiser",
+      "desc_keywords": [
+        "react",
+        "vue",
+        "typescript",
+        "javascript",
+        "node",
+        "express",
+        "playwright"
+      ],
+      "parallel_markers": [
+        "package.json",
+        "package-lock"
+      ],
+      "role_markers": [
+        "vue",
+        "react",
+        "frontend",
+        "node",
+        "express"
+      ]
+    },
+    "rust": {
+      "marker_file": "Cargo.toml",
+      "extension": ".rs",
+      "arch_script": "arch_contract_rust",
+      "arch_config": "clippy.toml",
+      "l4_file": "rust-patterns.md",
+      "check_fn": "check_rust",
+      "install_token": "cargo-modules",
+      "desc_keywords": [
+        "cargo",
+        "clippy"
+      ],
+      "parallel_markers": [
+        "Cargo.toml",
+        "Cargo.lock"
+      ],
+      "role_markers": [
+        ".rs",
+        "cargo",
+        "Cargo"
+      ]
+    },
+    "java": {
+      "marker_file": "pom.xml",
+      "extension": ".java",
+      "arch_script": "arch_contract_java",
+      "arch_config": "checkstyle.xml",
+      "l4_file": "java-patterns.md",
+      "check_fn": "check_java",
+      "install_token": "checkstyle",
+      "desc_keywords": [
+        "maven",
+        "gradle",
+        "junit"
+      ],
+      "parallel_markers": [
+        "pom.xml",
+        "build.gradle"
+      ],
+      "role_markers": [
+        ".java",
+        "pom.xml",
+        "build.gradle"
+      ]
+    },
+    "go": {
+      "marker_file": "go.mod",
+      "extension": ".go",
+      "arch_script": "arch_contract_go",
+      "arch_config": ".golangci.yml",
+      "l4_file": "go-patterns.md",
+      "check_fn": "check_go",
+      "install_token": "golangci-lint",
+      "desc_keywords": [
+        "golang",
+        "golangci",
+        "go.mod"
+      ],
+      "parallel_markers": [
+        "go.mod",
+        "go.sum"
+      ],
+      "role_markers": [
+        ".go",
+        "go.mod"
+      ]
+    }
+  }
+}

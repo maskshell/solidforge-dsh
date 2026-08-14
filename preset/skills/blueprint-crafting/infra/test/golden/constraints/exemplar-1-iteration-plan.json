@@ -1,0 +1,53 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "iteration-plan",
+  "authority_chain": [
+    "docs/arch-design.md",
+    "docs/iteration-plan.md"
+  ],
+  "items": [
+    {
+      "item_id": "ex1-1",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/iteration-plan.md#ex1"
+    },
+    {
+      "item_id": "ex1-2",
+      "seq": 1,
+      "depends_on": [
+        "ex1-1"
+      ],
+      "dod_ref": "docs/iteration-plan.md#ex1"
+    }
+  ],
+  "anchors": {
+    "complexity-tiers": {
+      "present": true
+    },
+    "dependency-edges": {
+      "present": true
+    },
+    "per-iteration-dod": {
+      "present": true
+    },
+    "dag": {
+      "present": true
+    },
+    "phase-acceptance-gates": {
+      "present": true
+    },
+    "risks-mitigations": {
+      "present": true
+    },
+    "out-of-scope": {
+      "present": true
+    },
+    "cross-cutting-tasks": {
+      "present": true
+    },
+    "facade-impact-assessment": {
+      "present": true
+    }
+  }
+}

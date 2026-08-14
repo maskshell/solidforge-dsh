@@ -1,0 +1,8 @@
+{
+  "_comment": "DSH-NATIVE heterogeneous profile — Zhipu (智谱 = BigModel = GLM family). zhipu and bigmodel are the SAME provider: ONE family, ONE profile, and it rides DSH's OWN pi-ai adapter via the INSTALLED CATALOG route `zai-coding-cn` (endpoint https://open.bigmodel.cn/api/coding/paas/v4, protocol openai-completions, models incl. glm-5.2 with thinkingLevelMap — reasoning effort IS supported; the earlier 'no effort' failure came from the wrong endpoint/protocol choice, not from GLM). The former bigmodel.json (claude-code substrate = a FOREIGN harness) was DELETED in the merge: the external-harness substrate is reserved for providers with no pi-ai route (see qwen3.json). Credential: ZHIPU_API_KEY (three-tier env chain). FILENAME = ROUTE: the pi-ai route name is this file's basename (provider is derived from it, never declared twice). Family label: `_family`. Credential var ROUTE-DERIVED: ZAI_CODING_CN_API_KEY (pi-ai env convention; override via `_credential_env` only when a route diverges). _family = the MODEL LINEAGE (glm), the paper's own family vocabulary — zai/bigmodel/zhipu are brands/platforms of this one lineage.",
+  "substrate": "dsh",
+  "model": "glm-5.2",
+  "reasoning_effort": "high",
+  "_catalog_verified": "2026-08-14 vs pi.dev (https://pi.dev/models/zai-coding-cn/glm-5-2?name=glm): catalog entry inherited VERBATIM - api openai-completions, baseUrl https://open.bigmodel.cn/api/coding/paas/v4, reasoning:true, thinkingLevelMap {minimal:null, low/medium/high:high, max:max}, input [text], contextWindow 1000000, maxTokens 131072, compat supportsReasoningEffort:true / thinkingFormat:zai. This profile declares ONLY apiKeyEnv; every model fact is catalog-inherited, so it cannot drift from the official docs.",
+  "_family": "glm"
+}

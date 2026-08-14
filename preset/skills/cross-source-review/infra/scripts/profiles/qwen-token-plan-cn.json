@@ -1,0 +1,7 @@
+{
+  "_comment": "PLACEHOLDER (unarmed template) — DSH-native Qwen via the INSTALLED pi-ai CATALOG route `qwen-token-plan-cn` (Alibaba Token Plan, CN; openai-completions gateway). NOTE: this route is MULTI-FAMILY (it also serves glm/deepseek/kimi models), so `_family` names the PINNED MODEL's lineage (qwen), not the route. ARM ME: set your token in QWEN_TOKEN_PLAN_CN_API_KEY (route-derived, pi-ai convention) through the three-tier env chain; until armed the leg fail-fasts honestly. Model id is editable per generation (catalog currently ships qwen3.8-max-preview).",
+  "substrate": "dsh",
+  "model": "qwen3.8-max-preview",
+  "reasoning_effort": "high",
+  "_family": "qwen"
+}

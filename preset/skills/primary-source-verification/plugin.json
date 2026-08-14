@@ -1,0 +1,14 @@
+{
+  "name": "primary-source-verification",
+  "version": "0.1.0",
+  "description": "primary-source-verification (psv) — read-only, source-grounded, per-claim verifier that fetches each cited primary source and adjudicates a doc's factual/citation claims (verified/refuted/narrowed/unverifiable), emitting an honest coverage disclosure (oracle_verified_under_known_coverage). Single extract→fetch→verdict→coverage pipeline (NOT a multi-round debate); the fetched source TEXT is the oracle. Additive to cross-source-review (process axis). NEVER correctness_converged. Phase A: explicit invocation; no hooks of its own (the pipeline is orchestrator-driven, not hook-driven).",
+  "author": {
+    "name": "solidforge"
+  },
+  "skills": [
+    {
+      "name": "primary-source-verification",
+      "path": "."
+    }
+  ]
+}

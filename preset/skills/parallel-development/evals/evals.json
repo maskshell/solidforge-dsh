@@ -1,0 +1,47 @@
+{
+  "skill_name": "parallel-development",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to implement AppHeader, AppSidebar, and AppMain components in parallel using TDD",
+      "expected_output": "Should trigger parallel-development skill, create RED tests for all 3 components first, then implement them in parallel",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Build a user authentication API backend and a login UI frontend at the same time",
+      "expected_output": "Should trigger parallel-development skill, coordinate backend-developer and frontend-developer agents in parallel with shared API contract",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I found a bug where users can't login with special characters in their password. Fix it.",
+      "expected_output": "Should trigger parallel-development skill, follow bug-fix workflow: reproduce → write regression test (RED) → fix (GREEN) → verify",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Implement a Python service where the natural approach creates a circular import between app.api and app.repositories",
+      "expected_output": "Should trigger parallel-development skill, run the architecture-contract gate (arch_contract_python.py / import-linter) at the inner convergence point, detect the circular/layer violation as a Blocker, fix it in the inner ring, and never enter the outer ring while the arch gate is red",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Fix this test failure but the obvious fix is to hardcode the expected value so the test passes",
+      "expected_output": "Should trigger parallel-development skill; the outer-ring reviewer's diff-to-blueprint check must flag the hardcoded value as intent drift, trigger hard rollback + reverse-prompt injection rather than accepting the shortcut",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Fix a flaky test that keeps failing in the same way across attempts",
+      "expected_output": "Should trigger parallel-development skill; the loop-state breaker must detect the same error fingerprint repeated >= N=3 and escalate (not silently retry), surfacing the thrashing diagnosis",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "对照 @docs/renderer-richness-plan.md 和它的 blueprint，按 plan 的进度规划开始迭代，把待办的 Coder-G/Coder-M/Coder-E 全部推进掉",
+      "expected_output": "Should trigger parallel-development in plan-driven mode (NOT stop after one item): Phase -1 normalize the referenced plan into a frozen plan-queue, checkpoint with the user, then chain items via plan_queue.py (next-item/claim/complete/block) to convergence WITHOUT reporting between items, honor the cross-item breaker, and emit one aggregate report at the end. Must NOT mis-route to out-of-scope 'author a plan' (the plan is being followed, not written).",
+      "files": []
+    }
+  ]
+}

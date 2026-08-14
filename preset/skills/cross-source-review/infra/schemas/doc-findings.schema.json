@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cross-source-review.local/schemas/doc-findings.schema.json",
+  "title": "cross-source-review doc-findings",
+  "description": "The schema'd output of a review leg (the same-family doc-reviewer agent OR the different-family substrate) on a doc-shaped artifact. One finding per real defect, each citing concrete evidence. Generalized from blueprint-crafting's review-findings.schema.json: the field shape is preserved (defect_id / severity / kind / location / evidence / suggestion) but the `kind` enum is the doc-domain set (Q2). severity keeps blueprint-crafting's {blocker, warning, coverage} — `coverage` is the reviewer's honest-disclosure 'could not verify X' (workspace rule 3), DISTINCT from the `coverage-gap` KIND which is a defect in the artifact (a missing section). The reviewer NEVER edits files — this JSON is its sole output. Validated in infra/test/findings_shape_check.py.",
+  "type": "object",
+  "required": ["outcome_axis_respected", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "outcome_axis_respected": {
+      "type": "boolean",
+      "description": "The leg asserts it did NOT judge outcome-axis questions (whether the doc is 'right' / the requirement is correct / the conclusion is true). True on every conformant review — both same-family and different-family legs are barred from outcome-axis."
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"},
+      "description": "One entry per real defect (or coverage disclosure). Empty when the artifact is clean."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["defect_id", "severity", "kind", "location", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable id for this finding (e.g. 'novel-1'). The different-family leg is fed prior findings by id so it hunts the gap, not restatements."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "warning", "coverage"],
+          "description": "blocker = real defect blocking convergence (needs concrete evidence — a quote); warning = suspected/advisory (never blocks — rule 4); coverage = 'could not verify X' honest disclosure (rule 3)."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["contradiction", "authority-chain-break", "scope-creep", "structural-gap", "citation-error", "coverage-gap"],
+          "description": "The doc-domain defect category (Q2). contradiction = two claims conflict, or a claim conflicts with a cited source; authority-chain-break = a claim cites a source that does not say what the doc says; scope-creep = over-reaches stated non-goals / conflates domains; structural-gap = a load-bearing concept is undefined or a step is missing; citation-error = a file/section/field citation is wrong or unverifiable; coverage-gap = something that should be addressed for soundness is absent. NOTE: the coverage-gap KIND (a defect in the artifact) is DISTINCT from the coverage SEVERITY (the reviewer's own honest disclosure)."
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where: doc section heading, line range, or anchor id. Concrete enough to act on."
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Concrete quote from the artifact (and from the source verified against, when applicable) + why it is a defect. A Blocker with no quote is downgraded."
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Optional one-line fix direction. The leg does NOT apply it (report-only)."
+        }
+      }
+    }
+  }
+}

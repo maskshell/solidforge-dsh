@@ -1,0 +1,16 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "iteration-plan",
+  "authority_chain": ["docs/fake-arch.md"],
+  "items": [
+    {
+      "item_id": "registry",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/fake-arch.md#registry",
+      "title": "constraints-profile loading",
+      "scope": "Build a dynamic plugin registry with runtime-discovered constraint-profile loaders, a hot-reload config watcher that re-imports profiles on file change, and a multi-backend provider abstraction (sqlite/yaml/json backends) to support the single iteration-plan constraints-profile used by this skill.",
+      "constraints_profile": "iteration-plan"
+    }
+  ]
+}

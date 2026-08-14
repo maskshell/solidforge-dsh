@@ -1,0 +1,11 @@
+.ruff_cache/
+.solidforge/
+__pycache__/
+*.pyc
+.DS_Store
+.solidforge/loop/loop-state.json
+.solidforge/loop/runs/
+.env
+.env.solidforge
+!.env.example
+!.env.solidforge.example

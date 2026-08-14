@@ -1,0 +1,20 @@
+# Dev lint config for the skill's OWN infra source (scripts/install/test).
+# This is NOT a runtime dependency. The infra stays stdlib-only; ruff is a standalone
+# dev tool. If ruff is absent, the self-lint gate skips with a clear message rather
+# than failing — mirroring parallel-development's lint_self.py (rule 7: mirror the
+# closest exemplar).
+#
+# MIRRORED VERBATIM from skills/parallel-development/ruff.toml (rule 7). Same rule
+# set, same rationale: real bug-catchers (E4/E7/E9 + F) with no style churn. This
+# keeps the CSR-I3 异源 substrate (hetero_doc_review.py — a copy-pattern of pd's
+# hetero_review.py) linting under the SAME standard as its pd source. The repo-root
+# pyproject.toml selects the broader E/F/W/I/UP/B/SIM set; this per-skill override
+# is deliberate and matches pd exactly — do not "widen" it without re-deriving the
+# rule-7 rationale (a green `ruff check infra/` is the skill passing its own Fast
+# Gate, dogfooding). Run:  ruff check infra/
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
+# E501 (line-too-long) is explicitly NOT enforced — consistent with markdownlint
+# MD013 off (../../.markdownlint.json). No line is ever rejected for length.
+ignore = ["E501"]

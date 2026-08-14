@@ -1,0 +1,45 @@
+# SwiftLint configuration template (Swift Architecture-Contract Gate).
+# Copy to project root. The arch_contract_swift.py gate runs:
+#   swiftlint lint --config .swiftlint.yml
+# plus `swift build -Xswiftc -strict-concurrency=complete` for the concurrency baseline.
+#
+# NEUTRAL BY DEFAULT: no `included:` (scans the whole project) + standard excludes.
+# The example custom_rules (layer/boundary contracts) are COMMENTED OUT so a freshly-
+# armed project has a GREEN gate. Uncomment + edit to enforce YOUR boundaries.
+
+excluded:
+  - .build
+  - DerivedData
+  - build
+  - Pods
+  - .swiftpm
+
+opt_in_rules:
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - unowned_variable_capture
+  - retroactive_conformance
+  - empty_count
+  - first_where
+
+# Line-length NOT enforced — consistent with the repo convention.
+disabled_rules:
+  - line_length
+
+# --- Uncomment + edit to enforce YOUR layer/boundary contracts ---------------
+# custom_rules:
+#   no_api_in_persistence:
+#     name: "No API in Persistence"
+#     regex: 'import\s+.*API'
+#     match_kinds: [import]
+#     message: "Persistence layer must not import the API layer (layer violation)."
+#     severity: error
+#   no_viewmodel_in_model:
+#     name: "No ViewModel in Model"
+#     regex: 'import\s+.*ViewModel'
+#     match_kinds: [import]
+#     message: "Domain models must not import ViewModels (layer violation)."
+#     severity: error
+
+strict_concurrency:
+  # The full concurrency baseline is enforced via swift build -strict-concurrency.

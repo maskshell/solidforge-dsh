@@ -1,0 +1,63 @@
+{
+  "coverage_record": {
+    "artifact": "README.md",
+    "signal": "oracle_verified_under_known_coverage",
+    "counts": {
+      "verified": 60,
+      "refuted": 0,
+      "narrowed": 1,
+      "unverifiable": 3,
+      "total_extracted": 64
+    },
+    "rightness": "human_confirm_required",
+    "escalations": [
+      {
+        "claim_ref": "C40",
+        "reason": "no fetchable source adjudicates it"
+      },
+      {
+        "claim_ref": "C52",
+        "reason": "no fetchable source adjudicates it"
+      },
+      {
+        "claim_ref": "C63",
+        "reason": "no fetchable source adjudicates it"
+      }
+    ],
+    "coverage": [
+      "extractor blind-spot: claims neither author nor extractor can see are absent from M (rule 3)",
+      "comparison blind-spot: 'verified' means no contradiction was found, not that none exists"
+    ]
+  },
+  "findings": {
+    "outcome_axis_respected": true,
+    "findings": [
+      {
+        "kind": "wording-vs-mechanism",
+        "detail": "docs said 'lowest-precedence-first' while the code loads highest-precedence-first; net precedence unchanged. FIXED after the run: README + template now say 'highest-precedence-first (setdefault \u2014 first-loaded wins, shell always wins)'.",
+        "evidence": "fetched: hetero_review.py `_load_dotenv` docstring: \"DSH port \u2014 three-tier env resolution (setdefault: the shell always wins; between files the FIRST loaded wins for a shared key, so they are loaded in HIGHEST-precedence-first order)\" \u2014 the README's prior text \"resolved in lowest-precedence-first order (shell wins)\" describes the same net precedence but names the load direction backwards."
+      },
+      {
+        "defect_id": "C40",
+        "severity": "coverage",
+        "kind": "claim-unverifiable",
+        "location": "",
+        "evidence": "verdict=unverifiable without a finding body"
+      },
+      {
+        "defect_id": "C52",
+        "severity": "coverage",
+        "kind": "claim-unverifiable",
+        "location": "",
+        "evidence": "verdict=unverifiable without a finding body"
+      },
+      {
+        "defect_id": "C63",
+        "severity": "coverage",
+        "kind": "claim-unverifiable",
+        "location": "",
+        "evidence": "verdict=unverifiable without a finding body"
+      }
+    ]
+  }
+}

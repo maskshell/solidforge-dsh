@@ -1,0 +1,12 @@
+# Dev lint config for the skill's OWN infra source (hooks/scripts/install/test).
+# This is NOT a runtime dependency. The infra stays stdlib-only (ADR #1); ruff is a standalone dev tool. If ruff is absent, the self-lint gate skips with a clear message (infra/test/lint_self.py) rather than failing — mirroring smoke_gates.
+# Rule set = ruff's stable default (E4/E7/E9 + F): real bug-catchers (undefined names, unused imports, ambiguous `l`/statement errors, syntax) with no style churn. Add rules here deliberately; a green `ruff check infra/` is the skill passing its own Fast Gate (dogfooding). Run:  ruff check infra/
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
+# E501 (line-too-long) is explicitly NOT enforced — consistent with markdownlint MD013 off
+# (../../.markdownlint.json). No line is ever rejected for length. The ruff *formatter's* 88-col
+# wrap is kept as the code style (wrapping aids Python readability and the infra is already
+# formatted to it); that is a formatter target, not a lint rule. Mirrors the prose convention:
+# one statement per line, no length gate.
+ignore = ["E501"]

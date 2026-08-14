@@ -1,0 +1,19 @@
+# clippy configuration template (Rust Architecture-Contract Gate).
+# Copy to project root. The arch_contract_rust.py gate runs:
+#   cargo clippy --all-targets --message-format=json
+# Docs: https://rust-lang.github.io/rust-clippy/
+#
+# clippy.toml tunes lint THRESHOLDS. To allow/deny specific lints, declare them
+# in src/lib.rs / src/main.rs with attribute:
+#   #![warn(clippy::all)]
+#   #![deny(clippy::unwrap_used, clippy::dbg_macro)]
+#
+# NOTE: Rust has no first-class layer/dependency-direction enforcer. Layering
+# contracts are NOT enforced by this gate — they remain an outer-ring semantic
+# concern. See references/arch-contracts.md.
+
+# Example thresholds (uncomment and tune to your project):
+# cognitive-complexity-threshold = 25
+# too-many-arguments-threshold = 6
+# type-complexity-threshold = 250
+# enum-variant-size-threshold = 256

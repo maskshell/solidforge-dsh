@@ -1,0 +1,327 @@
+[
+  {
+    "claim_id": "C1",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C2",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C3",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C4",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C5",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C6",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C7",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C8",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C9",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C10",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C11",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C12",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C13",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C14",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C15",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C16",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C17",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C18",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C19",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C20",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C21",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C22",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C23",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C24",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C25",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C26",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C27",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C28",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C29",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C30",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C31",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C32",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C33",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C34",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C35",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C36",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C37",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C38",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C39",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C41",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C42",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C43",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C44",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C46",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C47",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C48",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C49",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C50",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C51",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C53",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C54",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C55",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C56",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C57",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C58",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C59",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C60",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C61",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C62",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C64",
+    "verdict": "verified",
+    "evidence": "fetched source text supports the claim (verifier report, docs/dogfood/README-psv.verdicts.raw.md)"
+  },
+  {
+    "claim_id": "C45",
+    "verdict": "narrowed",
+    "evidence": "hetero_review.py/_load_dotenv loads files in HIGHEST-precedence-first order (setdefault, first-loaded wins); the README + .env.solidforge.example described the same net precedence as 'lowest-precedence-first'. Net precedence identical (shell > project .env.solidforge > project .env > preset .env.solidforge).",
+    "finding": {
+      "kind": "wording-vs-mechanism",
+      "detail": "docs said 'lowest-precedence-first' while the code loads highest-precedence-first; net precedence unchanged. FIXED after the run: README + template now say 'highest-precedence-first (setdefault — first-loaded wins, shell always wins)'.",
+      "evidence": "fetched: hetero_review.py `_load_dotenv` docstring: \"DSH port — three-tier env resolution (setdefault: the shell always wins; between files the FIRST loaded wins for a shared key, so they are loaded in HIGHEST-precedence-first order)\" — the README's prior text \"resolved in lowest-precedence-first order (shell wins)\" describes the same net precedence but names the load direction backwards."
+    }
+  },
+  {
+    "claim_id": "C40",
+    "verdict": "unverifiable",
+    "evidence": "inadmissible (interpretive/predictive/value) — escalate to human"
+  },
+  {
+    "claim_id": "C52",
+    "verdict": "unverifiable",
+    "evidence": "inadmissible (interpretive/predictive/value) — escalate to human"
+  },
+  {
+    "claim_id": "C63",
+    "verdict": "unverifiable",
+    "evidence": "inadmissible (interpretive/predictive/value) — escalate to human"
+  }
+]

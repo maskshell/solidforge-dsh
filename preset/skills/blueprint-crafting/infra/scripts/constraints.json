@@ -1,0 +1,88 @@
+{
+  "_comment": "Per-artifact-type constraints-profiles (iteration I3). The constraints-checker reads this registry (workspace rule 2); adding or editing a profile = edit this file, NOT the checker. The research profile is implemented separately by research_constraints.py (iteration I4) — it is not a constraints_check profile. Anchors are the artifact-type-specific completeness elements from arch-design section 3; authority_rule is the per-type arbitration rule; the checker enforces anchors-present + authority-consistency + resolve-now-ODP-resolved on the normalized plan-model (ADR #2).",
+  "profiles": {
+    "product-spec": {
+      "anchors": [
+        "jtbd",
+        "desired-outcome-metrics",
+        "scope-boundary",
+        "constraints-assumptions",
+        "decisions",
+        "acceptance-criteria",
+        "non-goals"
+      ],
+      "authority_rule": "spec is the master; authority_chain[0] is the spec"
+    },
+    "arch-design": {
+      "anchors": [
+        "positioning",
+        "what-it-does-not-do",
+        "layering",
+        "key-decisions-rationale",
+        "cross-boundary-contracts",
+        "parallel-boundaries",
+        "failure-modes",
+        "version-strategy"
+      ],
+      "authority_rule": "arch-design wins on conflict"
+    },
+    "iteration-plan": {
+      "anchors": [
+        "complexity-tiers",
+        "dependency-edges",
+        "per-iteration-dod",
+        "dag",
+        "phase-acceptance-gates",
+        "risks-mitigations",
+        "out-of-scope",
+        "cross-cutting-tasks",
+        "facade-impact-assessment"
+      ],
+      "authority_rule": "iteration-plan defers to arch-design"
+    },
+    "executable-summary": {
+      "anchors": [
+        "todos",
+        "authority-deferral",
+        "first-work-package",
+        "cross-doc-dod-ref"
+      ],
+      "authority_rule": "summary defers to blueprint/spec"
+    }
+  },
+  "cross_artifact": {
+    "authority_chain_rule": "authority_chain non-empty (schema-enforced); an item's dod_ref doc-prefix must be declared in the authority_chain or be anchor-only (no doc path) — an undeclared doc is an authority contradiction",
+    "odp_rule": "every resolve-now ODP must carry a resolution (text); an unresolved resolve-now ODP blocks convergence"
+  },
+  "anchor_detection": {
+    "_comment": "Detection signals per anchor (used by the normalizer to extract the anchors map). Keywords are matched case-insensitively against the source; a heading match (#...) = latch (high-confidence); a prose-only match = semantic-infer (low-confidence); no match = undetected. Keywords are BILINGUAL (English + Chinese) so the inner ring can detect anchors in Chinese-language artifacts (ADR #15); every profile anchor is listed here, an unlisted anchor falls back to its own kebab->space name. Detection stays heuristic — an undetected anchor degrades to a coverage note, never a Blocker (ADR #12, rule 4). Verified against the skill's own docs (the iteration-plan §10 dogfood) and a Chinese-source dogfood (constraints_check_goldens.check_chinese_anchor_detection).",
+    "complexity-tiers": ["complexity tier", "复杂度分级", "复杂度层级", "复杂度"],
+    "dependency-edges": ["dependency edge", "依赖边", "依赖关系", "依赖"],
+    "per-iteration-dod": ["done when", "definition of done", "validation gate", "完成标准", "完成定义", "完成条件", "验收闸"],
+    "dag": ["dependencies and parallelism", "parallel fan-out", "dag", "dependency graph", "依赖与并行", "依赖图", "依赖关系图", "有向无环图", "并行展开"],
+    "phase-acceptance-gates": ["acceptance gate", "阶段验收闸", "验收闸", "阶段准入"],
+    "risks-mitigations": ["risks and mitigation", "risk and mitigation", "风险与缓解", "风险和缓解", "风险与对策", "风险"],
+    "out-of-scope": ["out of scope", "out-of-scope", "范围外", "不在范围内"],
+    "cross-cutting-tasks": ["cross-cutting", "cross-cutting task", "横切", "横切任务", "横切关注点"],
+    "facade-impact-assessment": ["facade impact", "facade-impact", "门面影响", "门面"],
+    "positioning": ["positioning", "定位"],
+    "what-it-does-not-do": ["what it does not do", "does not implement", "不做什么", "不实现", "不包含"],
+    "layering": ["dual ring", "inner ring", "layer", "分层", "内环", "双环", "层"],
+    "key-decisions-rationale": ["technical decision", "key decision", "design decision", "rationale", "关键决策", "技术决策", "设计决策", "决策理由", "理由"],
+    "cross-boundary-contracts": ["handshake", "cross-boundary contract", "artifact contract", "跨边界契约", "边界契约", "跨边界合同", "握手"],
+    "parallel-boundaries": ["files_touched", "parallel boundarie", "并行边界", "并行边界划分"],
+    "failure-modes": ["failure mode", "degradation path", "失败模式", "故障模式", "降级路径", "退化路径"],
+    "version-strategy": ["version strategy", "版本策略", "版本演进策略"],
+    "jtbd": ["jtbd", "jobs to be done", "用户任务", "待办任务", "待完成的任务"],
+    "desired-outcome-metrics": ["desired outcome", "outcome metric", "期望结果指标", "期望指标", "目标指标"],
+    "scope-boundary": ["scope boundary", "范围边界", "范围界定", "边界范围"],
+    "constraints-assumptions": ["constraint", "assumption", "约束与假设", "约束和假设", "约束", "假设"],
+    "decisions": ["decision", "决策", "决定"],
+    "acceptance-criteria": ["acceptance criteri", "验收标准", "验收条件", "接受标准"],
+    "non-goals": ["non-goal", "非目标", "不做什么", "非目标清单"],
+    "todos": ["todo", "待办", "任务清单", "工作包"],
+    "authority-deferral": ["authority deferr", "defers to", "权威委托", "权威转移", "权威延迟", "遵从"],
+    "first-work-package": ["first work package", "首个工作包", "第一个工作包"],
+    "cross-doc-dod-ref": ["cross-doc dod", "dod ref", "跨文档完成标准引用", "跨文档 DoD 引用", "跨文档引用"]
+  }
+}

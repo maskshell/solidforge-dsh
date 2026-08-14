@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://primary-source-verification.local/schemas/coverage-record.schema.json",
+  "title": "primary-source-verification coverage-record",
+  "description": "psv's TOP-LINE output — the honest coverage disclosure. Carries the named signal `oracle_verified_under_known_coverage` (the ONLY permitted top-line string; `correctness_converged` is FORBIDDEN and never appears — enforced by coverage_policy_check.py) and the per-claim counts N/R/W/K of M. The coverage disclosure, NOT a boolean, is the contract (proposal §3 step 4, §9 Q3). Analogous to csr's split: psv emits doc-findings (per-claim defects) AND this coverage-record (the top-line disclosure). M=0 (no source-admissible claims — e.g. a purely interpretive doc) and K>0 (claims extracted but unverifiable) both ESCALATE to a human, never a silent pass (rule 3). Carries `rightness: human_confirm_required` as a constant — a coverage disclosure never certifies the doc is right.",
+  "type": "object",
+  "required": ["artifact", "signal", "counts", "rightness", "escalations"],
+  "additionalProperties": false,
+  "properties": {
+    "artifact": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path/ref to the doc-shaped artifact whose claims were verified."
+    },
+    "signal": {
+      "type": "string",
+      "const": "oracle_verified_under_known_coverage",
+      "description": "The sole permitted top-line signal. psv NEVER emits 'correctness_converged' or any boolean 'the doc is correct' — coverage_policy_check.py asserts this string is the only top-line value present."
+    },
+    "counts": {
+      "type": "object",
+      "required": ["verified", "refuted", "narrowed", "unverifiable", "total_extracted"],
+      "additionalProperties": false,
+      "description": "N/R/W/K of M. coverage_policy_check.py asserts total_extracted = verified + refuted + narrowed + unverifiable.",
+      "properties": {
+        "verified": {"type": "integer", "minimum": 0, "description": "N — claims the fetched source supports (model found no contradiction; not a proof of none — comparison blind-spot caveat). Counted here, NOT listed as findings."},
+        "refuted": {"type": "integer", "minimum": 0, "description": "R — claims the fetched source contradicts (each a blocker finding with a fetched quote)."},
+        "narrowed": {"type": "integer", "minimum": 0, "description": "W — claims the fetched source supports only in a weaker form (each a warning finding with a fetched quote)."},
+        "unverifiable": {"type": "integer", "minimum": 0, "description": "K — claims no fetchable source could adjudicate (interpretive / paywalled / judgment call). Each escalates to a human."},
+        "total_extracted": {"type": "integer", "minimum": 0, "description": "M — total atomic source-admissible claims extracted. M = N + R + W + K. M=0 means psv had no admissible surface on this artifact → escalates to a human (distinct from K>0)."}
+      }
+    },
+    "rightness": {
+      "type": "string",
+      "const": "human_confirm_required",
+      "description": "Outcome-axis constant. A coverage disclosure NEVER changes this — psv does not judge whether the doc is right."
+    },
+    "escalations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason"],
+        "additionalProperties": false,
+        "properties": {
+          "claim_ref": {"type": "string", "description": "The unverifiable claim's location/id, when this escalation is a K>0 claim. Absent for the M=0 (no surface) escalation."},
+          "reason": {"type": "string", "minLength": 1, "description": "Why it escalates: 'no fetchable source adjudicates it' (K>0) or 'no source-admissible claims extracted — psv has no surface on this artifact' (M=0)."}
+        }
+      },
+      "description": "Human escalations: every K>0 claim (one entry each) PLUS one M=0 entry when total_extracted=0. Never empty when K>0 or M=0."
+    },
+    "coverage": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Honest coverage notes (workspace rule 3): the extractor blind-spot (claims neither party could see are absent from M) and the comparison blind-spot (`verified` ≠ 'no contradiction exists'), plus any source-fetch degradation. Never silent."
+    },
+    "volatile_authority_registry": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_ref", "volatile_source"],
+        "additionalProperties": false,
+        "properties": {
+          "claim_ref": {"type": "string", "minLength": 1, "description": "The claim id whose adjudication source is volatile."},
+          "volatile_source": {"type": "string", "minLength": 1, "description": "Where the source lived at run time (e.g. ~/.claude/projects/... memory files, /tmp clones, shell environment state). Volatile = repo-external / unversioned / deletable."}
+        }
+      },
+      "description": "Volatile-authority registry (fix B): one entry per claim adjudicated against a non-durably-re-fetchable source. Covers verified claims too — their sources are counted-not-listed in the packet, so this registry is their only re-fetchability signal. Absent/empty when no volatile sources were used."
+    }
+  }
+}

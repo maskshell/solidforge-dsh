@@ -1,0 +1,14 @@
+{
+  "name": "cross-source-review",
+  "version": "0.1.0",
+  "description": "cross-source-review — same-family (同源) + different-family (异源) cross multi-round review engine that drives a doc-shaped artifact to substantive convergence. Drives same-family (同源, fresh-context) ↔ different-family (异源, cross-family, e.g. DeepSeek) adversarial review with a deterministic convergence-policy engine (caps, stalemate escalation, core-claims-coverage). Phase A: explicit invocation; no hooks of its own (the convergence loop is orchestrator-driven, not hook-driven). Bundles the doc-reviewer (同源, same-family) agent + the hetero_doc_review (异源, different-family) substrate + converge.py policy engine.",
+  "author": {
+    "name": "solidforge"
+  },
+  "skills": [
+    {
+      "name": "cross-source-review",
+      "path": "."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://primary-source-verification.local/schemas/doc-findings.schema.json",
+  "title": "primary-source-verification doc-findings",
+  "description": "The per-claim verdict packet psv emits. EXTENDS cross-source-review's doc-findings (a STRICT SUPERSET — csr's 6 `kind` values are preserved byte-for-byte; psv adds `claim-refuted` / `claim-narrowed` / `claim-unverifiable`). Field shape is identical to csr's (defect_id / severity / kind / location / evidence / suggestion) so a psv packet composes with csr's process-axis findings. The EVIDENCE STANDARD IS RAISED for psv's added kinds: a `claim-refuted` (severity blocker) or `claim-narrowed` (severity warning) finding MUST cite a FETCHED-SOURCE QUOTE in `evidence`, not model recall — a finding lacking a fetched quote is downgraded to `claim-unverifiable` (severity coverage), never asserted (workspace rule 3 + L1; enforced by fetched_quote_gate.py). `claim-unverifiable` is a KIND (an artifact claim no fetchable source could adjudicate), DISTINCT from csr's `coverage-gap` KIND (a missing-section defect in the artifact) and from the `coverage` SEVERITY (the reviewer's own honest disclosure). `verified` claims are NOT findings (no defect); they are counted in the coverage-record. The reviewer/extractor/comparator NEVER edits the artifact — this JSON is psv's sole output. Validated in infra/test/findings_shape_check.py.",
+  "type": "object",
+  "required": ["outcome_axis_respected", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "outcome_axis_respected": {
+      "type": "boolean",
+      "description": "psv asserts it did NOT judge outcome-axis questions (whether the doc is 'right' / the conclusion is true). True on every conformant run — psv verifies per-claim against a fetched source; it does not certify global truth."
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"},
+      "description": "One entry per refuted / narrowed / unverifiable claim. `verified` claims are NOT findings. Empty when every admissible claim verified."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["defect_id", "severity", "kind", "location", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable id for this finding (e.g. 'claim-1')."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "warning", "coverage"],
+          "description": "blocker = claim-refuted (real contradiction, needs a fetched quote); warning = claim-narrowed (source supports a weaker form, needs a fetched quote); coverage = claim-unverifiable (could not adjudicate — honest disclosure, rule 3). A quote-less refuted/narrowed finding is downgraded to coverage/claim-unverifiable."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["contradiction", "authority-chain-break", "scope-creep", "structural-gap", "citation-error", "coverage-gap", "claim-refuted", "claim-narrowed", "claim-unverifiable"],
+          "description": "csr's 6 doc-domain kinds (preserved) PLUS psv's 3 claim-verdict kinds. claim-refuted = fetched source contradicts the claim; claim-narrowed = fetched source supports a weaker form; claim-unverifiable = no fetchable source adjudicates it (interpretive / paywalled / judgment call — escalate to human). NOTE: claim-unverifiable the KIND (a claim the source could not settle) is DISTINCT from coverage-gap the KIND (a missing-section defect) and from coverage the SEVERITY."
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the claim lives in the artifact (section heading, line range, or anchor id) AND the adjudicating source ref (arXiv id / Crossref / repo file / spec section)."
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "(For the 6 csr-preserved kinds the evidence standard is csr's — a concrete artifact/source quote; psv's own packets emit only the 3 claim-verdict kinds below.) For claim-refuted / claim-narrowed: a QUOTE from the FETCHED source + the claim text + why they conflict/diverge. A Blocker/Warning of these kinds with no fetched quote is downgraded to claim-unverifiable. For claim-unverifiable: what was claimed and why no fetchable source could adjudicate it."
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Optional one-line fix direction. psv does NOT apply it (report-only)."
+        }
+      }
+    }
+  }
+}

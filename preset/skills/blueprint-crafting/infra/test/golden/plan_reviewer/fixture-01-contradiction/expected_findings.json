@@ -1,0 +1,13 @@
+{
+  "outcome_axis_respected": true,
+  "findings": [
+    {
+      "defect_id": "FX-01",
+      "severity": "blocker",
+      "kind": "contradiction",
+      "location": "write-mod.scope vs scope-decl.scope",
+      "evidence": "scope-decl.scope declares 'this skill does not implement code ... Out-of-scope: writing source modules', while write-mod.scope's deliverable is to 'Write and ship the Python module src/normalizer.py inside parallel-development/'. The deliverable violates the declared scope boundary.",
+      "suggestion": "Resolve the boundary: either remove write-mod (route the module to parallel-development) or relax scope-decl to permit this specific code deliverable."
+    }
+  ]
+}

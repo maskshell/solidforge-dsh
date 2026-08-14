@@ -1,0 +1,3 @@
+name: SolidForge
+description: 双轴收敛纪律：让"测试绿了"不等于"你做对了"——双环收敛（确定性内环 + 对抗外环）、Process/Outcome split（rightness 常量恒为 human_confirm_required）、异源评审（同 Harness 异 LLM 出进程）与冻结蓝图 + 断路器；spec-gaming 正交轴论文参考实现的 DeepSeek Harness 原生版。
+order: 90

@@ -1,0 +1,21 @@
+{
+  "_comment": "Drift sites (workspace rule 7 self-contained-script convention). Each site names a SIBLING SET whose duplicated boilerplate SHOULD match after normalized-text diff (ODP-2: strip comments + whitespace). drift_check.py compares each set; divergence is an advisory WARNING (rule 4 — never blocker, never changes exit code). variation_allowed marks a set whose siblings are EXPECTED to differ (skipped). This registry is the heuristic surface; drift_check.py is the deterministic comparator over it. v1 scope: emit-across-adapters (the canonical rule-7 duplication). Register more sites (have / run / find_marker_dirs across arch_contract_*.py) as their sibling sets stabilize — add a site here, never edit the checker.",
+  "sites": [
+    {
+      "name": "emit-across-adapters",
+      "kind": "function",
+      "function": "emit",
+      "siblings": [
+        "infra/scripts/semgrep_adapter.py",
+        "infra/scripts/vale_adapter.py",
+        "infra/scripts/spectral_adapter.py",
+        "infra/scripts/oasdiff_adapter.py",
+        "infra/scripts/iac_adapter.py",
+        "infra/scripts/license_adapter.py",
+        "infra/scripts/impeccable_detect_adapter.py"
+      ],
+      "variation_allowed": false,
+      "note": "the emit(findings, coverage) helper is the canonical rule-7 duplication across the adapter family; a divergent emit is a drift signal"
+    }
+  ]
+}

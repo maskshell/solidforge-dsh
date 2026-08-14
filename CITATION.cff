@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://citation-file-format.github.io/ to learn more.
+
+cff-version: 1.2.0
+title: "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops: The Verification-Source Decoupling Discipline"
+message: "If you use the paper or this reference implementation, please cite the paper using the metadata from this file."
+type: software
+authors:
+  - name: "Analyser"
+    email: "analyser@gmail.com"
+date-released: 2026-08-07
+repository-code: "https://github.com/maskshell/solidforge-dsh"
+url: "https://github.com/maskshell/solidforge-dsh/raw/main/docs/papers/spec-gaming-orthogonal-axis.pdf"
+abstract: "Autonomous coding agents increasingly execute long-horizon loops of generation, verification, and repair. This paper argues that specification gaming is a fourth failure axis — orthogonal to context rot, error compounding, and goal drift at the level of defense mechanism — and proposes the Process/Outcome split plus verification-source decoupling as the engineering discipline; SolidForge-DSH is its DeepSeek Harness-native reference implementation."
+keywords:
+  - specification gaming
+  - autonomous coding agents
+  - verification-source decoupling
+  - loop engineering
+  - AI safety
+license: Apache-2.0
+status: "draft — unpublished; cite with the version date (2026-08-07) or the snapshot commit"
+preferred-citation:
+  type: article
+  title: "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops: The Verification-Source Decoupling Discipline"
+  authors:
+    - name: "Analyser"
+      email: "analyser@gmail.com"
+  year: 2026
+  month: 8
+  day: 7
+  url: "https://github.com/maskshell/solidforge-dsh/raw/main/docs/papers/spec-gaming-orthogonal-axis.pdf"
+  status: "draft (unpublished)"

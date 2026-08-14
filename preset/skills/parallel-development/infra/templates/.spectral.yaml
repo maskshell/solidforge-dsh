@@ -1,0 +1,21 @@
+# Spectral OpenAPI ruleset — STARTING POINT (scaffolded by `arm.py --scaffold-configs`).
+# The default below (`extends: ["spectral:oas"]`) EQUALS what spectral_adapter.py
+# synthesizes as a temp fallback when no .spectral.yaml exists — scaffolding it makes the
+# ruleset PERSISTENT + USER-CUSTOMIZABLE. If you don't intend to customize, the adapter's
+# fallback already covers this default and you may delete this file.
+#
+# The spectral_adapter.py convergence gate runs `spectral lint -f json --ruleset
+# .spectral.yaml` against each OpenAPI/Swagger spec. Spectral 6.x dropped auto-application
+# of spectral:oas, so a ruleset FILE is required.
+#
+# Advisory (severity collapses to `warning`, never blocker). Tune per-rule severity below.
+
+extends:
+  - spectral:oas
+
+rules:
+  # Sensible stricter defaults (override per project):
+  operation-operationId: error
+  operation-tags: error
+  # operation-tag-defined: error   # uncomment if you enforce a closed tag set
+  info-contact: off               # often noisy for internal APIs

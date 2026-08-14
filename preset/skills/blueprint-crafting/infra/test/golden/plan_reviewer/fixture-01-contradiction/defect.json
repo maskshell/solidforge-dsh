@@ -1,0 +1,13 @@
+{
+  "id": "FX-01",
+  "kind": "contradiction",
+  "severity": "blocker",
+  "location": "write-mod.scope vs scope-decl.scope",
+  "description": "Item write-mod's deliverable (writing a Python source module inside parallel-development) contradicts item scope-decl's declared out-of-scope boundary ('this skill does not implement code ... Out-of-scope: writing source modules'). A plan-model cannot both forbid code implementation and contain an item that ships a source module.",
+  "ground_truth": {
+    "scope_decl_forbids_code": "does not implement code",
+    "scope_decl_out_of_scope": "writing source modules",
+    "write_mod_is_code": ["module", "parallel-development", "src/normalizer.py"]
+  },
+  "precision_rule": "A correct review cites BOTH the scope boundary (scope-decl.scope) and the violating deliverable (write-mod.scope) with quotes. A review that flags write-mod as 'over-engineering' or scope-decl as 'gap' misses the contradiction — wrong defect, not precise."
+}

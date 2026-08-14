@@ -1,0 +1,226 @@
+{
+  "artifact": "README.md",
+  "rounds": [
+    {
+      "round": 1,
+      "same_source_findings": 9,
+      "hetero_findings": 0,
+      "hetero_degraded": false,
+      "blockers": 0,
+      "verdict": "pass",
+      "findings": [
+        {
+          "defect_id": "outcome-axis-count",
+          "severity": "warning",
+          "kind": "contradiction",
+          "location": "README.md skills table row",
+          "evidence": "README classified csr as an outcome-axis verifier while preset/skills/cross-source-review/SKILL.md declares it process-axis ('Process-axis, not outcome-axis'); psv+pas are the outcome-axis layers.",
+          "suggestion": "reclassify csr as the convergence layer"
+        },
+        {
+          "defect_id": "probe-plugin-pointer",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "README.md Verify section",
+          "evidence": "README pointed mount-validation notes at 'docs/ notes'; grep docs/ finds no standingKeyFor mention — the evidence lives in test/verification.md.",
+          "suggestion": "point to test/verification.md"
+        },
+        {
+          "defect_id": "skills-references-overclaim",
+          "severity": "warning",
+          "kind": "structural-gap",
+          "location": "README.md skills row",
+          "evidence": "The row implied all five skills ship references/; ls preset/skills/blueprint-crafting/ shows docs/, infra/, ruff.toml, SKILL.md — no references/ dir.",
+          "suggestion": "qualify with 'references (where the skill has them)'"
+        },
+        {
+          "defect_id": "verification-file-count",
+          "severity": "warning",
+          "kind": "contradiction",
+          "location": "test/verification.md Installation",
+          "evidence": "'254 files' was not reproducible from the repo's current state; a clean reinstall yields 263 (find excluding .DS_Store and *.pyc).",
+          "suggestion": "recount + record the counting method"
+        },
+        {
+          "defect_id": "dsh-home-hardcode",
+          "severity": "warning",
+          "kind": "contradiction",
+          "location": "README.md Install/activation lines",
+          "evidence": "Activation line hardcoded ~/.dsh while scripts/install.sh honors DSH_HOME=${DSH_HOME:-$HOME/.dsh}.",
+          "suggestion": "use $DSH_HOME in the activation line too"
+        },
+        {
+          "defect_id": "paper-link-portability",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "README.md title block",
+          "evidence": "The relative paper link ../../ws-wiki/... escapes the repo root and resolves only on the authoring machine's layout.",
+          "suggestion": "add absolute-path fallback + layout-dependence note"
+        },
+        {
+          "defect_id": "same-source-by-construction",
+          "severity": "coverage",
+          "kind": "coverage-gap",
+          "location": "README.md discipline paragraph",
+          "evidence": "DSH in-process subagent/workflow routing semantics could not be independently verified from the artifacts read; the 'by construction' framing depended on them.",
+          "suggestion": "reword to the by-design boundary (substance accepted)"
+        },
+        {
+          "defect_id": "tool-cordis-collision-unverified",
+          "severity": "coverage",
+          "kind": "coverage-gap",
+          "location": "agent.cordis.yml comment block",
+          "evidence": "Process-global provider collision was observed in-session and recorded; not independently re-derivable from compiled sources.",
+          "suggestion": "none — recorded observation"
+        },
+        {
+          "defect_id": "suite-run-unverified",
+          "severity": "coverage",
+          "kind": "coverage-gap",
+          "location": "README.md Verify section",
+          "evidence": "The reviewer verified artifact existence/content but did not re-run the deterministic suites.",
+          "suggestion": "attach a suite-run transcript for a stricter record"
+        }
+      ],
+      "dispositions": [
+        {
+          "defect_id": "outcome-axis-count",
+          "action": "fixed",
+          "note": "README skills row reworded: csr = process-axis convergence layer; psv/pas = the two outcome-axis verifiers."
+        },
+        {
+          "defect_id": "probe-plugin-pointer",
+          "action": "fixed",
+          "note": "Verify section now names test/verification.md."
+        },
+        {
+          "defect_id": "skills-references-overclaim",
+          "action": "fixed",
+          "note": "Skills row now says 'references (where the skill has them)'."
+        },
+        {
+          "defect_id": "verification-file-count",
+          "action": "fixed",
+          "note": "test/verification.md now records 263 files with the counting method (find excluding .DS_Store/*.pyc)."
+        },
+        {
+          "defect_id": "dsh-home-hardcode",
+          "action": "fixed",
+          "note": "Activation line now uses $DSH_HOME/.agent-presets/solidforge/plugins/."
+        },
+        {
+          "defect_id": "paper-link-portability",
+          "action": "fixed",
+          "note": "Link now carries the absolute-path fallback + an explicit layout-dependence note."
+        },
+        {
+          "defect_id": "same-source-by-construction",
+          "action": "fixed",
+          "note": "Coverage-severity disclosure; substance accepted — sentence reworded to the by-design boundary (out-of-process leg; in-process routing semantics not relied upon)."
+        },
+        {
+          "defect_id": "tool-cordis-collision-unverified",
+          "action": "rejected",
+          "note": "Coverage disclosure, not a defect — no artifact change; the in-session observation stands as recorded."
+        },
+        {
+          "defect_id": "suite-run-unverified",
+          "action": "rejected",
+          "note": "Coverage disclosure — the orchestrator HAD run every deterministic suite during the porting session; transcripts recorded in test/verification.md (reviewer did not re-run them)."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "same_source_findings": 2,
+      "hetero_findings": 0,
+      "hetero_degraded": false,
+      "blockers": 0,
+      "verdict": "pass",
+      "findings": [
+        {
+          "defect_id": "F7-residual-inprocess-semantics",
+          "severity": "warning",
+          "kind": "contradiction",
+          "location": "README.md discipline paragraph vs docs/port-design.md §4",
+          "evidence": "README denied reliance on in-process routing semantics while port-design.md §4 still grounded the boundary in 'by construction' same-source-ness; plus a 'worflow' typo in the same sentence.",
+          "suggestion": "align both docs on the by-design boundary; fix typo"
+        },
+        {
+          "defect_id": "arm-tools-table-pointer",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "README.md arm-tools table row",
+          "evidence": "The shorthand 'infra/install/arm.py' resolves nowhere from the repo root; the real path is preset/skills/parallel-development/infra/install/arm.py.",
+          "suggestion": "write the full path in the table row"
+        }
+      ],
+      "dispositions": [
+        {
+          "defect_id": "F7-residual-inprocess-semantics",
+          "action": "fixed",
+          "note": "README + docs/port-design.md §4 now agree: the boundary is kept by design; whether in-process routing could cross providers is a harness detail the boundary does not depend on; typo fixed."
+        },
+        {
+          "defect_id": "arm-tools-table-pointer",
+          "action": "fixed",
+          "note": "Table row now carries the full path preset/skills/parallel-development/infra/install/arm.py."
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "same_source_findings": 0,
+      "hetero_findings": 2,
+      "hetero_degraded": false,
+      "blockers": 1,
+      "verdict": "rewrite",
+      "findings": [
+        {
+          "defect_id": "agent-count-mismatch",
+          "severity": "blocker",
+          "kind": "contradiction",
+          "location": "README.md lines 5+13",
+          "evidence": "different-family leg (claude, haiku tier): 'Grep verification of preset/agents/*.agent.md returns only 21 agent files' — but its own evidence enumerates 22 names. Independent verification (orchestrator): ls preset/agents/*.agent.md | wc -l = 22; the name set is identical to the README's claim. The blocker is a FALSE POSITIVE of the heterogeneous oracle (the paper's §8.7 oracle-error mode).",
+          "suggestion": "no fix — reject with rationale"
+        },
+        {
+          "defect_id": "profiles-root-path-citation",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "README.md config section",
+          "evidence": "'profiles/claude.json' implies a repo-root path; the templates live at preset/skills/{parallel-development,cross-source-review}/infra/scripts/profiles/claude.json (verified present, _native_auth: true).",
+          "suggestion": "write the full profile path"
+        }
+      ],
+      "dispositions": [
+        {
+          "defect_id": "agent-count-mismatch",
+          "action": "rejected",
+          "note": "Different-family-only finding; independently verified FALSE — 22 agent files exist (the leg's own evidence lists 22 names). Recorded as a heterogeneous-oracle false positive (paper §8.7)."
+        },
+        {
+          "defect_id": "profiles-root-path-citation",
+          "action": "fixed",
+          "note": "README now names the full profile path preset/skills/*/infra/scripts/profiles/."
+        }
+      ]
+    }
+  ],
+  "substantive_converged": false,
+  "coverage": [
+    "core-claims-coverage: 4/4",
+    "cap=2, rounds=3"
+  ],
+  "stalemate": true,
+  "rightness": "human_confirm_required",
+  "cap": 2,
+  "core_claims": [
+    "C1-port-identity-and-paper",
+    "C2-structure-claims",
+    "C3-config-claims",
+    "C4-verification-claims"
+  ],
+  "authority_ref": "port repo tree + installed preset + upstream maskshell/solidforge + spec-gaming-orthogonal-axis.md",
+  "size_tier": "short"
+}

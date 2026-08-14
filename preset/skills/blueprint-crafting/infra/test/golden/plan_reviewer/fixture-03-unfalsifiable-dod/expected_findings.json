@@ -1,0 +1,13 @@
+{
+  "outcome_axis_respected": true,
+  "findings": [
+    {
+      "defect_id": "FX-03",
+      "severity": "blocker",
+      "kind": "gap",
+      "location": "polish.scope",
+      "evidence": "polish.scope defines done as 'the feature is complete when it feels finished and users are happy with it' and states 'No objective acceptance criteria are defined and no measurable gate is specified'. This DoD cannot be objectively checked, so convergence on this item can never be proven.",
+      "suggestion": "Replace the DoD with a falsifiable, measurable gate (e.g. specific output checks, a golden round-trip, or concrete acceptance criteria)."
+    }
+  ]
+}

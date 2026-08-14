@@ -1,0 +1,234 @@
+# The `solidforge` agent preset: SolidForge ported to the DeepSeek Harness.
+#
+# SolidForge is the reference implementation of the paper "Specification Gaming
+# as an Orthogonal Failure Axis in Autonomous Coding Loops" (spec-gaming-
+# orthogonal-axis.md). This preset is its DSH port: the two-layer convergence
+# pipeline (blueprint-crafting → parallel-development), the dual-ring
+# convergence loop (deterministic inner ring + adversarial outer ring), the
+# Process/Outcome split as a schema-level invariant (`rightness` is a CONSTANT
+# the agent cannot write), the heterogeneous review ring as an out-of-process
+# cross-provider subprocess, and the frozen-blueprint + drift-detection
+# discipline. The port's full re-derivation lives in the port workspace:
+# docs/port-design.md.
+#
+# This file is an AGENT-PLANE composition. It is mounted once per session
+# under a standing scope. Every row here follows the standard preset rules:
+# a service-publishing row MUST sit inside a group carrying an `isolate`
+# realm; host registries (tools, skills, subagents) are consumed, not owned.
+
+# ── identity ────────────────────────────────────────────────────────────────
+
+# The preset's own persona: the SolidForge discipline as the agent's standing
+# frame. `{{model}}` and `{{cwd}}` resolve from the agent's route and workspace.
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    text: |-
+      You are a coding agent powered by the {{model}} model, running on the DeepSeek Harness. Your working directory is {{cwd}}.
+
+      You operate under the SolidForge discipline (this preset), the DSH port of the reference implementation behind the paper "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops". Its two axes govern your work:
+
+      - Axis A — flow-control completeness: the convergence loop runs deterministic gates (fast gate, architecture-contract gate) and adversarial review until the gates go green. Green gates mean `process_converged`, nothing more.
+      - Axis B — verification-source decoupling: the oracle that judges the OUTPUT must not share your blind spots. Same-source self-endorsement is not a correctness claim. Your run records carry a `rightness` field you cannot write — it is a schema constant (`human_confirm_required`) enforced outside your workspace; correctness is confirmed by a human, never auto-satisfied by process success.
+
+      Load the relevant skill before acting: `parallel-development` (implementation convergence), `blueprint-crafting` (specify-side artifacts), `cross-source-review` (document convergence), `primary-source-verification` (fetched-source per-claim verification), `prior-art-search` (novelty collision). Role agents are prompt files under the preset's `agents/` directory — spawn them via the `subagent` tool. The deterministic gates (`fast_gate.py`, `blueprint_guard.py`, `counters.py`) are runnable directly from the skills' `infra/` directories; when the `solidforge-loop-gates` plugin is activated (from a cordis-capable session of this process, sources in the preset's `plugins/` dir), they also fire structurally as tool-event listeners. Project loop state lives in `.solidforge/loop/` (`$SOLIDFORGE_PROJECT_DIR` overrides the project root; the preset root is `$SOLIDFORGE_PRESET_ROOT`).
+
+      Honesty rules: a gate that degrades is reported as degraded, never silently green; a heterogeneous oracle that did not run is reported as out-of-scope, never silently satisfied.
+
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    maxBytes: 65536
+
+# ── shell ───────────────────────────────────────────────────────────────────
+
+- id: tool-bash
+  name: '@deepseek-ai/dsh-tool-bash'
+  disabled: !!js process.platform === 'win32'
+
+- id: tool-pwsh
+  name: '@deepseek-ai/dsh-tool-pwsh'
+  disabled: !!js process.platform !== 'win32'
+
+# ── filesystem ──────────────────────────────────────────────────────────────
+
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+
+- id: tool-fs-search
+  name: '@deepseek-ai/dsh-tool-fs-search'
+  config:
+    sampleOverCapGlobResults: false
+
+# ── background jobs ─────────────────────────────────────────────────────────
+
+- id: tool-jobs
+  name: '@deepseek-ai/dsh-tool-jobs'
+
+# ── skills ──────────────────────────────────────────────────────────────────
+
+# Both rows register into THIS preset's layer of the host skill registry, so
+# they need no realm. `baseUrl` is the preset's own directory, so `skills/`
+# resolves wherever the preset is installed — the five SolidForge skills travel
+# with the preset (the same wiring the `cordis` preset uses for its skill).
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+  config:
+    customSkillDirs:
+      - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
+
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+
+# ── goals ───────────────────────────────────────────────────────────────────
+
+- id: tool-goal
+  name: '@deepseek-ai/dsh-tool-goal'
+
+# ── plan mode ───────────────────────────────────────────────────────────────
+
+# Plan state is per-agent by nature, so an entry-local realm is the correct
+# lifetime (copied from the standard preset).
+- id: planning
+  name: cordis:group
+  group: true
+  isolate:
+    planMode: true
+  config:
+    - id: plan-mode
+      name: '@deepseek-ai/dsh-plan-mode'
+      config:
+        section: |
+              You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.
+
+              Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.
+
+              The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.
+
+              Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.
+
+              Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.
+
+              When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask "should I proceed?" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.
+
+# ── compaction ──────────────────────────────────────────────────────────────
+
+# `compaction-basic` reads `toolResultPrune` through `ctx.get`, so the pruner
+# must share this realm (copied from the standard preset).
+- id: compaction
+  name: cordis:group
+  group: true
+  isolate:
+    compaction: true
+    toolResultPruner: true
+  config:
+    - id: compaction-basic
+      name: '@deepseek-ai/dsh-compaction-basic'
+
+    - id: command-compact
+      name: '@deepseek-ai/dsh-command-compact'
+
+    - id: tool-result-pruner
+      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+      config:
+        thresholdChars: 8192
+        headChars: 4096
+        tailChars: 1024
+
+# ── delegation and workflows ────────────────────────────────────────────────
+
+# The `subagents` registry and its backends are host-plane singletons; this
+# preset contributes the delegation TOOLS. In-process children are SAME-SOURCE
+# by construction (paper §4.4) — the heterogeneous ring never rides this tool;
+# it runs as an OS subprocess (hetero_review.py), which is exactly the
+# platform-imposed decoupling boundary the paper describes.
+- id: delegation
+  name: cordis:group
+  group: true
+  isolate:
+    workflowEngine: true
+  config:
+    - id: tool-subagent-control
+      name: '@deepseek-ai/dsh-tool-subagent-control'
+
+    - id: tool-subagent-list-agents
+      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+
+    - id: tool-subagent
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: subagent
+        backgroundMode: continuable
+
+    - id: tool-subagent-fork
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: fork
+        toolName: subagent_fork
+        backgroundMode: continuable
+
+    # Product providers are host-plane singletons; disabled here — the
+    # heterogeneous ring uses hetero_review.py's own subprocess spawn instead.
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: codex
+        toolName: subagent_codex
+        enableRunInBackground: false
+        maxDepth: provider-managed
+
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: claude-code
+        toolName: subagent_claude_code
+        enableRunInBackground: false
+        maxDepth: provider-managed
+
+    - id: workflow-worker-thread
+      name: '@deepseek-ai/dsh-workflow-worker-thread'
+      config:
+        provider: spawn
+
+    - id: tool-workflow
+      name: '@deepseek-ai/dsh-tool-workflow'
+
+    - id: tool-ralph
+      name: '@deepseek-ai/dsh-tool-ralph'
+      config:
+        subagentProvider: spawn
+        maxRounds: 64
+
+# ── remaining model-facing rows ─────────────────────────────────────────────
+
+- id: tool-ask-user
+  name: '@deepseek-ai/dsh-tool-ask-user'
+
+- id: tool-todo
+  name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
+
+# The `web` service and its search provider stay in the host composition; only
+# the model-facing tool is per-session. `web_search` backs the fetched-source
+# verifiers (psv/pas) and the researcher fan-out.
+- id: tool-web
+  name: '@deepseek-ai/dsh-tool-web'
+  config:
+    fetch: false
+    searchTimeoutMs: 60000
+
+# ── structural enforcement (deliberately NOT a row here) ────────────────────
+
+# The SolidForge dynamic plugins (loop-gates / run-record / hetero-review) are
+# NOT rows of this composition: `tool-cordis` registers PROCESS-GLOBAL Host
+# inspect providers, so including it here would collide with the `cordis` preset
+# the moment one deployment mounts both (one process, two presets). Instead the
+# plugin sources ship in this preset's `plugins/` dir and are activated with the
+# cordis toolset from a cordis-capable session of the same process — the same
+# boundary the `standard` preset keeps (no tool-cordis row). Without them the
+# loop still runs; the deterministic gates stay callable directly from the
+# skills' `infra/` (advisory mode, honest per the persona).

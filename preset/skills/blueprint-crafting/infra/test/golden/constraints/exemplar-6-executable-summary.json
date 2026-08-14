@@ -1,0 +1,30 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "executable-summary",
+  "authority_chain": [
+    "docs/spec.md",
+    "docs/arch-design.md"
+  ],
+  "items": [
+    {
+      "item_id": "ex6-1",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/arch-design.md#ex6"
+    }
+  ],
+  "anchors": {
+    "todos": {
+      "present": true
+    },
+    "authority-deferral": {
+      "present": true
+    },
+    "first-work-package": {
+      "present": true
+    },
+    "cross-doc-dod-ref": {
+      "present": true
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueprint-crafting.local/schemas/run-record.schema.json",
+  "title": "blueprint-crafting spec run-record",
+  "description": "The normalized record the verdict-emitter (I6) produces for an artifact-convergence run. Two verdict fields, kept structurally isolated: process_converged (the process axis — high confidence, convergeable) and rightness (the outcome axis — a CONSTANT 'human_confirm_required', out of this skill's scope). Field isolation is ENFORCED by the schema: rightness is an enum with exactly ONE value, so it can never change regardless of process_converged. Mirrors parallel-development's run-record shape, moved upstream (arch-design section 5). Validated in infra/test/run_record_schema.py.",
+  "type": "object",
+  "required": ["artifact_type", "process_converged", "rightness", "inner_ring", "outer_ring", "coverage", "caveats"],
+  "additionalProperties": false,
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "enum": ["product-spec", "arch-design", "iteration-plan", "executable-summary", "research"],
+      "description": "Which artifact type this run converged (or failed to)."
+    },
+    "process_converged": {
+      "type": "boolean",
+      "description": "Process-axis verdict (high confidence). true iff the inner ring passed (no Blocker) AND the outer ring had no Blocker. This is the convergeable field."
+    },
+    "rightness": {
+      "type": "string",
+      "enum": ["human_confirm_required"],
+      "description": "CONSTANT — the outcome axis (is the artifact 'right') is out of this skill's scope. The enum has exactly ONE value to STRUCTURALLY enforce field isolation: no matter process_converged, rightness is always human_confirm_required. A consumer must never read a green process_converged as outcome-axis success (rule 3; ADR: process/outcome axis separation)."
+    },
+    "inner_ring": {"$ref": "#/$defs/ring_result"},
+    "outer_ring": {"$ref": "#/$defs/ring_result"},
+    "coverage": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Which checks ran / were skipped / degraded (honest degradation, rule 3)."
+    },
+    "caveats": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Gloss for consumers — e.g. 'rightness is human_confirm_required by design; do not misread process_converged as outcome success'."
+    }
+  },
+  "$defs": {
+    "ring_result": {
+      "type": "object",
+      "required": ["passed", "blockers"],
+      "additionalProperties": false,
+      "properties": {
+        "passed": {"type": "boolean", "description": "true iff this ring had zero Blockers."},
+        "blockers": {"type": "integer", "minimum": 0, "description": "Count of Blocker-severity failures in this ring."},
+        "findings": {"type": "integer", "minimum": 0, "description": "Total findings (all severities) in this ring."},
+        "profile": {"type": "string", "description": "Which profile ran (e.g. 'iteration-plan', 'research-v1')."}
+      }
+    }
+  }
+}

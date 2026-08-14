@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parallel-development.local/schemas/violation-log.schema.json",
+  "title": "Architecture-contract gate violation log (越权日志)",
+  "description": "The contract every arch_contract_<lang>.py emits (stdout JSON) and the convergence loop consumes. `passed` and `findings[].severity` drive the Blocker decision. Every arch gate MUST conform; adding a field requires updating this schema AND infra/test/violation_log_schema.py's validator if it uses a new keyword. Validated in infra/test/smoke_gates.py.",
+  "type": "object",
+  "required": ["gate", "passed", "coverage", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "gate": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Gate identifier, e.g. 'arch-contract-python'."
+    },
+    "passed": {
+      "type": "boolean",
+      "description": "True iff no finding has severity 'blocker'."
+    },
+    "coverage": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "What was checked / skipped (degrade-honestly trail)."
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["severity", "rule", "file", "line", "detail", "suggestion"],
+      "additionalProperties": true,
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "warning"],
+          "description": "'blocker' fails the gate (outer-ring rewrite); 'warning' is informational."
+        },
+        "rule": {"type": "string", "minLength": 1},
+        "file": {"type": "string"},
+        "line": {"type": "integer", "minimum": 0, "description": "0 when unknown."},
+        "detail": {"type": "string"},
+        "suggestion": {"type": "string"}
+      }
+    }
+  }
+}

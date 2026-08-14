@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prior-art-search.local/schemas/collision-findings.schema.json",
+  "title": "prior-art-search collision-findings",
+  "description": "The per-novelty-claim collision packet prior-art-search emits. EXTENDS primary-source-verification's doc-findings (a STRICT SUPERSET — psv's 9 `kind` values are preserved byte-for-byte; prior-art-search adds `claim-collision` / `claim-uncited-relevant` / `claim-inconclusive`). psv's 9 are themselves csr's 6 doc-domain kinds PLUS psv's 3 cited-source verdict kinds; prior-art-search keeps the full 9 (so a prior-art-search packet COMPOSES with both csr's process-axis findings and psv's cited-source findings) and adds its 3 UNcited-prior-art collision kinds. Field shape is identical (defect_id / severity / kind / location / evidence / suggestion). The EVIDENCE STANDARD IS RAISED for prior-art-search's added kinds: a `claim-collision` (severity blocker) or `claim-uncited-relevant` (severity warning) finding MUST cite a FETCHED QUOTE of the found prior-art text in `evidence`, not model recall or a bare search snippet — a finding lacking a fetched quote is downgraded to `claim-inconclusive` (severity coverage), never asserted (workspace rule 3 + L1; enforced by fetched_quote_gate.py). `claim-inconclusive` is a KIND (a novelty claim the search could not cover), DISTINCT from csr's `coverage-gap` KIND (a missing-section defect in the artifact) and from the `coverage` SEVERITY (the reviewer's own honest disclosure). `clear-under-search` claims are NOT findings (no defect — no collision found is not a positive result); they are counted in the collision-record. The extractor/comparator NEVER edits the artifact — this JSON is prior-art-search's sole output. Validated in infra/test/findings_shape_check.py.",
+  "type": "object",
+  "required": ["outcome_axis_respected", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "outcome_axis_respected": {
+      "type": "boolean",
+      "description": "prior-art-search asserts it did NOT judge outcome-axis questions (whether the doc's novelty is REAL / significant). True on every conformant run — prior-art-search reports collisions under known search coverage; it does not certify novelty."
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"},
+      "description": "One entry per collision / uncited-relevant / inconclusive novelty claim. `clear-under-search` claims are NOT findings. Empty when every admissible novelty claim came back clear-under-search."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["defect_id", "severity", "kind", "location", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable id for this finding (e.g. 'novelty-claim-1')."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["blocker", "warning", "coverage"],
+          "description": "blocker = claim-collision (found prior art already makes the claim — the doc overstates novelty; needs a fetched quote); warning = claim-uncited-relevant (found relevant work the doc didn't cite — a coverage gap; needs a fetched quote); coverage = claim-inconclusive (search couldn't cover the claim — honest disclosure, rule 3). A quote-less collision/uncited-relevant finding is downgraded to coverage/claim-inconclusive."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["contradiction", "authority-chain-break", "scope-creep", "structural-gap", "citation-error", "coverage-gap", "claim-refuted", "claim-narrowed", "claim-unverifiable", "claim-collision", "claim-uncited-relevant", "claim-inconclusive"],
+          "description": "csr's 6 doc-domain kinds (preserved) PLUS psv's 3 cited-source verdict kinds (claim-refuted / claim-narrowed / claim-unverifiable — preserved for packet composition with psv; prior-art-search itself does not emit these, it searches UNcited prior art) PLUS prior-art-search's 3 collision kinds: claim-collision = found prior art already makes this novelty claim (the doc's novelty is overstated); claim-uncited-relevant = found relevant work the doc didn't cite (a coverage gap, not a direct collision); claim-inconclusive = the search could not cover the claim (paywalled corpus, ambiguous query, nothing findable — escalate to human). NOTE: claim-inconclusive the KIND (a novelty claim the search could not cover) is DISTINCT from coverage-gap the KIND (a missing-section defect) and from coverage the SEVERITY."
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the novelty claim lives in the artifact (section heading, line range, or anchor id) AND the colliding/relevant prior-art source ref (URL / arXiv id / repo)."
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "(For csr's 6 and psv's 3 preserved kinds the evidence standard is theirs; prior-art-search's own packets emit only its 3 collision kinds below.) For claim-collision / claim-uncited-relevant: a QUOTE from the FETCHED found prior-art text (not a bare search snippet) + the novelty claim text + why they collide / why the work is relevant-and-uncited. A Blocker/Warning of these kinds with no fetched quote is downgraded to claim-inconclusive. For claim-inconclusive: what novelty was claimed and why the search could not cover it."
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Optional one-line fix direction (e.g. 'cite the colliding prior art and reframe the novelty claim'). prior-art-search does NOT apply it (report-only)."
+        }
+      }
+    }
+  }
+}

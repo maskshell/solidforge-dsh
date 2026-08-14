@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueprint-crafting.local/schemas/plan-model.schema.json",
+  "title": "blueprint-crafting plan-model",
+  "description": "The normalized plan-model this skill freezes and hands to parallel-development. The handshake contract is the EXECUTABLE SUBSET (ADR #1): item_id / seq / depends_on / dod_ref round-trip losslessly with plan_queue.py's Phase -1 frozen queue. Every item field is classified into exactly one of three subsets (see $defs/subset_tags and infra/scripts/plan_model.py's EXECUTABLE_SUBSET constant): (1) executable — the lossless round-trip contract, consumed by parallel-development; (2) upstream_only — metadata this skill sources (complexity / risk / authority / ODP / constraints-profile / descriptive title/scope), tagged and IGNORED by parallel-development; (3) downstream_only — blueprint_subset, a code-execution concern with NO upstream source, left empty or 'downstream-filled' at round-trip. NOT globally isomorphic to plan_queue.py's queue (the field sets genuinely differ — ADR #1). Additively versioned: new fields optional + default empty; removing a field or changing semantics needs a deprecation transition + a re-run of infra/test/round_trip.py. Validated in infra/test/plan_model_schema.py.",
+  "type": "object",
+  "required": ["plan_model_version", "artifact_type", "authority_chain", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "plan_model_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Schema version of this plan-model, e.g. 'v1'. Additive changes bump minor."
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["product-spec", "arch-design", "iteration-plan", "executable-summary", "research"],
+      "description": "Which upstream artifact this plan-model normalizes. Drives the constraints-profile (I3 registry)."
+    },
+    "authority_chain": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1,
+      "description": "Ordered authority references (spec > blueprint > summary > companion). First entry is the master."
+    },
+    "conflict_rule": {
+      "type": "string",
+      "description": "How to arbitrate cross-artifact conflict, e.g. 'on conflict, authority_chain[0] wins'. Optional; defaults to first-wins."
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/item"},
+      "description": "The executable item list. For iteration-plan / executable-summary these are the queue items that round-trip with plan_queue.py. Each item carries the executable subset (lossless) + tagged upstream_only / downstream_only extensions."
+    },
+    "anchors": {"$ref": "#/$defs/anchors"},
+    "anchors_meta": {"$ref": "#/$defs/anchors_meta"},
+    "research": {"$ref": "#/$defs/research"},
+    "subset_tags": {"$ref": "#/$defs/subset_tags"}
+  },
+  "$defs": {
+    "subset_tags": {
+      "type": "object",
+      "description": "Declares the three-way field classification (ADR #1) so a consumer knows which fields are the round-trip contract vs tagged extensions. Mirrored as a constant in infra/scripts/plan_model.py.",
+      "required": ["executable", "upstream_only", "downstream_only"],
+      "additionalProperties": false,
+      "properties": {
+        "executable": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "item_id, seq, depends_on, dod_ref — the lossless round-trip subset."
+        },
+        "upstream_only": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "title, scope, source_location, complexity, risk, odp_status, constraints_profile, parallel_group — tagged, ignored by parallel-development."
+        },
+        "downstream_only": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "blueprint_subset — no upstream source; empty / 'downstream-filled' at round-trip."
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["item_id", "seq", "depends_on", "dod_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {"type": "string", "minLength": 1, "description": "[executable] Stable item identifier. Lossless round-trip field."},
+        "seq": {"type": "integer", "minimum": 0, "description": "[executable] Ordering / sequence. Lossless round-trip field."},
+        "depends_on": {"type": "array", "items": {"type": "string"}, "description": "[executable] item_ids this item depends on (DAG edges). Lossless round-trip field. Empty array when none."},
+        "dod_ref": {"type": "string", "description": "[executable] Pointer to this item's definition-of-done (authority doc + section). Lossless round-trip field."},
+        "title": {"type": "string", "description": "[upstream_only] Human-readable item title. Descriptive; not part of the lossless contract."},
+        "scope": {"type": "string", "description": "[upstream_only] One-line scope / intent of the item."},
+        "source_location": {"type": "string", "description": "[upstream_only] Where in the source artifact this item was extracted from."},
+        "complexity": {"type": "string", "enum": ["S", "M", "L", "XL"], "description": "[upstream_only] Complexity tier (iteration-plan §1)."},
+        "risk": {"type": "string", "description": "[upstream_only] Free-text risk note for this item."},
+        "odp_status": {"type": "array", "items": {"$ref": "#/$defs/odp"}, "description": "[upstream_only] Open Decision Points for this item (resolve-now blocks convergence; deferred may remain)."},
+        "constraints_profile": {"type": "string", "description": "[upstream_only] Which constraints-profile applies (e.g. 'iteration-plan', 'research'). Resolved against the I3 registry."},
+        "parallel_group": {"type": ["string", "null"], "description": "[upstream_only] Normalizer-inferred parallel wave / group. Null when sequential."},
+        "blueprint_subset": {"type": "array", "items": {"type": "string"}, "description": "[downstream_only] Code-execution subset (e.g. AC ids). NO upstream source — this skill leaves it empty / 'downstream-filled'; parallel-development fills it. NOT part of the lossless contract."}
+      }
+    },
+    "odp": {
+      "type": "object",
+      "description": "An Open Decision Point on an item.",
+      "required": ["id", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "description": "Stable ODP identifier."},
+        "kind": {"type": "string", "enum": ["resolve-now", "deferred"], "description": "resolve-now blocks convergence (must be resolved); deferred may remain and re-surfaces downstream."},
+        "resolution": {"type": "string", "description": "[upstream_only] Optional resolution text. A resolve-now ODP without a resolution is UNRESOLVED -> the constraints-checker (I3) Blocks convergence."}
+      }
+    },
+    "anchors": {
+      "type": "object",
+      "description": "[upstream_only, document-level] Artifact anchor presence map: anchor-name -> {present, ref?, confidence?}. The normalizer extracts these from the source (latch: explicit anchor sections; semantic-infer: inferred); the constraints-checker (I3) verifies the required anchors for artifact_type are present. Absent entirely => the checker degrades to a coverage note (rule 3), not a failure.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["present"],
+        "additionalProperties": false,
+        "properties": {
+          "present": {"type": "boolean", "description": "Whether the anchor is satisfied in the artifact."},
+          "ref": {"type": "string", "description": "Optional pointer to where the anchor is satisfied."},
+          "confidence": {"type": "string", "description": "Extraction confidence (latch / semantic-infer) if anchor was inferred."}
+        }
+      }
+    },
+    "anchors_meta": {
+      "type": "object",
+      "description": "[upstream_only] Provenance of the anchors map. source=author-supplied => the map is authoritative (a missing required anchor is a real Blocker). source=normalizer-extracted => the map came from heuristic keyword detection, so an UNDETECTED required anchor degrades to a coverage note (rule 4: no Blocker-on-a-heuristic-miss), not a Blocker.",
+      "required": ["source"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"description": "How the anchors map was sourced: 'author-supplied' (authoritative — a missing required anchor is a real Blocker) or 'normalizer-extracted' (heuristic — an undetected required anchor degrades to a coverage note, rule 4).", "type": "string", "enum": ["author-supplied", "normalizer-extracted"]}
+      }
+    },
+    "research": {
+      "type": "object",
+      "description": "[upstream_only] research-specific constraints-profile data (artifact_type=research). Carries claims (each citing fetched sources), sources (with provenance), a cost_ledger (budget vs used), and staging state. Checked by research_constraints.py (I4) against the ADR #7 v1 subset: sources-cited(b) / staging-via-convergence(b) / cost-bounded(b when exceeded) / provenance-tag(w). Idempotency + full trust-tier DEFERRED; fedaot-kb purity DROPPED.",
+      "additionalProperties": false,
+      "properties": {
+        "claims": {"description": "The synthesized research claims (each citing fetched sources via source_refs).", "type": "array", "items": {"$ref": "#/$defs/research_claim"}},
+        "sources": {"description": "The fetched sources backing the claims (each with provenance + fetched flag).", "type": "array", "items": {"$ref": "#/$defs/research_source"}},
+        "cost_ledger": {"$ref": "#/$defs/cost_ledger"},
+        "staging": {"$ref": "#/$defs/research_staging"}
+      }
+    },
+    "research_claim": {
+      "type": "object",
+      "description": "A synthesized research claim. sources-cited (Blocker): source_refs must be non-empty and each must reference a fetched source.",
+      "required": ["text", "source_refs"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {"description": "The synthesized research claim — one verifiable proposition backed by source_refs.", "type": "string", "minLength": 1},
+        "source_refs": {"type": "array", "items": {"type": "string"}, "description": "source_ids backing this claim. Empty => unsourced => Blocker."}
+      }
+    },
+    "research_source": {
+      "type": "object",
+      "required": ["source_id", "ref", "provenance", "fetched"],
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {"description": "Stable id for this fetched source; referenced by research_claim.source_refs.", "type": "string", "minLength": 1},
+        "ref": {"type": "string", "description": "URL or stable reference to the fetched source."},
+        "provenance": {"type": "string", "enum": ["official-spec", "peer-reviewed", "vendor-doc", "blog", "unknown"], "description": "provenance-tag (warning if unknown/missing signal)."},
+        "fetched": {"type": "boolean", "description": "True iff the source was actually fetched (not asserted). A claim citing an unfetched source fails sources-cited."}
+      }
+    },
+    "cost_ledger": {
+      "type": "object",
+      "description": "cost-bounded: used must be <= cap on each axis; exceeding any cap is a Blocker (early-terminate).",
+      "required": ["budget", "used"],
+      "additionalProperties": false,
+      "properties": {
+        "budget": {"$ref": "#/$defs/cost_axes"},
+        "used": {"$ref": "#/$defs/cost_axes"}
+      }
+    },
+    "cost_axes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {"description": "Token-cost axis of the budget vs used ledger.", "type": "integer", "minimum": 0},
+        "calls": {"description": "Model-call-count axis of the budget vs used ledger.", "type": "integer", "minimum": 0},
+        "sources": {"description": "Fetched-source-count axis of the budget vs used ledger.", "type": "integer", "minimum": 0}
+      }
+    },
+    "research_staging": {
+      "type": "object",
+      "description": "staging-via-convergence: research must pass through staging AND converge before being frozen. A frozen artifact (in_staging=false) that has not converged is a Blocker.",
+      "required": ["in_staging", "converged"],
+      "additionalProperties": false,
+      "properties": {
+        "in_staging": {"type": "boolean", "description": "true = still in the staging queue (not yet frozen); false = frozen/published out of staging."},
+        "converged": {"type": "boolean", "description": "true iff the convergence loop has passed on this research."}
+      }
+    }
+  }
+}

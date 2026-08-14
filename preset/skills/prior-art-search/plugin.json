@@ -1,0 +1,14 @@
+{
+  "name": "prior-art-search",
+  "version": "0.1.0",
+  "description": "prior-art-search — read-only, search-grounded, per-novelty-claim collision detector that searches the prior-art corpus for each of a doc-shaped artifact's novelty claims and adjudicates prior-art collision (collision/uncited-relevant/clear-under-search/inconclusive), emitting an honest coverage disclosure (collisions_under_known_coverage). Single extract→search→collision→coverage pipeline (NOT a multi-round debate); the searchable prior-art corpus is the oracle — WEAKER than psv's fetched source at two layers (comparison-side + selection-side). Additive to cross-source-review (process axis) and primary-source-verification (cited-source). NEVER novel_confirmed. Phase A: explicit invocation; no hooks of its own (the pipeline is orchestrator-driven, not hook-driven).",
+  "author": {
+    "name": "solidforge"
+  },
+  "skills": [
+    {
+      "name": "prior-art-search",
+      "path": "."
+    }
+  ]
+}

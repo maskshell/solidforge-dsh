@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Checkstyle configuration template (Java Architecture-Contract Gate, JDK 17+).
+  Copy to project root. The arch_contract_java.py gate runs:
+    checkstyle -f xml -c checkstyle.xml src/main/java
+  (or `java -jar checkstyle-*-all.jar ...`, or whatever $CHECKSTYLE_JAR points at).
+  Docs: https://checkstyle.org/checks/
+
+  Severity mapping in the gate: Checkstyle severity "error" -> Blocker (gate
+  exits non-zero, loop stays inner); anything else -> warning. Set severity on
+  each module so the gate blocks only on what you genuinely consider a red line.
+
+  NOTE: Java has no single first-class standalone layer/dependency-direction
+  enforcer in this config+CLI model. ImportControl (commented below) can encode
+  package-layer import rules deterministically; beyond that, layering is an
+  outer-ring concern (or add ArchUnit rules, enforced through the test gate via
+  mvn/gradle test). See references/java-patterns.md and references/arch-contracts.md.
+-->
+
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+  <property name="severity" value="warning"/>
+  <property name="fileExtensions" value="java"/>
+
+  <!-- File-level checks -->
+  <module name="FileTabCharacter">
+    <property name="severity" value="error"/>
+  </module>
+
+  <module name="TreeWalker">
+    <!-- Imports: real clutter / latent bugs -> Blocker out of the box. -->
+    <module name="UnusedImports">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="RedundantImport">
+      <property name="severity" value="error"/>
+    </module>
+
+    <!-- Line-length intentionally NOT enforced — consistent with the repo convention (markdownlint
+         MD013 off, ruff E501 ignored, swiftlint line_length disabled). Re-enable a LineLength
+         module here if your project wants a Java line-length check. -->
+
+    <!--
+      Layer / dependency-direction enforcement (the codable architecture rule).
+      Uncomment and declare your package layers; the gate will Block on a
+      package importing a forbidden layer. See https://checkstyle.org/checks/imports/importcontrol.html
+
+      You will also need an import-control.xml (the pkg<->rule mapping). Example
+      rule blocking a `domain` package from importing a `web` package:
+          <import-control pkg="com.example.domain">
+            <disallow class="com.example.web.*" regex="true"/>
+          </import-control>
+      and point the file property at it:
+
+    <module name="ImportControl">
+      <property name="severity" value="error"/>
+      <property name="file" value="import-control.xml"/>
+    </module>
+    -->
+
+    <!-- Add more checks from https://checkstyle.org/checks/ as your project's
+         L1 red lines require (naming, Javadoc, design, etc.). -->
+  </module>
+</module>

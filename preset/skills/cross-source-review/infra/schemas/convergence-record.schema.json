@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cross-source-review.local/schemas/convergence-record.schema.json",
+  "title": "cross-source-review convergence-record",
+  "description": "The output of the convergence driver (CSR-I4) — the honest record of a same-family+different-family cross-review run on one artifact. Field NAMES are aligned to parallel-development loop_state's run-record (rounds/iterations, verdict, findings) so a Phase-B map to loop_state is cheap, but this schema has NO code dependency on loop_state. Carries the process-axis verdict (substantive_converged) and NEVER claims outcome-axis correctness (rightness stays human — cf. bc ADR field-isolation). Validated in infra/test/convergence_policy_check.py.",
+  "type": "object",
+  "required": ["artifact", "rounds", "substantive_converged", "coverage", "stalemate"],
+  "additionalProperties": false,
+  "properties": {
+    "artifact": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path/ref to the artifact under review."
+    },
+    "authority_ref": {
+      "type": "string",
+      "description": "Optional path/ref to the authoritative reference the artifact was reviewed against (empty when self-contained)."
+    },
+    "size_tier": {
+      "type": "string",
+      "enum": ["short", "long"],
+      "description": "Artifact size tier; selects the cap (short=2, long=5–7)."
+    },
+    "cap": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The max-rounds cap applied to this run (short artifact=2; long doc=5–7)."
+    },
+    "rounds": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per cross-round executed (a round = same-family pass + reconcile + different-family pass + reconcile). The count of rounds is the analog of loop_state outer.iterations.",
+      "items": {"$ref": "#/$defs/round"}
+    },
+    "substantive_converged": {
+      "type": "boolean",
+      "description": "PROCESS-AXIS verdict. True iff (a) the core claims are coverage-verified AND (b) no new Blocker-class finding appeared for >=2 rounds. NOT outcome-axis correctness."
+    },
+    "rightness": {
+      "type": "string",
+      "enum": ["human_confirm_required"],
+      "description": "Outcome-axis constant (cf. bc field-isolation). A green process axis NEVER changes this constant — the skill does not judge whether the doc is right."
+    },
+    "stalemate": {
+      "type": "boolean",
+      "description": "True iff the cap was hit without reaching substantive convergence (NOT substantive_converged AND len(rounds) >= cap) — matches converge.py + pd ADR #40 (e). cap-hit escalates to the human, never silent-pick."
+    },
+    "coverage": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Honest coverage notes: what was checked, what degraded (different-family substrate-error), what was not verified. Never silent (workspace rule 3)."
+    },
+    "core_claims": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "The enumerated core claims of the artifact (the coverage-verified prong checks these were each examined). Empty when the artifact declares no explicit core-claim set."
+    }
+  },
+  "$defs": {
+    "round": {
+      "type": "object",
+      "required": ["round", "same_source_findings", "hetero_findings", "blockers", "verdict", "findings", "dispositions"],
+      "additionalProperties": false,
+      "properties": {
+        "round": {"type": "integer", "minimum": 1, "description": "Round number (1-indexed)."},
+        "same_source_findings": {"type": "integer", "minimum": 0, "description": "Count of findings from the same-family leg this round. Field name retained for schema back-compat; prose uses 'same-family'."},
+        "hetero_findings": {"type": "integer", "minimum": 0, "description": "Count of findings from the different-family leg this round (0 + degraded=true when the leg DEGRADED on a substrate error)."},
+        "hetero_degraded": {"type": "boolean", "description": "True iff the different-family leg DEGRADED this round (budget/turn cap, provider overwhelm — ADR #41). The same-family primary stands."},
+        "blockers": {"type": "integer", "minimum": 0, "description": "New BLOCKER-class findings this round (across both legs, de-duplicated). The convergence count tracks this."},
+        "verdict": {"type": "string", "enum": ["pass", "rewrite", "adversarial-stalemate"], "description": "The reconciled verdict for this round. pass = no new blocker; rewrite = new blocker(s) to fix; adversarial-stalemate = persistent disagreement (escalate to human)."},
+        "findings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/finding"},
+          "description": "The reconciled findings this round (same-family + hetero combined per the reconciliation table; empty when the round is clean). RETENTION FIX (record-auditability): the record embeds the findings so a reader can re-judge severity — the counts-only hole is closed."
+        },
+        "dispositions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/disposition"},
+          "description": "One disposition per finding defect_id in this round's findings (fixed / rejected / escalated, each with the orchestrator's rationale). RETENTION FIX: 'what was done about it' is recorded, not inferred. converge.py enforces the 1:1 coverage invariant."
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["defect_id", "severity", "kind", "location", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {"type": "string", "minLength": 1, "description": "Stable id for this finding (e.g. 'novel-1')."},
+        "severity": {"type": "string", "enum": ["blocker", "warning", "coverage"], "description": "blocker = real defect blocking convergence; warning = suspected/advisory (never blocks — rule 4); coverage = honest disclosure (rule 3)."},
+        "kind": {"type": "string", "enum": ["contradiction", "authority-chain-break", "scope-creep", "structural-gap", "citation-error", "coverage-gap"], "description": "The doc-domain defect category (mirrors doc-findings.schema.json — that schema is authoritative for leg outputs; this inline copy is the record's retention shape)."},
+        "location": {"type": "string", "minLength": 1, "description": "Where: doc section heading, line range, or anchor id."},
+        "evidence": {"type": "string", "minLength": 1, "description": "Concrete quote from the artifact (and from the source verified against, when applicable) + why it is a defect."},
+        "suggestion": {"type": "string", "description": "Optional one-line fix direction."}
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "required": ["defect_id", "action", "note"],
+      "additionalProperties": false,
+      "properties": {
+        "defect_id": {"type": "string", "minLength": 1, "description": "The finding's defect_id this disposition covers (1:1 with this round's findings)."},
+        "action": {"type": "string", "enum": ["fixed", "rejected", "escalated"], "description": "fixed = accepted, artifact revised; rejected = declined, with rationale (incl. coverage disclosures — not defects, carried in coverage notes); escalated = the reconciliation table's different-family-only→escalate row (SKILL.md step 2 — the row names no target; the skill's only named escalation target is the human)."},
+        "note": {"type": "string", "minLength": 1, "description": "The orchestrator's reconcile rationale — required (a disposition without a rationale is a contract violation)."}
+      }
+    }
+  }
+}

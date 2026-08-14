@@ -1,0 +1,26 @@
+# Semgrep SAST ruleset — STARTING POINT (scaffolded by `arm.py --scaffold-configs`).
+# OFFLINE-DETERMINISTIC: this replaces the `semgrep_adapter.py` fallback `--config auto`
+# (which fetches the Semgrep registry — network, cached). The packs below are high-signal
+# / low-noise; extend locally, do not weaken.
+#
+# The semgrep_adapter.py convergence gate runs `semgrep --json --config .semgrep.yml`.
+# SAST is false-positive-prone — the adapter is advisory (severity collapses to `warning`,
+# never blocker); findings are review input, not auto-Blockers.
+#
+# To resolve the pack contents offline: `semgrep sync` (one-time fetch), OR keep `extends:`
+# referencing the packs if online sync is acceptable. Verify the rules you enable actually
+# run on your languages (semgrep skips rules whose `languages:` don't match).
+#
+# Docs: https://semgrep.dev/docs/
+
+extends:
+  - p/owasp-top-ten
+  - p/security-audit
+
+# Add project-specific rules under `rules:` below (empty list = extends-only):
+rules: []
+#   - id: my-custom-check
+#     pattern: ...
+#     message: ...
+#     languages: [python]
+#     severity: WARNING

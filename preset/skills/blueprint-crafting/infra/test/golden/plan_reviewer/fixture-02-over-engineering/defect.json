@@ -1,0 +1,12 @@
+{
+  "id": "FX-02",
+  "kind": "over-engineering",
+  "severity": "warning",
+  "location": "registry.scope",
+  "description": "Item registry introduces a dynamic plugin registry, runtime discovery, a hot-reload config watcher, and a multi-backend provider abstraction (three backends) to serve a SINGLE constraints-profile. None of this machinery has a second consumer — it is speculative generality (YAGNI).",
+  "ground_truth": {
+    "machinery_markers": ["plugin registry", "runtime-discovered", "hot-reload", "multi-backend", "abstraction"],
+    "single_consumer_tell": "single iteration-plan constraints-profile"
+  },
+  "precision_rule": "A correct review identifies over-engineering (machinery with one consumer) at warning severity. Over-engineering is advisory, NOT a blocker (workspace rule 4 — it does not block convergence on a real violation). A review that flags this as 'blocker' or reclassifies it as 'gap'/'contradiction' is imprecise."
+}

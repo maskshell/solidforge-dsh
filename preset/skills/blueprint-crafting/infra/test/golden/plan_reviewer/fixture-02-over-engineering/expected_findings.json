@@ -1,0 +1,13 @@
+{
+  "outcome_axis_respected": true,
+  "findings": [
+    {
+      "defect_id": "FX-02",
+      "severity": "warning",
+      "kind": "over-engineering",
+      "location": "registry.scope",
+      "evidence": "registry.scope specifies 'a dynamic plugin registry with runtime-discovered ... loaders, a hot-reload config watcher ..., and a multi-backend provider abstraction (sqlite/yaml/json backends)' to support the 'single iteration-plan constraints-profile'. Three backends and a plugin system for one profile is speculative generality with no second consumer.",
+      "suggestion": "Drop to a static registry + one backend; reintroduce plugins/hot-reload/multi-backend only when a second profile or backend actually exists."
+    }
+  ]
+}

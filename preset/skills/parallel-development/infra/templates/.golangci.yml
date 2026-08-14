@@ -1,0 +1,63 @@
+# golangci-lint configuration template (Go Architecture-Contract Gate).
+# Copy to project root. The arch_contract_go.py gate runs:
+#   golangci-lint run --out-format=json -c .golangci.yml
+# (when this file is absent the gate falls back to a minimal `--no-config -E govet,gofmt`).
+# Docs: https://golangci-lint.run/usage/configuration/
+
+# Severity mapping in the gate (NOT golangci-lint's own severity): the gate maps by
+# FromLinter — depguard/govet/staticcheck/errcheck/typecheck -> Blocker (gate exits
+# non-zero, loop stays inner); gofmt/gofumpt/whitespace/other style lints -> warning.
+# golangci-lint's per-Issue `Severity` field is EMPTY by default (only populated when a
+# `severity` config section exists); a configured `Severity: "error"` may PROMOTE an unmapped
+# linter to Blocker but never demote a blocker linter. Do NOT add a `severity` section unless
+# you understand this precedence. See references/go-patterns.md and references/arch-contracts.md.
+
+# WHY THIS IS MINIMAL: depguard (commented below) is the COMPLEMENT to — not the foundation
+# of — layer isolation. Go's `internal/` directory already provides a COMPILER-ENFORCED
+# structural boundary (importing `internal/*` from outside its parent tree is a compile
+# failure; the gate's `go build` enforces it). Depguard covers the finer dependency-direction
+# rules between non-`internal` packages that `internal/` cannot express. Per fedaot-wiki
+# `go-tooling-ecosystem`, golangci-lint aggregates many linters but that introduces config
+# complexity + false-positives — enable deliberately, not all at once. This template ships
+# only `govet` + `gofmt`; add more per project.
+
+run:
+  timeout: 5m
+  # modules-download-mode: mod   # uncomment in air-gapped/CI contexts to forbid network fetches
+
+linters:
+  # Deliberately selective (see header): only govet (correctness) + gofmt (format) on by
+  # default. Add linters (e.g. staticcheck, ineffassign, gosec) per project as red lines firm up.
+  disable-all: true
+  enable:
+    - govet
+    - gofmt
+
+linters-settings:
+  govet:
+    enable-all: false
+
+  # ── depguard: layer / dependency-direction enforcement ──────────────────────────────
+  # The codable architecture rule (the semantic layer guard). Uncomment and declare your
+  # package layers; the gate Blocks on a package importing a forbidden layer (depguard →
+  # blocker). REQUIRES golangci-lint >= v1.53 (depguard v2 `rules:` shape; the v1
+  # `list-type:`/`packages:` shape was removed and fails on modern golangci-lint).
+  # v2 format: `rules` is a map of {rule-name: {files, deny[]}}; each deny entry is
+  # {pkg, desc}, where `pkg` matches an import path prefix and `files` is a glob list.
+  # Example forbidding a `domain` package from importing a `web` package (dependencies
+  # point inward: cmd -> internal/pkg, never reverse):
+  #
+  # depguard:
+  #   rules:
+  #     no-web-in-domain:
+  #       files:
+  #         - "**/internal/domain/**/*.go"
+  #       deny:
+  #         - pkg: "example.com/myapp/web"
+  #           desc: domain must not import web — dependencies point inward
+
+issues:
+  # Line-length is intentionally NOT enforced — consistent with the repo convention
+  # (markdownlint MD013 off, ruff E501 ignored, swiftlint line_length disabled, checkstyle
+  # LineLength omitted). Re-enable a lll/nolint rule here if your project wants one.
+  exclude-use-default: false

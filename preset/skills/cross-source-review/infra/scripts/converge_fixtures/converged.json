@@ -1,0 +1,31 @@
+{
+  "artifact": "docs/converged-sample.md",
+  "authority_ref": "",
+  "size_tier": "short",
+  "core_claims": [
+    "claim_a",
+    "claim_b"
+  ],
+  "rounds": [
+    {
+      "same_findings": [],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a",
+        "claim_b"
+      ],
+      "dispositions": []
+    },
+    {
+      "same_findings": [],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a",
+        "claim_b"
+      ],
+      "dispositions": []
+    }
+  ]
+}

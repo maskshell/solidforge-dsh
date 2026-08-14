@@ -1,0 +1,449 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parallel-development.local/schemas/run-record.schema.json",
+  "title": "Convergence-loop run record",
+  "description": "The normalized record `loop_state.py run-record` emits at a terminal status (converged / suspended / hard_terminated). Aggregates the append-only event log + state into one machine-consumed artifact. The `l4_assessment` block is the instrumented form of the maturity.md rubric — a provisional verdict on whether this run evidences L4, pending human confirm. Every run record MUST conform; adding a field requires updating this schema AND infra/test/run_record_schema.py's validator if it uses a new keyword. Validated in infra/test/run_record.py.",
+  "type": "object",
+  "required": [
+    "task_id",
+    "started_at",
+    "ended_at",
+    "outcome",
+    "final_status",
+    "steps",
+    "budget",
+    "breakers_fired",
+    "top_fingerprints",
+    "outer_verdicts",
+    "rollbacks",
+    "converged",
+    "dod_satisfied",
+    "l4_assessment",
+    "rightness"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The loop-state task_id."
+    },
+    "blueprint_ref": {
+      "type": "string",
+      "description": "Path to the frozen Intent Blueprint. Omitted when no blueprint."
+    },
+    "blueprint_version": {
+      "type": "string",
+      "description": "e.g. 'v1'. Omitted when no blueprint."
+    },
+    "started_at": {
+      "type": "string",
+      "description": "ISO 8601 (UTC), from state.task_started_at."
+    },
+    "ended_at": {
+      "type": "string",
+      "description": "ISO 8601 (UTC), at run-record emission."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "converged",
+        "suspended",
+        "hard_terminated",
+        "non-terminal"
+      ],
+      "description": "Derived from final status. 'non-terminal' when run-record is emitted before a terminal mark-* (operator error, but the tool emits valid JSON rather than crashing)."
+    },
+    "final_status": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Raw state.status string."
+    },
+    "converged": {
+      "type": "boolean",
+      "description": "True iff outcome == 'converged'."
+    },
+    "dod_satisfied": {
+      "type": "boolean",
+      "description": "True iff outcome=='converged' AND >=1 outer-ring review ran (ADR #16 Definition of Done). False exposes a converged-without-outer-ring state — which mark-converged refuses and this backstop reports honestly via outcome_met=false."
+    },
+    "steps": {
+      "$ref": "#/$defs/steps"
+    },
+    "budget": {
+      "$ref": "#/$defs/budget"
+    },
+    "breakers_fired": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/breaker_firing"
+      },
+      "description": "Every non-ok breaker firing (from gate-fail / mark-* events) with its trigger."
+    },
+    "top_fingerprints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fingerprint_count"
+      },
+      "description": "Top recurring error fingerprints (error-compounding evidence)."
+    },
+    "outer_verdicts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/outer_verdict"
+      },
+      "description": "Each outer-ring review verdict. One entry == one inner→outer context fold (context-rot defense evidence)."
+    },
+    "rollbacks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rollback"
+      },
+      "description": "Each hard rollback (intent-drift → snapshot restore). Goal-drift defense evidence."
+    },
+    "task": {
+      "$ref": "#/$defs/task_descriptor"
+    },
+    "l4_assessment": {
+      "$ref": "#/$defs/l4_assessment"
+    },
+    "upstream": {
+      "$ref": "#/$defs/upstream"
+    },
+    "rightness": {
+      "type": "string",
+      "enum": [
+        "human_confirm_required"
+      ],
+      "description": "CONSTANT — the outcome axis (is the run's conclusion 'right') is out of the loop's scope. The enum has exactly ONE value to STRUCTURALLY enforce field isolation: no matter converged/dod_satisfied, rightness is always human_confirm_required. A consumer must never read a green process axis as outcome-axis success (paper §4.2)."
+    }
+  },
+  "$defs": {
+    "upstream": {
+      "type": "object",
+      "description": "Optional upstream-artifact provenance (rich path, odp2-verdict-design D1): when parallel-development consumes a blueprint-crafting artifact, it records bc's convergence verdict here as provenance — NOT a gate-skip (process_converged is necessary-but-not-sufficient; charter R6). Omitted on the free path.",
+      "additionalProperties": false,
+      "properties": {
+        "producer": {
+          "type": "string",
+          "description": "The upstream producer, e.g. 'blueprint-crafting'."
+        },
+        "process_converged": {
+          "type": "boolean",
+          "description": "bc's process-axis verdict — a trust signal, not execution-correctness."
+        },
+        "profile": {
+          "type": "string",
+          "description": "bc's inner-ring profile that ran (e.g. 'iteration-plan')."
+        }
+      }
+    },
+    "steps": {
+      "type": "object",
+      "required": [
+        "inner",
+        "outer",
+        "total"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "inner": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "inner.iteration."
+        },
+        "outer": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "outer.iterations."
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "inner + outer (step-count proxy)."
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": [
+        "token_used",
+        "token_cap",
+        "time_used",
+        "time_cap",
+        "cost_used",
+        "cost_cap"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "token_used": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "token_cap": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_used": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_cap": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost_used": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cost_cap": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "breaker_firing": {
+      "type": "object",
+      "required": [
+        "action",
+        "reason",
+        "at_iteration",
+        "at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "escalate",
+            "degrade",
+            "suspend",
+            "hard-terminate"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The breaker reason / fingerprint."
+        },
+        "at_iteration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "at": {
+          "type": "string"
+        }
+      }
+    },
+    "fingerprint_count": {
+      "type": "object",
+      "required": [
+        "fingerprint",
+        "count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "outer_verdict": {
+      "type": "object",
+      "required": [
+        "verdict",
+        "findings_count",
+        "at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "rewrite",
+            "intent-drift",
+            "blueprint-defect",
+            "visual-drift",
+            "adversarial-stalemate"
+          ],
+          "description": "adversarial-stalemate = the different-family multi-round debate hit the round cap without convergence (ADR #40 (e)); never resolves by silently adopting either side — escalates to human."
+        },
+        "findings_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "at": {
+          "type": "string"
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "required": [
+        "lost_uc",
+        "at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "lost_uc": {
+          "type": "string",
+          "description": "The Core Use Case that was drifting; '' when unspecified."
+        },
+        "at": {
+          "type": "string"
+        }
+      }
+    },
+    "task_descriptor": {
+      "type": "object",
+      "description": "Human-declared DEMAND setup (novel codebase / fuzzy requirements / high difficulty / unattended) — a probe-grade run that stress-tests capacity. NOT a capacity criterion (capacity = 3-degradation defense, ADR #38). Omitted (top-level `task` absent) for non-probe runs; a non-probe run can still be l4-evidenced on capacity alone.",
+      "required": [
+        "codebase_novelty",
+        "requirement_clarity",
+        "difficulty",
+        "attended",
+        "declared_at",
+        "target_horizon_steps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "codebase_novelty": {
+          "type": "string",
+          "enum": [
+            "novel",
+            "familiar"
+          ]
+        },
+        "requirement_clarity": {
+          "type": "string",
+          "enum": [
+            "fuzzy",
+            "specd"
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "high",
+            "moderate",
+            "low"
+          ]
+        },
+        "attended": {
+          "type": "boolean",
+          "description": "false = unattended (autonomous)."
+        },
+        "declared_at": {
+          "type": "string"
+        },
+        "target_horizon_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "DEMAND threshold — the step-count bar a probe run stress-tests capacity with (an estimate, not authoritative — per fedaot-wiki; NOT a capacity criterion, ADR #38)."
+        }
+      }
+    },
+    "l4_assessment": {
+      "type": "object",
+      "description": "Provisional, computed verdict on whether this run evidences L4 — the instrumented form of references/maturity.md's rubric. Capacity/demand split (ADR #38): capacity = 3-degradation defense under convergence (the l4-evidenced gate); horizon + is_l4_probe are DEMAND (evidence weight, not the gate). Final judgment stays human (task novelty/difficulty are human-declared; this only rolls up the evidence). `terminal_cause` is provider-normalized: a resource cap (time/token/cost) is 'inconclusive' on capability, not a failure — wall-clock confounds provider throughput.",
+      "required": [
+        "is_l4_probe",
+        "provisional_verdict",
+        "terminal_cause",
+        "horizon_met",
+        "outcome_met",
+        "error_compounding_defended",
+        "goal_drift_defended",
+        "context_rot_defended",
+        "steps_total",
+        "target_horizon_steps",
+        "breakers_fired_count",
+        "rollbacks_count",
+        "outer_reviews",
+        "caveats_addressed",
+        "human_confirm_required"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "is_l4_probe": {
+          "type": "boolean",
+          "description": "True iff task descriptor present AND novel AND fuzzy AND high AND unattended. DEMAND declaration (probe-grade run marker), NOT a capacity gate — a non-probe run can still be l4-evidenced (ADR #38)."
+        },
+        "provisional_verdict": {
+          "type": "string",
+          "enum": [
+            "l4-evidenced",
+            "not-yet",
+            "not-a-probe",
+            "inconclusive"
+          ]
+        },
+        "terminal_cause": {
+          "type": "string",
+          "enum": [
+            "converged",
+            "suspended",
+            "resource-capped",
+            "step-capped",
+            "manual",
+            "non-terminal"
+          ],
+          "description": "Why the run ended, provider-normalized. resource-capped = a budget axis (time/token/cost) hit -> inconclusive on capability; step-capped = total steps hit the provider-independent cap -> capability signal."
+        },
+        "horizon_met": {
+          "type": "boolean",
+          "description": "DEMAND marker (run-lifetime evidence weight), NOT a capacity criterion (ADR #38)."
+        },
+        "outcome_met": {
+          "type": "boolean"
+        },
+        "error_compounding_defended": {
+          "type": "boolean"
+        },
+        "goal_drift_defended": {
+          "type": "boolean"
+        },
+        "context_rot_defended": {
+          "type": "boolean"
+        },
+        "steps_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_horizon_steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "breakers_fired_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rollbacks_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outer_reviews": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "caveats_addressed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "maturity.md caveats this run can retire. l4-evidenced AND is_l4_probe (probe-grade demand + capacity) → ['caveat-2-unproven-at-scale']; else [] (ADR #38: caveat-2 is demand-weighted — non-probe l4-evidenced has capacity but lacks probe-grade demand)."
+        },
+        "human_confirm_required": {
+          "type": "boolean",
+          "description": "Always true — final L4 judgment is human."
+        }
+      }
+    }
+  }
+}

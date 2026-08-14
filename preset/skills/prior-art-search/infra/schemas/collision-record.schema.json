@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prior-art-search.local/schemas/collision-record.schema.json",
+  "title": "prior-art-search collision-record",
+  "description": "prior-art-search's TOP-LINE output — the honest collision-coverage disclosure. Carries the named signal `collisions_under_known_coverage` (the ONLY permitted top-line string; `novel_confirmed` is FORBIDDEN and never appears — enforced by coverage_policy_check.py) and the per-claim counts N/U/C/I of M. The coverage disclosure, NOT a verdict, is the contract (proposal §3 step 4, §8 Q3). Analogous to psv's split: prior-art-search emits collision-findings (per-claim collisions) AND this collision-record (the top-line disclosure). M=0 (no extractable novelty claims — a doc making no novelty assertion, or all novelty claims interpretive) and I>0 (claims extracted but the search couldn't cover them) both ESCALATE to a human, never a silent pass (rule 3). Carries `rightness: human_confirm_required` as a constant — a coverage disclosure never certifies the doc is novel.",
+  "type": "object",
+  "required": ["artifact", "signal", "counts", "rightness", "escalations"],
+  "additionalProperties": false,
+  "properties": {
+    "artifact": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path/ref to the doc-shaped artifact whose novelty claims were collision-checked."
+    },
+    "signal": {
+      "type": "string",
+      "const": "collisions_under_known_coverage",
+      "description": "The sole permitted top-line signal. prior-art-search NEVER emits 'novel_confirmed' or any boolean 'the doc is novel' — coverage_policy_check.py asserts this string is the only top-line value present."
+    },
+    "counts": {
+      "type": "object",
+      "required": ["collisions", "uncited_relevant", "clear_under_search", "inconclusive", "total_extracted"],
+      "additionalProperties": false,
+      "description": "N/U/C/I of M. coverage_policy_check.py asserts total_extracted = collisions + uncited_relevant + clear_under_search + inconclusive.",
+      "properties": {
+        "collisions": {"type": "integer", "minimum": 0, "description": "N — novelty claims where found prior art already makes the claim (each a blocker finding with a fetched quote of the found prior-art text). The doc overstates novelty here."},
+        "uncited_relevant": {"type": "integer", "minimum": 0, "description": "U — novelty claims where found relevant work the doc didn't cite (each a warning finding with a fetched quote). A coverage gap, not a direct collision."},
+        "clear_under_search": {"type": "integer", "minimum": 0, "description": "C — novelty claims with no collision found IN THE SEARCHED CORPUS (NOT 'novel' — the comparison model found no collision; not a proof none exists — comparison + selection blind-spot caveats). Counted here, NOT listed as findings."},
+        "inconclusive": {"type": "integer", "minimum": 0, "description": "I — novelty claims the search could not cover (paywalled corpus, ambiguous query, nothing findable). Each escalates to a human."},
+        "total_extracted": {"type": "integer", "minimum": 0, "description": "M — total atomic novelty claims extracted. M = N + U + C + I. M=0 means prior-art-search had no novelty surface on this artifact (the doc makes no novelty assertion, or all novelty claims are interpretive) -> escalates to a human (distinct from I>0)."}
+      }
+    },
+    "rightness": {
+      "type": "string",
+      "const": "human_confirm_required",
+      "description": "Outcome-axis constant. A coverage disclosure NEVER changes this — prior-art-search does not judge whether the doc is genuinely novel."
+    },
+    "escalations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason"],
+        "additionalProperties": false,
+        "properties": {
+          "claim_ref": {"type": "string", "description": "The inconclusive claim's location/id, when this escalation is an I>0 claim. Absent for the M=0 (no novelty surface) escalation."},
+          "reason": {"type": "string", "minLength": 1, "description": "Why it escalates: 'search could not cover this claim' (I>0) or 'no extractable novelty claims — prior-art-search has no novelty surface on this artifact' (M=0)."}
+        }
+      },
+      "description": "Human escalations: every I>0 claim (one entry each) PLUS one M=0 entry when total_extracted=0. Never empty when I>0 or M=0."
+    },
+    "coverage": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Honest coverage notes (workspace rule 3): the extractor blind-spot (claims neither party could see are absent from M), the comparison blind-spot (`clear-under-search` != 'no collision exists'), and the SELECTION-side weakness (ranking bias, recall limits, found text is model-extracted — the second oracle-weakness layer beyond psv's comparison-side one). Plus any search-source degradation. Never silent."
+    }
+  }
+}

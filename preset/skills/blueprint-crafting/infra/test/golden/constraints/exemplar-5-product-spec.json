@@ -1,0 +1,38 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "product-spec",
+  "authority_chain": [
+    "docs/spec.md"
+  ],
+  "items": [
+    {
+      "item_id": "ex5-1",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/spec.md#ex5"
+    }
+  ],
+  "anchors": {
+    "jtbd": {
+      "present": true
+    },
+    "desired-outcome-metrics": {
+      "present": true
+    },
+    "scope-boundary": {
+      "present": true
+    },
+    "constraints-assumptions": {
+      "present": true
+    },
+    "decisions": {
+      "present": true
+    },
+    "acceptance-criteria": {
+      "present": true
+    },
+    "non-goals": {
+      "present": true
+    }
+  }
+}

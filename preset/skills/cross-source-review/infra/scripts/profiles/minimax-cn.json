@@ -1,0 +1,8 @@
+{
+  "_comment": "DSH-NATIVE heterogeneous profile — MiniMax (MiniMax-M3 family) via the INSTALLED CATALOG route `minimax-cn` (CN platform — the `sk-cp-` key format belongs to api.minimaxi.com, not the international `minimax` route) in DSH's own pi-ai adapter (endpoint + protocol + model catalog inherited from pi-ai). Same harness, different LLM, out of process. Credential: MINIMAX_API_KEY (three-tier env chain). FILENAME = ROUTE: the pi-ai route name is this file's basename (provider is derived from it, never declared twice). Family label: `_family`. Credential var ROUTE-DERIVED: MINIMAX_CN_API_KEY (pi-ai env convention; override via `_credential_env` only when a route diverges).",
+  "substrate": "dsh",
+  "model": "MiniMax-M3",
+  "reasoning_effort": "high",
+  "_catalog_verified": "2026-08-14 vs pi.dev (https://pi.dev/models/minimax-cn/minimax-m3?provider=minimax-cn): catalog entry inherited VERBATIM - api anthropic-messages, baseUrl https://api.minimaxi.com/anthropic, reasoning:true, input [text,image], contextWindow 1000000, maxTokens 128000, cost {input 0.3, output 1.2, cacheRead 0.06, cacheWrite 0}. This profile declares ONLY apiKeyEnv; every model fact is catalog-inherited, so it cannot drift from the official docs.",
+  "_family": "minimax"
+}

@@ -1,0 +1,45 @@
+{
+  "artifact": "docs/degraded-sample.md",
+  "authority_ref": "",
+  "size_tier": "short",
+  "core_claims": [],
+  "rounds": [
+    {
+      "same_findings": [
+        {
+          "defect_id": "same_only",
+          "severity": "blocker",
+          "kind": "contradiction",
+          "location": "s1",
+          "evidence": "same-source caught this"
+        }
+      ],
+      "hetero_findings": [
+        {
+          "defect_id": "het_dropped",
+          "severity": "blocker",
+          "kind": "citation-error",
+          "location": "s2",
+          "evidence": "this finding must NOT count — 异源 degraded"
+        }
+      ],
+      "hetero_degraded": true,
+      "hetero_degraded_subtype": "error_max_budget_usd",
+      "core_claims_covered": [],
+      "dispositions": [
+        {
+          "defect_id": "same_only",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        }
+      ]
+    },
+    {
+      "same_findings": [],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [],
+      "dispositions": []
+    }
+  ]
+}

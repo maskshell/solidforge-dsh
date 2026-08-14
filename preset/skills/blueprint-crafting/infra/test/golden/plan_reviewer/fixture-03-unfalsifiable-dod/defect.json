@@ -1,0 +1,12 @@
+{
+  "id": "FX-03",
+  "kind": "gap",
+  "severity": "blocker",
+  "location": "polish.scope",
+  "description": "Item polish's Definition of Done ('the feature is complete when it feels finished and users are happy with it') is unfalsifiable — there is no objective, checkable gate. The plan-model explicitly states 'No objective acceptance criteria are defined'. A convergence loop can never prove this DoD is met, so process-axis convergence is impossible for this item.",
+  "ground_truth": {
+    "unfalsifiable_markers": ["feels finished", "users are happy"],
+    "no_criteria_marker": "No objective acceptance criteria"
+  },
+  "precision_rule": "A correct review flags the UNFALSIFIABLE DoD as a gap at blocker severity (it blocks convergence — you can never prove 'feels finished'). A review that flags this as 'blind-spot' or 'over-engineering', or that opines on whether the polish is 'good' (outcome axis), is imprecise or out-of-bounds."
+}

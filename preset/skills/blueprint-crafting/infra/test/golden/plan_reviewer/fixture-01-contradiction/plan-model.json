@@ -1,0 +1,25 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "iteration-plan",
+  "authority_chain": ["docs/fake-spec.md"],
+  "items": [
+    {
+      "item_id": "scope-decl",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/fake-spec.md#scope",
+      "title": "scope boundary declaration",
+      "scope": "Declare the skill boundary: this skill does not implement code — code implementation routes to parallel-development. Out-of-scope: writing source modules.",
+      "constraints_profile": "iteration-plan"
+    },
+    {
+      "item_id": "write-mod",
+      "seq": 1,
+      "depends_on": ["scope-decl"],
+      "dod_ref": "docs/fake-spec.md#mod",
+      "title": "write the module",
+      "scope": "Write and ship the Python module src/normalizer.py inside parallel-development/, including its test suite and docs.",
+      "constraints_profile": "iteration-plan"
+    }
+  ]
+}

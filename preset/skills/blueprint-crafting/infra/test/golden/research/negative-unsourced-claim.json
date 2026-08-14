@@ -1,0 +1,66 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "research",
+  "authority_chain": [
+    "docs/research.md"
+  ],
+  "items": [
+    {
+      "item_id": "negative-1",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/research.md#negative"
+    }
+  ],
+  "research": {
+    "claims": [
+      {
+        "text": "The widget quacks at 440Hz.",
+        "source_refs": [
+          "src-official"
+        ]
+      },
+      {
+        "text": "Prior work confirms the quack rate.",
+        "source_refs": [
+          "src-paper",
+          "src-official"
+        ]
+      },
+      {
+        "text": "Widgets are sentient.",
+        "source_refs": []
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "src-official",
+        "ref": "https://example.org/spec",
+        "provenance": "official-spec",
+        "fetched": true
+      },
+      {
+        "source_id": "src-paper",
+        "ref": "https://doi.org/10.x/abc",
+        "provenance": "peer-reviewed",
+        "fetched": true
+      }
+    ],
+    "cost_ledger": {
+      "budget": {
+        "tokens": 1000,
+        "calls": 10,
+        "sources": 5
+      },
+      "used": {
+        "tokens": 500,
+        "calls": 4,
+        "sources": 2
+      }
+    },
+    "staging": {
+      "in_staging": false,
+      "converged": true
+    }
+  }
+}

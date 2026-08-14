@@ -1,0 +1,69 @@
+{
+  "artifact": "docs/warnings-sample.md",
+  "authority_ref": "",
+  "size_tier": "short",
+  "core_claims": [
+    "claim_a"
+  ],
+  "rounds": [
+    {
+      "same_findings": [
+        {
+          "defect_id": "w1",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "s1",
+          "evidence": "advisory — never blocks (rule 4)"
+        }
+      ],
+      "hetero_findings": [
+        {
+          "defect_id": "w2",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "s2",
+          "evidence": "advisory — never blocks (rule 4)"
+        }
+      ],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a"
+      ],
+      "dispositions": [
+        {
+          "defect_id": "w1",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        },
+        {
+          "defect_id": "w2",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        }
+      ]
+    },
+    {
+      "same_findings": [
+        {
+          "defect_id": "w3",
+          "severity": "warning",
+          "kind": "citation-error",
+          "location": "s3",
+          "evidence": "advisory — never blocks (rule 4)"
+        }
+      ],
+      "hetero_findings": [],
+      "hetero_degraded": false,
+      "core_claims_covered": [
+        "claim_a"
+      ],
+      "dispositions": [
+        {
+          "defect_id": "w3",
+          "action": "fixed",
+          "note": "fixture disposition (accepted, artifact revised)"
+        }
+      ]
+    }
+  ]
+}

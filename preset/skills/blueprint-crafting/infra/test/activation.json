@@ -1,0 +1,76 @@
+{
+  "_comment": "Bidirectional activation boundary for blueprint-crafting vs parallel-development. Enforced by infra/test/trigger_check.py. The skill's `description` frontmatter is the routing surface a model tokenizes at activation time. ADD a trigger case: add an entry under 'positive' or 'negative' — the checker reads it; do not edit the checker. Positive phrases must be coverable by THIS skill's description (route here). Negative phrases must be coverable by parallel-development's description (route there), and this skill's description must NOT steal parallel-development's distinctive keywords (parallel_dev_distinctive).",
+  "positive": [
+    {
+      "phrase": "author a spec",
+      "keys": ["author a spec", "product spec", "spec"]
+    },
+    {
+      "phrase": "write an arch-design",
+      "keys": ["arch-design", "architecture design"]
+    },
+    {
+      "phrase": "produce an iteration-plan",
+      "keys": ["iteration plan", "iteration-plan"]
+    },
+    {
+      "phrase": "research X for the spec",
+      "keys": ["research"]
+    },
+    {
+      "phrase": "spec-driven",
+      "keys": ["spec-driven"]
+    },
+    {
+      "phrase": "write a PRD",
+      "keys": ["prd"]
+    },
+    {
+      "phrase": "author a roadmap",
+      "keys": ["roadmap"]
+    },
+    {
+      "phrase": "write a design doc",
+      "keys": ["design doc"]
+    },
+    {
+      "phrase": "decision log",
+      "keys": ["decision log"]
+    }
+  ],
+  "negative": [
+    {
+      "phrase": "implement this feature",
+      "keys": ["implement"],
+      "routes_to": "parallel-development"
+    },
+    {
+      "phrase": "fix this bug",
+      "keys": ["bug fix", "bug"],
+      "routes_to": "parallel-development"
+    },
+    {
+      "phrase": "refactor this module",
+      "keys": ["refactor"],
+      "routes_to": "parallel-development"
+    },
+    {
+      "phrase": "write tests / TDD",
+      "keys": ["tdd", "test first", "test-first"],
+      "routes_to": "parallel-development"
+    },
+    {
+      "phrase": "red green refactor",
+      "keys": ["red green refactor", "red-green"],
+      "routes_to": "parallel-development"
+    }
+  ],
+  "parallel_dev_distinctive": [
+    "tdd",
+    "red green refactor",
+    "red-green",
+    "test first",
+    "test-first",
+    "convergent fix loop"
+  ]
+}

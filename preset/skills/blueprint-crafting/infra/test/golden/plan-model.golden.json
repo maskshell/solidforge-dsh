@@ -1,0 +1,63 @@
+{
+  "plan_model_version": "v1",
+  "artifact_type": "iteration-plan",
+  "authority_chain": [
+    "docs/arch-design.md",
+    "docs/iteration-plan.md"
+  ],
+  "conflict_rule": "on conflict, authority_chain[0] wins",
+  "items": [
+    {
+      "item_id": "bc-I0",
+      "seq": 0,
+      "depends_on": [],
+      "dod_ref": "docs/iteration-plan.md#I0-done",
+      "title": "scaffold + activation/routing",
+      "scope": "SKILL.md + activation boundary + self-check placeholder",
+      "source_location": "docs/iteration-plan.md section 3 (I0)",
+      "complexity": "M",
+      "risk": "activation collision with parallel-development",
+      "odp_status": [],
+      "constraints_profile": "iteration-plan",
+      "parallel_group": null,
+      "blueprint_subset": []
+    },
+    {
+      "item_id": "bc-I1",
+      "seq": 1,
+      "depends_on": ["bc-I0"],
+      "dod_ref": "docs/iteration-plan.md#I1-done",
+      "title": "plan-model spec + schema + round-trip assertion",
+      "scope": "executable subset (item_id/seq/depends_on/dod_ref) round-trips losslessly with plan_queue.py",
+      "source_location": "docs/iteration-plan.md section 3 (I1)",
+      "complexity": "M",
+      "risk": "executable subset drifts from plan_queue.py",
+      "odp_status": [
+        {"id": "ODP-3", "kind": "deferred"}
+      ],
+      "constraints_profile": "iteration-plan",
+      "parallel_group": null,
+      "blueprint_subset": []
+    },
+    {
+      "item_id": "bc-I2",
+      "seq": 2,
+      "depends_on": ["bc-I1"],
+      "dod_ref": "docs/iteration-plan.md#I2-done",
+      "title": "normalizer (format -> plan-model)",
+      "scope": "3 source formats each golden; graded extraction confidence tagged",
+      "source_location": "docs/iteration-plan.md section 4 (I2)",
+      "complexity": "L",
+      "risk": "prose dependency inference misjudged",
+      "odp_status": [],
+      "constraints_profile": "iteration-plan",
+      "parallel_group": "wave-A",
+      "blueprint_subset": []
+    }
+  ],
+  "subset_tags": {
+    "executable": ["item_id", "seq", "depends_on", "dod_ref"],
+    "upstream_only": ["title", "scope", "source_location", "complexity", "risk", "odp_status", "constraints_profile", "parallel_group"],
+    "downstream_only": ["blueprint_subset"]
+  }
+}

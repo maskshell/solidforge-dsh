@@ -1,0 +1,143 @@
+{
+  "verdict": "rewrite",
+  "degraded": false,
+  "degraded_providers": [],
+  "findings_count": 14,
+  "findings": [
+    {
+      "defect_id": "hetero-default-self-contradiction",
+      "severity": "blocker",
+      "kind": "contradiction",
+      "location": "README.md discipline paragraph (line 20) vs Heterogeneous-provider config (lines 36-39)",
+      "evidence": "Line 20 states the heterogeneous review ring runs as an out-of-process subprocess '(default `claude -p`; qwen3/bigmodel/minimax via profiles)'. Lines 36-39 of the SAME doc state the opposite: 'The upstream `claude -p` mechanism survives ONLY as an explicitly labeled external-harness opt-in ... it is never the default.' The authoritative source disagrees with line 20 too: hetero_review.py:989 sets `default=os.environ.get(\"HETERO_PROFILE\", \"pi-ai\")` and hetero_doc_review.py:1028 sets `default=...(\"HETERO_DOC_PROFILE\", \"pi-ai\")`. So line 20 contradicts both line 39 and the live argparse default.",
+      "suggestion": "Change line 20's '(default `claude -p`)' to '(default DSH-native pi-ai substrate; claude -p is the external-harness opt-in)' to match lines 36-39 and the code.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "solidforge-preset-root-never-set",
+      "severity": "warning",
+      "kind": "structural-gap",
+      "location": "README.md line 53 + preset/commands/arm-tools.md:15-20",
+      "evidence": "README line 53 instructs 'python3 $SOLIDFORGE_PRESET_ROOT/skills/parallel-development/infra/install/arm.py <project>' and arm-tools.md:15 invokes 'python3 \"${SOLIDFORGE_PRESET_ROOT}/skills/parallel-development/infra/install/arm.py\"', treating $SOLIDFORGE_PRESET_ROOT as a live variable. But a repo-wide search for any assignment (`SOLIDFORGE_PRESET_ROOT=` or `export SOLIDFORGE_PRESET_ROOT`) across scripts/, preset/, plugins/ returns ZERO matches. scripts/install.sh installs to `$DEST` (= $DSH_HOME/.agent-presets/solidforge) and never exports SOLIDFORGE_PRESET_ROOT. The variable is load-bearing for the entire Layer-2 arming flow yet nothing in the install path sets it.",
+      "suggestion": "Either have install.sh export SOLIDFORGE_PRESET_ROOT=$DEST (and document it), or state in the README how a session obtains it (DSH preset-env injection), since the command file assumes it is already in the environment.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "workspace-hetero-profile-baked-into-readme",
+      "severity": "warning",
+      "kind": "scope-creep",
+      "location": "README.md line 43 (Heterogeneous-provider config, resolution-order item 1)",
+      "evidence": "The committed, portable README embeds an author-machine runtime note: '*(this workspace is armed: `HETERO_PROFILE=zhipu,minimax` — GLM-5.2 + MiniMax-M3, both DSH-native routes)*'. This both (a) contradicts the same section's own stated default ('the DSH-native default ... profiles/pi-ai.json'), and (b) bakes the current maintainer's local profile selection into an install doc that every reader is expected to follow — a non-portable workspace secret leaking into a committed artifact.",
+      "suggestion": "Remove the parenthetical workspace-armed note from the committed README; record such runtime state in a gitignored per-workspace file instead.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "infra-hooks-path-shorthand-unverifiable",
+      "severity": "warning",
+      "kind": "citation-error",
+      "location": "README.md Verify section, line 59",
+      "evidence": "Line 59 says: 'pipe a payload into `infra/hooks/fast_gate.py` / `blueprint_guard.py`'. The shorthand `infra/hooks/` resolves nowhere from the repo root; the real paths are preset/skills/parallel-development/infra/hooks/fast_gate.py and preset/skills/parallel-development/infra/hooks/blueprint_guard.py (verified). This is the identical shorthand-rooted citation defect the primary reviewer caught for arm.py in the same-doc skills/arm-tools tables, but on a different line (Verify section) it went uncovered.",
+      "suggestion": "Write the full path 'preset/skills/parallel-development/infra/hooks/fast_gate.py' (and blueprint_guard.py) in line 59.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "hetero-config-section-omits-doc-selector",
+      "severity": "coverage",
+      "kind": "coverage-gap",
+      "location": "README.md Heterogeneous-provider config section (lines 28-51)",
+      "evidence": "The README's single hetero-config narrative covers only the shared/pd substrate (PI_AI_API_KEY, HETERO_PROFILE) and never names HETERO_DOC_PROFILE, the separate selector the csr doc-leg reads. The committed .env.solidforge.example:25 explicitly documents the split ('HETERO_DOC_PROFILE=pi-ai # csr's separate selector (same rule)') and hetero_doc_review.py:1028 reads HETERO_DOC_PROFILE as an independent knob. A reader of the README alone cannot arm csr's different-family leg. I could not independently verify the claim that the two selectors are truly independent at runtime — flagging that as the coverage boundary of this check.",
+      "suggestion": "Add one line to the hetero-config section noting csr uses HETERO_DOC_PROFILE (same rule, separate var) so the doc leg is arming-complete from the README.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "preset-local-skills-overclaim",
+      "severity": "warning",
+      "kind": "structural-gap",
+      "location": "README.md skills row line 11 ('Agent preset' table cell)",
+      "evidence": "Line 11 describes the composition as 'standard coding-agent rows + SolidForge persona + preset-local skills', implying the agent.cordis.yml composition itself defines skills. The actual source (agent.cordis.yml skill-filesystem row) only mounts a customSkillDirs entry pointing at the `skills/` directory; the five skills are filesystem-loaded via the dsh-skill-filesystem host service, not defined as composition rows. The phrase 'preset-local skills' mislocates where the skills live relative to the composition.",
+      "suggestion": "Re-word to '+ skills mounted from preset/skills/ via customSkillDirs' to match what the composition actually does.",
+      "provider": "zhipu"
+    },
+    {
+      "defect_id": "default-substrate-contradiction",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "README.md line 20 (discipline paragraph) vs lines 30-39 (install section)",
+      "evidence": "README line 20: 'the heterogeneous review ring runs as an out-of-process, cross-provider subprocess (default `claude -p`; qwen3/bigmodel/minimax via profiles).' README line 32-33: 'the DSH-native default substrate spawns a fresh, stateless `dsh --profile headless` subprocess whose throwaway `DSH_HOME` pins a DIFFERENT provider/model route (`substrate: dsh`, `profiles/pi-ai.json`...)'. Cross-check: preset/skills/parallel-development/references/install.md line 101 confirms 'DSH-NATIVE default: `dsh --profile headless`'. The discourse paragraph's leading claim is the upstream default; the install paragraph's leading claim is the current DSH default — the two are conflated under a single unlabeled 'default' in the discourse paragraph, and a reader landing in the discourse paragraph first will read it as the current default being `claude -p`.",
+      "suggestion": "rephrase the discipline paragraph to lead with the DSH-native default (dsh --profile headless) and explicitly tag the `claude -p` reference as the upstream mechanism it re-derives",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "env-resolution-order-reversed",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "README.md lines 40-45 (Heterogeneous-provider config) vs preset/skills/parallel-development/infra/scripts/hetero_review.py _load_dotenv() lines 277-296",
+      "evidence": "README lines 43-45 list: '1. <preset-root>/.env.solidforge — the DSH site default ... 2. <project>/.env; 3. <project>/.env.solidforge — the arm-tools-provisioned file (authoritative among files)' under the heading 'Credentials resolve in highest-precedence-first order (setdefault — first-loaded wins...)'. Actual code: `_load_dotenv_file(os.path.join(root, '.env.solidforge'))` then `_load_dotenv_file(os.path.join(root, '.env'))` then `_load_dotenv_file(os.path.join(preset, '.env.solidforge'))` — i.e. project/.env.solidforge wins, preset-root/.env.solidforge is the last fallback. The README's 'highest-precedence-first' table is the OPPOSITE precedence of the code. The committed preset root hosts `.env.solidforge.example` (line 6) which carries the same reversed ordering, so the example file documents the wrong precedence too.",
+      "suggestion": "swap the numbered list order to project/.env.solidforge → project/.env → preset-root/.env.solidforge (= match the code's load_dotenv order); or rephrase the README's preamble as 'lowest-precedence-first' so the listed order matches the code's actual precedence",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "outcome-axis-count-was-backwards",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "previous finding 'outcome-axis-count' (round 1) — the finding targets the README, but the README text is correct; the finding's own claim is inverted",
+      "evidence": "README line 12: 'the document-convergence layer (csr — process-axis), and the two outcome-axis verifiers (psv/pas)'. Verified against the cited sources: csr SKILL.md frontmatter says 'Out: ... outcome-axis judgment (human)' and section 'Process-axis, not outcome-axis' (line 18-20) explicitly states 'the skill converges a doc's PROCESS-AXIS quality'. psv SKILL.md frontmatter says 'Does NOT judge whether the doc is RIGHT (outcome-axis — human)' and line 11: 'It opens the OUTCOME axis's admissible surface that cross-source-review (csr) cannot reach'. pas SKILL.md line 19: 'prior-art-search lives entirely on the outcome axis'. The previous reviewer's claim that the README 'classified csr as an outcome-axis verifier while csr SKILL.md declares process-axis' is exactly inverted — the README correctly maps csr→process-axis and psv/pas→outcome-axis. reclassifying csr as 'the convergence layer' would be the wrong direction.",
+      "suggestion": "drop this finding — the README's axis assignment is correct as stated; the previous reviewer inverted the claim",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "f7-residual-already-fixed",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "previous finding 'F7-residual-inprocess-semantics' (round 2) — the cited state has already moved past the alleged contradiction",
+      "evidence": "The previous reviewer claimed README 'denied reliance on in-process routing semantics while port-design.md §4 still grounded the boundary in by-construction same-source-ness; plus a worflow typo'. Current state: README line 20 reads 'The boundary is kept BY DESIGN rather than bridged' (no 'worflow' typo is present in the current README — grep returns zero matches in the doc). docs/port-design.md line 110 also says 'is kept by design' — the two agree. The README's own dogfood trail (docs/dogfood/README-csr.run.json line 174 + README-csr.convergence-record.json line 162) explicitly records: 'README + docs/port-design.md §4 now agree: the boundary is kept by design; whether in-process routing could cross providers is a harness detail the boundary does not depend on; typo fixed.' The finding is stale.",
+      "suggestion": "drop this finding — already resolved on the doc side; the dogfood record itself documents the resolution",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "arm-tools-path-was-full",
+      "severity": "warning",
+      "kind": "citation-error",
+      "location": "previous finding 'arm-tools-table-pointer' (round 2) — the alleged shorthand is not present in the README",
+      "evidence": "Previous reviewer claimed 'shorthand infra/install/arm.py resolves nowhere from the repo root'. README line 14: '`preset/skills/parallel-development/infra/install/arm.py`' (full path from repo root). README line 53: '`python3 $SOLIDFORGE_PRESET_ROOT/skills/parallel-development/infra/install/arm.py <project>`' (full path from preset root, expanded by the env). Neither reference is a shorthand that escapes the repo root. The verified file exists at preset/skills/parallel-development/infra/install/arm.py.",
+      "suggestion": "drop this finding — the README uses the full path in both occurrences",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "dsh-home-was-not-hardcoded",
+      "severity": "warning",
+      "kind": "contradiction",
+      "location": "previous finding 'dsh-home-hardcode' (round 1) — the alleged hardcode is not present in the README",
+      "evidence": "Previous reviewer claimed 'activation line hardcoded ~/.dsh while install.sh honors $DSH_HOME'. grep '~/.dsh' across README.md returns zero matches. README line 25: 'bash scripts/install.sh        # -> $DSH_HOME/.agent-presets/solidforge' (uses $DSH_HOME, matches install.sh line 13: `DSH_HOME=\"${DSH_HOME:-$HOME/.dsh}\"`). README line 47: 'define from `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js`...' (uses $DSH_HOME). The README is consistent with install.sh on the env-var handling, not contradictory.",
+      "suggestion": "drop this finding — the README honors $DSH_HOME throughout",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "hooks-reference-relpath-ambiguous",
+      "severity": "warning",
+      "kind": "citation-error",
+      "location": "README.md line 59 (Verify section)",
+      "evidence": "README line 59: 'Gate behavior: pipe a payload into `infra/hooks/fast_gate.py` / `blueprint_guard.py` (see `references/hooks-reference.md`).' The cited `references/hooks-reference.md` is a relative path; from the repo root there is no top-level `references/` directory (verified: `find . -maxdepth 2 -name references -type d` does not return a repo-root match). The actual file is at `preset/skills/parallel-development/references/hooks-reference.md`. The reader has to know which skill's `references/` is intended; the README does not disambiguate. The prior same-family reviewer's analogous `probe-plugin-pointer` finding (for `test/verification.md`) flagged the same kind of unspecified-relpath issue but only for one of the two links here — the second one was missed.",
+      "suggestion": "write the full path `preset/skills/parallel-development/references/hooks-reference.md` (matching the table-row convention used at line 14); the gate-script paths on the same line have the same relative-path ambiguity and could be qualified similarly",
+      "provider": "minimax"
+    },
+    {
+      "defect_id": "plugin-source-still-says-claude-default",
+      "severity": "coverage",
+      "kind": "coverage-gap",
+      "location": "README.md row 4 (Structural plugins) — the README claims the dynamic Cordis plugins are the new DSH enforcement, but the actual plugin source files still carry the pre-redesign substrate default",
+      "evidence": "README row 4 (line 15) presents plugins/loop-gates.host.js, plugins/run-record.host.js, plugins/hetero-review.host.js as the new DSH enforcement; the README's install section (line 32-39) declares the DSH-native default substrate as `dsh --profile headless`. But plugins/hetero-review.host.js line 4 still reads: '... (default `claude -p` native; qwen3 / bigmodel / minimax via profiles/<backend>.json) as a fresh, stateless session.' plugins/hetero-review.host.js line 34 (the registered tool's description): '... (default claude; qwen3/bigmodel/minimax via profiles) as a stateless session...'. These match the README's discipline paragraph's now-stale wording but contradict the install section. The README's discipline paragraph / plugin-source / install-section triad are not a self-consistent set as shipped — the README is the only thing that has been fixed.",
+      "suggestion": "either (a) update the plugin sources' header-comment strings + the tool's description to read 'DSH-NATIVE default: `dsh --profile headless` ...; upstream `claude -p` is a labeled external-harness opt-in', or (b) explicitly note in the README that those plugin-source comments are pre-substrate-redesign and carry the upstream wording",
+      "provider": "minimax"
+    }
+  ],
+  "coverage": [
+    "The README's single hetero-config narrative covers only the shared/pd substrate (PI_AI_API_KEY, HETERO_PROFILE) and never names HETERO_DOC_PROFILE, the separate selector the csr doc-leg reads. The committed .env.solidforge.example:25 explicitly documents the split ('HETERO_DOC_PROFILE=pi-ai # csr's separate selector (same rule)') and hetero_doc_review.py:1028 reads HETERO_DOC_PROFILE as an independent knob. A reader of the README alone cannot arm csr's different-family leg. I could not independently verify the claim that the two selectors are truly independent at runtime — flagging that as the coverage boundary of this check.",
+    "README row 4 (line 15) presents plugins/loop-gates.host.js, plugins/run-record.host.js, plugins/hetero-review.host.js as the new DSH enforcement; the README's install section (line 32-39) declares the DSH-native default substrate as `dsh --profile headless`. But plugins/hetero-review.host.js line 4 still reads: '... (default `claude -p` native; qwen3 / bigmodel / minimax via profiles/<backend>.json) as a fresh, stateless session.' plugins/hetero-review.host.js line 34 (the registered tool's description): '... (default claude; qwen3/bigmodel/minimax via profiles) as a stateless session...'. These match the README's discipline paragraph's now-stale wording but contradict the install section. The README's discipline paragraph / plugin-source / install-section triad are not a self-consistent set as shipped — the README is the only thing that has been fixed."
+  ],
+  "malformation": "",
+  "providers": [
+    "zhipu",
+    "minimax"
+  ]
+}
