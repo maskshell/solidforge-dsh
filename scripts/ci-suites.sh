@@ -5,6 +5,12 @@
 set -u
 
 PY="${1:-python3}"
+# Absolutize the interpreter: each suite runs from its own directory, so a
+# relative path (e.g. a venv python) would break after the first cd.
+case "$PY" in
+  */*) PY="$(cd "$(dirname "$PY")" && pwd)/$(basename "$PY")" ;;
+  *)   command -v "$PY" >/dev/null || { echo "error: interpreter not found: $PY" >&2; exit 2; } ;;
+esac
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 FAIL=0
 TOTAL=0
