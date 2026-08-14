@@ -75,6 +75,17 @@ bash scripts/install.sh        # 安装 agent preset → $DSH_HOME/.agent-preset
 
 每一环的裁决都留痕（convergence-record / coverage-record / run-record），异源腿未运行或降级时如实报告，绝不静默绿。
 
+**在提示里显式引用**（语义触发不可靠时，用全名或缩写直呼其名——确定性写法）：
+
+| 提示写法 | 效果 |
+| --- | --- |
+| `psv → csr → psv → bc → pd` | 完整流水线：psv gate（外部引用 GO/NO-GO）→ csr 文档收敛 → psv full-M 权威覆盖 → bc 冻结蓝图 → pd 双环实现 |
+| `csr → bc → pd` | 文档收敛 → 冻结蓝图 → 并行实现 |
+| `psv + pas` | 对一份文档并行跑两条结果轴（引用核查 + 新颖性碰撞） |
+| `pd` / `bc` / `csr` / `psv` / `pas` | 单技能直呼 |
+
+缩写对照：`pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cross-source-review · `psv`=primary-source-verification · `pas`=prior-art-search。会话代理按此映射加载技能。
+
 ## 五个核心概念（循序渐进）
 
 1. **双环收敛**：确定性内环（lint/类型/测试/架构契约）绿了才进外环；外环是同源对抗评审，逐 finding 裁决（修复/拒绝/升级），记录全程留痕。

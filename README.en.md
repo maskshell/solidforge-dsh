@@ -75,6 +75,17 @@ The five skills are not islands — they compose the paper's §6 specify→imple
 
 Every ring's verdict is recorded (convergence-record / coverage-record / run-record); a hetero leg that didn't run or degraded is reported honestly — never silently green.
 
+**Explicit in-prompt references** (when semantic triggering is unreliable, name the skills — full names or abbreviations both work):
+
+| Prompt notation | Effect |
+| --- | --- |
+| `psv → csr → psv → bc → pd` | The full pipeline: psv gate (external-citation GO/NO-GO) → csr doc convergence → psv full-M authoritative coverage → bc frozen blueprint → pd dual-ring implementation |
+| `csr → bc → pd` | Converge the doc → freeze the blueprint → parallel implementation |
+| `psv + pas` | Run both outcome axes over one doc (citation verification + novelty collision) |
+| `pd` / `bc` / `csr` / `psv` / `pas` | A single skill by name |
+
+Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cross-source-review · `psv`=primary-source-verification · `pas`=prior-art-search. The session agent maps them to the skills.
+
 ## Five core concepts (progressively)
 
 1. **Dual-ring convergence**: the deterministic inner ring (lint/types/tests/architecture contracts) must be green before the outer ring; the outer ring is same-source adversarial review with per-finding dispositions (fix/reject/escalate), fully audited.

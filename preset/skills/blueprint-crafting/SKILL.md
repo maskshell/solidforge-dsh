@@ -1,7 +1,7 @@
 ---
 name: blueprint-crafting
 description: |
-  blueprint-crafting: Produces convergence-checked upstream artifacts — product spec (PRD), architecture design (arch-design), iteration plan, executable summary, and research — that parallel-development consumes as authoritative references. Use it whenever the user wants to author, rewrite, research, or convergence-check an upstream artifact: "author a spec", "write an arch-design", "produce an iteration-plan", "research X for the spec", "spec-driven", "write a PRD", "author a roadmap", "write a design doc", "decision log". Each artifact converges on its constraints-profile (process axis: anchors + authority-chain + sources); content correctness stays human (outcome axis). NOT for implementing code — feature implementation, bug fixes, and refactors route to parallel-development. Specifier half of the specify then implement pipeline.
+  blueprint-crafting (bc): Produces convergence-checked upstream artifacts — product spec (PRD), architecture design (arch-design), iteration plan, executable summary, and research — that parallel-development consumes as authoritative references. Use it whenever the user wants to author, rewrite, research, or convergence-check an upstream artifact: "author a spec", "write an arch-design", "produce an iteration-plan", "research X for the spec", "spec-driven", "write a PRD", "author a roadmap", "write a design doc", "decision log". Each artifact converges on its constraints-profile (process axis: anchors + authority-chain + sources); content correctness stays human (outcome axis). NOT for implementing code — feature implementation, bug fixes, and refactors route to parallel-development. Specifier half of the specify then implement pipeline.
 ---
 
 # Blueprint Crafting

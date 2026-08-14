@@ -124,6 +124,24 @@ csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv ga
 4. **pd**——按蓝图 RED/GREEN 并行派发子代理 → 双环收敛 → 断路器看护 → 终态产出 run-record（`process_converged` 与恒定的 `rightness` 分家）。
 5. **psv full-M（收尾，仅规则 13 文档）**——csr 收敛后对最终文本做权威逐声明覆盖记录。
 
+
+**显式引用写法**（把缩写直接写进提示，最可靠的触发方式）：
+
+```
+> psv → csr → psv → bc → pd       把 docs/req.md 从引用核查一路做到可运行实现
+> csr → bc → pd                   收敛 docs/design.md，冻结蓝图，然后实现
+> psv + pas                       对 docs/paper.md 并行做引用核查与新颖性碰撞
+> pd                              直接对当前任务跑实现收敛循环
+```
+
+缩写对照（全名与缩写均可触发）：
+
+| 缩写 | 技能 | 缩写 | 技能 |
+| --- | --- | --- | --- |
+| `pd` | parallel-development | `psv` | primary-source-verification |
+| `bc` | blueprint-crafting | `pas` | prior-art-search |
+| `csr` | cross-source-review | | |
+
 ## 7. 调参与常见问题
 
 **调参**（`loop_state.py init` 旗标）：内环上限 `M=8`、同指纹阈值 `N=3`、token 上限 2M、时间上限 1800s、成本上限 5.0、步数上限 200。时间轴最可靠；token 是估算。

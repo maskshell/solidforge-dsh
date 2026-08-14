@@ -118,6 +118,24 @@ After the per-skill table, the composition table — the skills form the paper's
 4. **pd** — RED/GREEN subagents dispatched in parallel against the blueprint → dual-ring convergence → breakers watching → a run-record at the terminal status (`process_converged` strictly separated from the constant `rightness`).
 5. **psv full-M (closing, rule-13 docs only)** — after csr convergence, the authoritative per-claim coverage record over the final text.
 
+
+**Explicit notation** (write the abbreviations straight into the prompt — the most reliable trigger):
+
+```
+> psv → csr → psv → bc → pd       take docs/req.md from citation check to a working implementation
+> csr → bc → pd                   converge docs/design.md, freeze the blueprint, then implement
+> psv + pas                       run citation verification and novelty collision over docs/paper.md in parallel
+> pd                              run the implementation convergence loop on the current task
+```
+
+Abbreviation map (full names and abbreviations both trigger):
+
+| Abbrev | Skill | Abbrev | Skill |
+| --- | --- | --- | --- |
+| `pd` | parallel-development | `psv` | primary-source-verification |
+| `bc` | blueprint-crafting | `pas` | prior-art-search |
+| `csr` | cross-source-review | | |
+
 ## 7. Tuning and FAQ
 
 **Tuning** (`loop_state.py init` flags): inner cap `M=8`, thrash threshold `N=3`, token cap 2M, time cap 1800s, cost cap 5.0, step cap 200. The time axis is the reliable one; tokens are an estimate.
