@@ -156,3 +156,17 @@ Two loader contracts discovered the hard way, both now encoded in the design:
    changes alone do not re-import the package module. Fresh boots always
    apply cleanly. A web-process restart is required after structural patch
    changes.
+
+## npm distribution (2026-08-14)
+
+Published `@maskshell/solidforge` to npm (versions 0.1.0, 0.1.1; the first
+publish of the newly created `@maskshell` scope hit the registry's
+new-scope packument lag — tarballs/version docs/dist-tags live while the
+packument builds). Publish flow: `npm publish --otp` blocked (account has
+publish-2FA), then a granular access token succeeded once the scope existed.
+Future releases: npm trusted publishing (OIDC) via
+`.github/workflows/publish.yml` (`workflow_dispatch` / `v*` tags, no tokens) —
+configure once on the npm website for the package after first publish.
+Upstream discussion updated: deepseek-ai/deepseek-harness#1101 (comment
+18015751) carries the shipped-package summary plus the two loader-contract
+findings as extension-surface feedback.
