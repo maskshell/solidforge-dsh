@@ -55,7 +55,8 @@ source).
   pnpm 11.7.0), including the new positive/negative parse cases and the new
   registration-rejection cases.
 - Upstream contact: posted to the repo's GitHub Discussions (Ideas) on
-  2026-08-14.
+  2026-08-14:
+  [deepseek-ai/deepseek-harness#1101](https://github.com/deepseek-ai/deepseek-harness/discussions/1101).
 
 ## Follow-up (separate RFC, not in this patch)
 
