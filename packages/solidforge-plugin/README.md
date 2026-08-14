@@ -48,4 +48,4 @@ Full source, the preset, the structural gate plugins, and the installer:
 
 ## License
 
-MIT
+Apache-2.0 (LICENSE and NOTICE included in this package)

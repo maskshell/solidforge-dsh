@@ -1,16 +1,18 @@
 {
   "name": "@maskshell/solidforge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "SolidForge on the DeepSeek Harness \u2014 the globally installed plugin face: five skills in every session's catalog plus /solidforge:<skill> colon-gesture injection and the /solidforge, /arm-tools commands.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "files": [
     "lib",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "keywords": [
     "dsh-plugin",

@@ -170,3 +170,12 @@ configure once on the npm website for the package after first publish.
 Upstream discussion updated: deepseek-ai/deepseek-harness#1101 (comment
 18015751) carries the shipped-package summary plus the two loader-contract
 findings as extension-surface feedback.
+
+## npm license correction (2026-08-14)
+
+The first publish declared `license: MIT` by mistake; the repo and the
+upstream (maskshell/solidforge) are Apache-2.0. Fixed in 0.1.2:
+`license: Apache-2.0` + LICENSE/NOTICE shipped inside the tarball (files
+whitelist), README footer updated. 0.1.0/0.1.1 keep their historical MIT
+metadata (npm does not allow editing published versions); the npm page
+renders the latest version's license, now correct.
