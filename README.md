@@ -2,6 +2,8 @@
 
 **让"测试绿了"不再等于"你做对了"。** SolidForge-DSH 是 [《Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops》](docs/papers/spec-gaming-orthogonal-axis.md)（论文随仓快照；引用请用 [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) 与 [CITATION.cff](CITATION.cff)，论文为草稿状态）参考实现的 DeepSeek Harness 原生版：把编码代理的可靠性拆成**两条轴**，用确定性门 + 对抗评审 + 异源验证把两条轴都关进笼子。
 
+[![deterministic-suites](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml/badge.svg)](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml)
+
 > [English README](README.en.md) · [使用指南](USER_GUIDE.md) · [论文](docs/papers/spec-gaming-orthogonal-axis.pdf) · [移植设计](docs/port-design.md) · [概念映射](docs/claude-code-to-dsh-map.md) · [自举评审轨迹](docs/dogfood/README-dogfood.md)
 
 ---

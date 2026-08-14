@@ -2,6 +2,8 @@
 
 **"Tests are green" should never equal "you got it right".** SolidForge-DSH is the DeepSeek Harness-native implementation of the reference implementation behind *[Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops](docs/papers/spec-gaming-orthogonal-axis.md)* (snapshotted with the repo; cite via the [PDF](docs/papers/spec-gaming-orthogonal-axis.pdf) and [CITATION.cff](CITATION.cff); the paper is a draft). It splits coding-agent reliability into **two axes** and cages both with deterministic gates, adversarial review, and heterogeneous verification.
 
+[![deterministic-suites](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml/badge.svg)](https://github.com/maskshell/solidforge-dsh/actions/workflows/ci.yml)
+
 > [中文 README](README.md) · [User Guide](USER_GUIDE.en.md) · [Paper](docs/papers/spec-gaming-orthogonal-axis.pdf) · [Port design](docs/port-design.md) · [Concept map](docs/claude-code-to-dsh-map.md) · [Dogfood trail](docs/dogfood/README-dogfood.md)
 
 ---
