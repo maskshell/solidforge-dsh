@@ -179,3 +179,18 @@ upstream (maskshell/solidforge) are Apache-2.0. Fixed in 0.1.2:
 whitelist), README footer updated. 0.1.0/0.1.1 keep their historical MIT
 metadata (npm does not allow editing published versions); the npm page
 renders the latest version's license, now correct.
+
+## Upstream-sync audit (2026-08-22)
+
+Audited upstream maskshell/solidforge history since the port basis (08-13/14):
+
+- 407c7be (08-13) format-failure commit stratification — ALREADY PORTED
+  (fast_gate remediation guidance + smoke coverage).
+- eeff1c5 (08-22, upstream ADR #53) deepseek review-leg default demotion —
+  NOT APPLICABLE by construction: the port removed same-source deepseek
+  legs entirely; lesson recorded as our ADR #53.
+- cbfde40 (08-22, upstream ADR #54) rustfmt --edition hardcode false-positive
+  generator — WE HAD THE BUG (fast_gate.py check_rust hardcoded --edition
+  2021). Fix ported verbatim + the upstream test surface (6 resolution
+  fixtures + edition-2024 let-chains e2e + 2021 control); local run green.
+  Recorded as our ADR #52.

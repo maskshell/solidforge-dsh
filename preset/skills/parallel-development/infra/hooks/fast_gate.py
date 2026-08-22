@@ -9,6 +9,7 @@ Tool missing or not configured → silent pass (exit 0). Never hard-errors.
 """
 
 import os
+import re
 import subprocess
 import sys
 
@@ -63,12 +64,99 @@ def check_swift(file_path):
     return True, None
 
 
+def _manifest_editions(text):
+    """Parse a Cargo.toml (regex, section-aware — stdlib only) into
+    (package_edition, workspace_package_edition, inherits_edition).
+
+    Covers both inheritance spellings (`edition.workspace = true` and
+    `edition = { workspace = true }`). Comments and section headers are
+    respected — `edition` under [package] vs [workspace.package] mean
+    different things and must not be conflated. (Ported from upstream ADR #54.)"""
+    pkg = wsp = None
+    inherits = False
+    section = ""
+    for line in text.splitlines():
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        header = re.match(r"^\[([^\]]+)\]$", s)
+        if header:
+            section = header.group(1)
+            continue
+        direct = re.match(r'^edition\s*=\s*"(\d{4})"', s)
+        if direct:
+            if section == "package":
+                pkg = direct.group(1)
+            elif section == "workspace.package":
+                wsp = direct.group(1)
+            continue
+        if section == "package" and re.match(
+            r"^edition(?:\.workspace\s*=\s*true|\s*=\s*\{\s*workspace\s*=\s*true)", s
+        ):
+            inherits = True
+    return pkg, wsp, inherits
+
+
+def _rust_edition(file_path):
+    """Resolve the rustfmt --edition for file_path from the nearest manifest.
+
+    A hardcoded edition parsed 2024 code (e.g. let-chains) with 2021 grammar
+    and false-positived EVERY edit on edition-2024 projects — the upstream
+    tianwang-waf handoff (2026-08-22) measured gate-red while `cargo fmt
+    --check` was green, tripping the thrashing breaker on phantom violations.
+    A false-positive Blocker breaks gate truthfulness exactly like a fake
+    green. Walk parent dirs from the file:
+
+      1. nearest Cargo.toml with a direct `[package].edition = "YYYY"` -> that;
+      2. `edition.workspace = true` (inherited) -> the first ANCESTOR's
+         `[workspace.package].edition = "YYYY"` (an ancestor's own
+         [package].edition is NOT the workspace default and is skipped);
+      3. a nearest manifest that declares NO edition ends the walk (cargo
+         defaults that crate; an ancestor's edition does not apply to it);
+      4. no manifest at all / unresolved -> "2021" — the historical hardcoded
+         default, preserved so manifest-less paths keep pre-fix behavior.
+    (Ported from upstream ADR #54.)"""
+    d = os.path.dirname(os.path.abspath(file_path))
+    inherits = False
+    while True:
+        manifest = os.path.join(d, "Cargo.toml")
+        if os.path.isfile(manifest):
+            try:
+                with open(manifest, encoding="utf-8") as fh:
+                    pkg, wsp, inh = _manifest_editions(fh.read())
+            except OSError:
+                pkg, wsp, inh = None, None, False
+            if not inherits:
+                if pkg:
+                    return pkg
+                if inh:
+                    inherits = True  # resolve via an ancestor's [workspace.package]
+                elif wsp:
+                    return wsp  # a root manifest without its own [package]
+                else:
+                    return (
+                        "2021"  # nearest manifest declares nothing: stop, no poaching
+                    )
+            elif wsp:
+                return wsp  # the inherited edition's source
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    return "2021"
+
+
 def check_rust(file_path):
     # Cheap per-file check: rustfmt --check. cargo check / clippy are whole-crate and belong to the architecture-contract gate at the convergence point.
+    # The edition is DERIVED from the file's nearest manifest (_rust_edition,
+    # ADR #54) — never hardcoded: 2024 code parsed with 2021 grammar is a
+    # systematic false positive on edition-2024 projects.
     tool = dt.resolve_tool("rustfmt")
     if not tool:
         return True, None
-    rc, out = run_quiet(tool + ["--edition", "2021", "--check", file_path])
+    rc, out = run_quiet(
+        tool + ["--edition", _rust_edition(file_path), "--check", file_path]
+    )
     if rc not in (0, None):
         return False, ("rustfmt", out)
     return True, None

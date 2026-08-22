@@ -769,6 +769,123 @@ def smoke_fast_gate_guidance():
     print("  fast-gate guidance: PASS (lint→fix-in-ring; format→stratify)")
 
 
+def smoke_rust_edition():
+    # tianwang-waf handoff (ported from upstream ADR #54, 2026-08-22): the hook
+    # hardcoded `--edition 2021` and false-positived EVERY edit on edition-2024
+    # projects (gate red while `cargo fmt --check` green — let-chains only valid
+    # in 2024 — repeatedly tripping the thrashing breaker on phantom
+    # violations). _rust_edition derives the edition from the file's nearest
+    # manifest. A false-positive Blocker breaks gate truthfulness exactly like
+    # a fake green (rule 3, both directions).
+    hook = os.path.join(ROOT, "infra", "hooks", "fast_gate.py")
+    sys.path.insert(0, os.path.dirname(hook))
+    import fast_gate as fg  # __main__-guarded hook module; in-process for the unit layer
+
+    def edition_of(tree, file_rel):
+        d = tempfile.mkdtemp(prefix="pdsmoke_ed_")
+        for rel, content in tree.items():
+            write(os.path.join(d, rel), content)
+        return fg._rust_edition(os.path.join(d, file_rel))
+
+    assert (
+        edition_of({"Cargo.toml": '[package]\nname="a"\nedition="2024"\n'}, "src/x.rs")
+        == "2024"
+    ), "direct [package].edition must win"
+    assert (
+        edition_of({"Cargo.toml": '[package]\nname="a"\nedition="2021"\n'}, "src/x.rs")
+        == "2021"
+    ), "direct 2021 must be honored (not upgraded)"
+    assert (
+        edition_of(
+            {
+                "Cargo.toml": '[workspace.package]\nedition="2024"\n[workspace]\nmembers=["m"]\n',
+                "m/Cargo.toml": '[package]\nname="m"\nedition.workspace=true\n',
+            },
+            "m/src/x.rs",
+        )
+        == "2024"
+    ), "edition.workspace=true must resolve via the ancestor [workspace.package]"
+    assert (
+        edition_of(
+            {
+                "Cargo.toml": '[workspace.package]\nedition="2024"\n',
+                "m/Cargo.toml": '[package]\nname="m"\nedition={workspace=true}\n',
+            },
+            "m/src/x.rs",
+        )
+        == "2024"
+    ), "the table-form inheritance spelling must resolve too"
+    assert edition_of({}, "src/x.rs") == "2021", (
+        "no manifest at all must keep the historical 2021 default"
+    )
+    assert (
+        edition_of(
+            {
+                "Cargo.toml": '[package]\nname="root"\nedition="2024"\n',
+                "m/Cargo.toml": '[package]\nname="m"\n',
+            },
+            "m/src/x.rs",
+        )
+        == "2021"
+    ), "a silent member manifest must NOT poach an ancestor's edition"
+    unit_note = "edition resolution PASS (6 cases)"
+
+    if not have("rustfmt"):
+        print(f"  rust edition: {unit_note}; e2e SKIP (rustfmt not installed)")
+        return
+
+    # e2e: an edition-2024 let-chains file must PASS the hook (the exact
+    # historical false positive), while bare rustfmt --edition 2021 still
+    # reproduces the incident error (pins the toolchain behavior the fix rests on).
+    d = tempfile.mkdtemp(prefix="pdsmoke_ede2e_")
+    write(
+        os.path.join(d, "Cargo.toml"),
+        '[package]\nname = "e2e"\nedition = "2024"\n',
+    )
+    write(
+        os.path.join(d, "src", "x.rs"),
+        "pub fn chk(x: Option<i32>, y: bool) -> i32 {\n"
+        "    if let Some(v) = x\n"
+        "        && y\n"
+        "    {\n"
+        "        v\n"
+        "    } else {\n"
+        "        0\n"
+        "    }\n"
+        "}\n",
+    )
+    src = os.path.join(d, "src", "x.rs")
+    env = dict(os.environ, SOLIDFORGE_PROJECT_DIR=d)
+    proc = subprocess.run(
+        ["python3", hook],
+        input=json.dumps({"tool_input": {"file_path": src}}),
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=120,
+    )
+    blocked = False
+    if proc.stdout.strip():
+        try:
+            blocked = json.loads(proc.stdout).get("decision") == "block"
+        except json.JSONDecodeError:
+            blocked = True  # unparseable hook output is a failure, not a pass
+    assert not blocked, (
+        "edition-2024 let-chains file blocked by the fast gate (the historical "
+        f"false positive): rc={proc.returncode} out={proc.stdout} err={proc.stderr}"
+    )
+    ctrl = subprocess.run(
+        ["rustfmt", "--edition", "2021", "--check", src],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert ctrl.returncode != 0 and "2024" in (ctrl.stdout + ctrl.stderr), (
+        "the --edition 2021 control no longer reproduces the let-chains error — the toolchain changed; re-derive the fix's basis"
+    )
+    print(f"  rust edition: {unit_note}; e2e PASS (2024 file green, 2021 control red)")
+
+
 def main():
     print("smoke_gates:")
     failures = []
@@ -791,6 +908,7 @@ def main():
         smoke_license,
         smoke_iac,
         smoke_fast_gate_guidance,
+        smoke_rust_edition,
     ):
         try:
             fn()
