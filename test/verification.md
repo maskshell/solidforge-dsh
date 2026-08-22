@@ -205,3 +205,14 @@ preset" failure mode (the 0.1.2-vs-fix confusion) is detected deterministically.
 install-global.sh warns on staleness (the plugin face reads the preset live);
 the plugin's /solidforge-status + probe file report presetHashNow /
 presetStamp / presetDrifted. Smoke covers stamp matching/mismatch/no-stamp.
+
+## Stale-preset detection nuance (2026-08-22)
+
+The plugin's /solidforge-status stamp fields (presetHashNow/presetStamp/
+presetDrifted) require a web-process restart to appear: the loader caches the
+loaded package MODULE per process (config hot-reload re-runs apply() with the
+cached module — lib changes do not re-import). The CLI-level check
+(install-global.sh -> preset-stamp.py check) is immediate and was verified
+live: after the stamp commit, reinstall printed
+"OK: preset in sync (commit cf6eba3d, installed 2026-08-22T16:32:52+0800)".
+A same-process lib change therefore needs a restart — noted, not buried.
