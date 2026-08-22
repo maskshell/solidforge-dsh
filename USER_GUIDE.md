@@ -29,7 +29,7 @@ bash scripts/install-global.sh     # 可选：全局插件面 → 任何会话�
   - 冒号手势 `/solidforge:parallel-development` … `/solidforge:pas`（全名或缩写均可，pre-step 边界确定性注入技能正文）；
   - 追加式 `solidforge:discipline` 人格段（`--with-persona`；两轴纪律 + 缩写映射进任何预设的系统提示）。
   - 卸载：`bash scripts/install-global.sh --revert`。技能正文仍从预设目录实时读取（单一来源，无副本漂移）；预设未装时诚实降级。
-  - **注意**：补丁层的上下文看不到 `commands`/`tools`/`subprocess` 服务（loader 只桥接 `inject` 声明的服务）——`/solidforge`、`/arm-tools`、`/solidforge-status` 命令因此由 solidforge **预设行**提供（见下），门禁仍属三个动态插件。
+  - **注意**：补丁层的上下文看不到 `commands`/`tools`/`subprocess` 服务（loader 只桥接 `inject` 声明的服务）——`/solidforge`、`/arm-tools`、`/solidforge-status` 命令因此由 solidforge **预设行**提供（见下），门禁仍属三个动态插件。预设侧修复（门禁脚本等）走 `install.sh` 通道：它现在写 `.preset-stamp.json` 版本戳，`install-global.sh` 安装时会检查预设是否过期（仓库已有修复而部署未同步会显式警告），`/solidforge-status` 也报告 `presetDrifted`。
 - **会话级激活（完整形态）**：在 DSH 中新建会话时选择 **solidforge** preset。该会话额外获得 SolidForge 人格（缩写映射、honesty rules）、22 个角色代理的引导，以及 `/solidforge`、`/arm-tools`、`/solidforge-status` 三个命令（同一包以预设行挂载，`config: {commands: true}`；命令注册表按作用域分层，这些命令对 solidforge 会话可见）。
 - **结构化插件（可选但推荐）**：三个动态 Cordis 插件把门禁与不变量变成结构强制（代码在你的工作区之外，代理改不了）：
   - `loop-gates` —— 每次 edit/write 触发快速门 / 蓝图守卫 / 终态计数器（`tools/pre-execute` deny + `tools/post-execute` block 反馈）；

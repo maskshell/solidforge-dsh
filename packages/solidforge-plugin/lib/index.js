@@ -37,7 +37,8 @@
 //     them live (no copy, no drift) and degrades honestly when the preset is
 //     not installed (skills unregistered, gestures skipped, /arm-tools fails
 //     loud — never silently green).
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
@@ -122,6 +123,51 @@ function colonTokens(messages) {
     }
   }
   return tokens
+}
+
+
+function presetHash(root) {
+  const h = createHash('sha256')
+  const files = []
+  const walk = (dir) => {
+    let entries
+    try {
+      entries = readdirSync(dir)
+    } catch {
+      return
+    }
+    entries.sort()
+    for (const entry of entries) {
+      if (entry === '.git' || entry === '__pycache__' || entry === '.ruff_cache') continue
+      const full = join(dir, entry)
+      let st
+      try {
+        st = statSync(full)
+      } catch {
+        continue
+      }
+      if (st.isDirectory()) {
+        walk(full)
+        continue
+      }
+      if (entry === '.DS_Store' || entry === '.preset-stamp.json' || entry.endsWith('.pyc')) continue
+      files.push(full)
+    }
+  }
+  walk(root)
+  for (const full of files) {
+    h.update(full.slice(root.length))
+    h.update(readFileSync(full))
+  }
+  return h.digest('hex')
+}
+
+function presetStamp(root) {
+  try {
+    return JSON.parse(readFileSync(join(root, '.preset-stamp.json'), 'utf8'))
+  } catch {
+    return undefined
+  }
 }
 
 function steerMessage(text, summary) {
@@ -445,6 +491,9 @@ export function apply(ctx, config = {}) {
     package: '@maskshell/solidforge',
     config: { persona, gates },
     presetRoot: root,
+    presetHashNow: presetHash(root),
+    presetStamp: presetStamp(root) ?? null,
+    presetDrifted: undefined,
     skillsRegistered: 0,
     systemPromptSeen: false,
     sectionRegistered: false,
@@ -457,6 +506,9 @@ export function apply(ctx, config = {}) {
     status.errors.push({ phase, message })
     warn(`${phase} failed: ${message}`)
   }
+  status.presetDrifted = status.presetStamp === null
+    ? 'no-stamp'
+    : status.presetStamp.hash !== status.presetHashNow
 
   // Additive discipline section (order 50: after the deployment persona, before
   // tool guidance). It never replaces the preset's own persona.

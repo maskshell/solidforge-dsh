@@ -34,6 +34,7 @@ done
 
 echo "== installed. Files:"
 find "$DEST" -type f | wc -l
+python3 "$HERE/scripts/preset-stamp.py" write "$DEST" "$HERE" || echo "  (stamp write failed — continue)"
 echo "== next steps:"
 echo "  1. Start a session on the 'solidforge' preset (or any preset — the"
 echo "     global plugin face via scripts/install-global.sh)."

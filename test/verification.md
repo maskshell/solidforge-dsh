@@ -194,3 +194,14 @@ Audited upstream maskshell/solidforge history since the port basis (08-13/14):
   2021). Fix ported verbatim + the upstream test surface (6 resolution
   fixtures + edition-2024 let-chains e2e + 2021 control); local run green.
   Recorded as our ADR #52.
+
+## Preset version stamp (2026-08-22)
+
+install.sh now writes `.preset-stamp.json` (source_commit, installed_at,
+content hash). scripts/preset-stamp.py `check` compares the installed preset
+against BOTH its own stamp (post-install drift) and the CURRENT repo's would-be
+install (preset/ + baked plugins) — so the "fixed in repo but stale deployed
+preset" failure mode (the 0.1.2-vs-fix confusion) is detected deterministically.
+install-global.sh warns on staleness (the plugin face reads the preset live);
+the plugin's /solidforge-status + probe file report presetHashNow /
+presetStamp / presetDrifted. Smoke covers stamp matching/mismatch/no-stamp.

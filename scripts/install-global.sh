@@ -143,3 +143,15 @@ echo "   new sessions (any preset) get the five skills, /solidforge:<skill>"
 echo "   colon gestures, and the /solidforge + /arm-tools commands."
 [ "$WITH_PERSONA" = 1 ] && echo "   persona: true — additive discipline section in every session."
 echo "   Revert: bash scripts/install-global.sh --revert [$PROFILE]"
+
+# preset staleness check: the plugin face reads skill bodies and gate scripts
+# LIVE from the installed preset, so a stale preset silently undersells it.
+PRESET_DEST="$DSH_HOME/.agent-presets/solidforge"
+if [ -d "$PRESET_DEST" ]; then
+  if ! python3 "$HERE/scripts/preset-stamp.py" check "$PRESET_DEST" "$HERE"; then
+    echo "   -> run: bash scripts/install.sh to sync the installed preset"
+  fi
+else
+  echo "   WARNING: solidforge preset not installed — the plugin degrades (skills/gestures inactive)."
+  echo "   Install: bash scripts/install.sh"
+fi

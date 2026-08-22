@@ -171,6 +171,39 @@ function userMessage(text) {
   }
 }
 
+
+// ── preset stamp observability ──────────────────────────────────────────────
+{
+  const home = buildFixture()
+  const previous = process.env.DSH_HOME
+  process.env.DSH_HOME = home
+  try {
+    const statusOf = (ctx) => JSON.parse(
+      ctx.commands.find((c) => c.name === 'solidforge-status').handler().text,
+    )
+    const ctx = mockCtx()
+    mod.apply(ctx, {})
+    const s1 = statusOf(ctx)
+    assert.equal(s1.presetStamp, null, 'no stamp yet')
+    assert.equal(s1.presetDrifted, 'no-stamp')
+    assert.equal(typeof s1.presetHashNow, 'string')
+
+    const stampPath = join(home, '.agent-presets', 'solidforge', '.preset-stamp.json')
+    writeFileSync(stampPath, JSON.stringify({ source_commit: 'test', installed_at: '2026-08-22', hash: s1.presetHashNow }))
+    const ctx2 = mockCtx()
+    mod.apply(ctx2, {})
+    assert.equal(statusOf(ctx2).presetDrifted, false, 'matching stamp => in sync')
+
+    writeFileSync(stampPath, JSON.stringify({ source_commit: 'test', installed_at: '2026-08-22', hash: 'deadbeef' }))
+    const ctx3 = mockCtx()
+    mod.apply(ctx3, {})
+    assert.equal(statusOf(ctx3).presetDrifted, true, 'mismatched stamp => drifted')
+  } finally {
+    process.env.DSH_HOME = previous
+    rmSync(home, { recursive: true, force: true })
+  }
+}
+
 // ── honest degrade: preset missing ──────────────────────────────────────────
 {
   const empty = mkdtempSync(join(tmpdir(), 'solidforge-empty-'))
