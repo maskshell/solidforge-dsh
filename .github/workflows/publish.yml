@@ -27,7 +27,20 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+      - name: Skip when the version is already published (idempotent tag runs)
+        id: version-check
+        working-directory: packages/solidforge-plugin
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if npm view "@maskshell/solidforge@$VERSION" version >/dev/null 2>&1; then
+            echo "already-published=true" >> "$GITHUB_OUTPUT"
+            echo "@maskshell/solidforge@$VERSION already exists on npm — skipping publish"
+          else
+            echo "already-published=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Publish @maskshell/solidforge
+        if: steps.version-check.outputs.already-published != 'true'
         working-directory: packages/solidforge-plugin
         # No token: with id-token: write + trusted publishing configured on
         # npm, the CLI performs the OIDC exchange with the registry itself.
