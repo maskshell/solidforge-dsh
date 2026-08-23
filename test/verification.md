@@ -216,3 +216,32 @@ cached module — lib changes do not re-import). The CLI-level check
 live: after the stamp commit, reinstall printed
 "OK: preset in sync (commit cf6eba3d, installed 2026-08-22T16:32:52+0800)".
 A same-process lib change therefore needs a restart — noted, not buried.
+
+## DSH update compatibility audit (2026-08-23)
+
+The deployment's dsh updated in place (0.1.0-rc.6 -> 0.1.1-rc.2; checkout
+files refreshed 08-22 10:25, web process started 10:59 on the new version —
+so every live E2E since then already ran against 0.1.1-rc.2). Re-audited
+every seam the patch depends on against the CURRENT sources:
+
+- dsh-commands: COMMAND_NAME /^[a-z][a-z0-9_-]*$/ unchanged (the colon-grammar
+  RFC is still pending upstream — kebab names unaffected).
+- dsh-system-prompt: PromptSection {name, order, text} unchanged.
+- dsh-skill: SkillRegistration shape unchanged.
+- dsh-tool-skill: SKILL_GESTURE + agent/pre-step injection boundary unchanged.
+- dsh-agent-loop: agent/pre-step waterfall payload unchanged.
+- dsh-scope: unscoped-pass filter unchanged (root listeners still see all
+  scoped events — the patch layer's gesture/persona design holds).
+- dsh-tools: tools/pre-execute + tools/post-execute waterfall signatures
+  unchanged (the dynamic gate plugins hold).
+
+Clean-room verification: fresh `dsh --profile web` boot of the CURRENT
+checkout with our patch layer -> probe shows skillsRegistered=5,
+sectionRegistered=true, errors=[], servicesSeen identical. Verdict:
+COMPATIBLE.
+
+One operational finding (unrelated to the update): the three session-owned
+dynamic plugins were gone from the process when the audit began — they are
+per-session activations and do not survive session resumptions; re-activated
+(sfgat-1 / sfrec-2 / sfhet-3). This is the documented per-session activation
+model, not a regression.
