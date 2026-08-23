@@ -271,3 +271,13 @@ line + the gate assertions. Verified on a fresh web-profile boot (3099): the
 served graph contains @maskshell/solidforge with the bundle route
 /plugins/@maskshell/solidforge/client.js. The 3080 process picks it up on
 its next restart (clientModules caches package metadata per process).
+
+## Colon token UI-decoration root cause + upstream patch (2026-08-23)
+
+User-observed: a sent /solidforge:psv message renders split ("/solidforge" +
+":psv say hi"). Root cause from the shipped source: projectUserText's
+plain-token scan /(^|\s)(\/[\w-]+|...)/gu — \w- excludes ":", so the chip
+decorates only the leading part. The stored message and the host-side
+injection are untouched (the injection firing proves the token stayed
+intact) — cosmetic, but misleading. Fix prepared upstream (one-line regex +
+unit test): docs/upstream/colon-token-decoration.patch; posted to #1101.

@@ -1,0 +1,59 @@
+From 3454a49bd478a13bbffa72388be74fc49aa8468a Mon Sep 17 00:00:00 2001
+From: maskshell <analyser@gmail.com>
+Date: Sun, 23 Aug 2026 23:48:12 +0800
+Subject: [PATCH] fix(ui-conversation): keep colon-namespaced slash tokens in
+ one chip
+
+The plain-token scan /(^|\s)(\/[\w-]+|...)/ splits /plugin:skill tokens at
+the colon: /solidforge:psv rendered as a /solidforge chip plus stray :psv
+text. Include ":" in the token class; trailing punctuation stripping already
+handles a terminal colon. Test: /solidforge:psv say hi renders ONE
+data-ref-chip="skill" chip plus the rest as plain text.
+---
+ .../src/client/chat/MessageItem.tsx              |  2 +-
+ .../tests/chat-branch-tails.client.spec.tsx      | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/packages/client/ui-conversation/src/client/chat/MessageItem.tsx b/packages/client/ui-conversation/src/client/chat/MessageItem.tsx
+index 8a882a7..fe1b7cc 100644
+--- a/packages/client/ui-conversation/src/client/chat/MessageItem.tsx
++++ b/packages/client/ui-conversation/src/client/chat/MessageItem.tsx
+@@ -163,7 +163,7 @@ function projectUserText(text: string, sessionLabels: readonly string[]): ReactN
+       start = text.indexOf(label, start + label.length)
+     }
+   }
+-  const re = /(^|\s)(\/[\w-]+|@"[^"\n]+"|@[^\s]+)/gu
++  const re = /(^|\s)(\/[\w:-]+|@"[^"\n]+"|@[^\s]+)/gu
+   let m: RegExpExecArray | null
+   while ((m = re.exec(text)) !== null) {
+     const tokenStart = m.index + (m[1]?.length ?? 0)
+diff --git a/packages/client/ui-conversation/tests/chat-branch-tails.client.spec.tsx b/packages/client/ui-conversation/tests/chat-branch-tails.client.spec.tsx
+index ce8c100..e1585ea 100644
+--- a/packages/client/ui-conversation/tests/chat-branch-tails.client.spec.tsx
++++ b/packages/client/ui-conversation/tests/chat-branch-tails.client.spec.tsx
+@@ -126,6 +126,22 @@ describe('MessageItem arms', () => {
+     expect(view.getByText('引用会话 · Research notes')).toBeTruthy()
+   })
+ 
++
++  it('keeps a colon-namespaced slash token in ONE chip (no split at the colon)', () => {
++    const view = render(
++      <MessageItem t={t} node={{
++        kind: 'user',
++        seq: 1,
++        time: 1_000,
++        content: [{ type: 'text', text: '/solidforge:psv say hi' }] as never,
++        source: null,
++      }} />,
++    )
++    const skills = [...view.container.querySelectorAll('[data-ref-chip="skill"]')]
++    expect(skills.map(chip => chip.textContent)).toEqual(['/solidforge:psv'])
++    expect(view.getByText('say hi')).toBeTruthy()
++  })
++
+   it('renders no-extension paths as files and leaves sentence punctuation outside the reference', () => {
+     const view = render(
+       <MessageItem t={t} node={{
+-- 
+2.55.0
+
