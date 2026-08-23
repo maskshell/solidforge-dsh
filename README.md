@@ -53,6 +53,26 @@ bash scripts/install-global.sh # 可选：全局插件面 → 任何预设的会
 3. 对会话说「并行实现 X，TDD」，收敛循环接管——双环、断路器、回滚与运行记录全部自动。
 4. （可选）在 cordis 会话里激活三个结构化插件（见 [使用指南](USER_GUIDE.md) §激活插件）。
 
+### 全局插件面（Node.js 插件，可选）
+
+`install-global.sh` 安装并挂载的是 npm 包 **`@maskshell/solidforge`**（Node.js 插件，零依赖）。两种装法等价：
+
+```bash
+# 方式一：仓库脚本（推荐——自动写 profile 补丁层，并检查预设是否过期）
+bash scripts/install-global.sh web --with-persona
+
+# 方式二：直接装 npm 包，再手写补丁条目
+npm install --prefix "$DSH_HOME" @maskshell/solidforge
+# 在 $DSH_HOME/profiles/<profile>/cordis.patch.yml 追加：
+#   - insert:
+#       - id: solidforge
+#         name: '@maskshell/solidforge'
+#         config:
+#           persona: true
+```
+
+装好后**任何预设**的会话获得：五个技能（host 层注册 → `/` 菜单与模型目录）、`/solidforge:<skill>` 冒号手势（全名或缩写，pre-step 边界确定性注入技能正文）、追加式纪律段（`persona: true`）。`/solidforge`、`/arm-tools`、`/solidforge-status` 三个命令由 solidforge **预设行**提供（同一包以 `config: {commands: true, gestures: false, skills: false}` 挂载，命令按作用域分层，仅 solidforge 会话可见）。技能正文实时读取已安装的 preset（未装则诚实降级）；预设过期时 `install-global.sh` 会显式警告（`.preset-stamp.json` 版本戳）。卸载：`npm uninstall --prefix "$DSH_HOME" @maskshell/solidforge` 或 `bash scripts/install-global.sh --revert`。
+
 完整的循序渐进上手：**[USER_GUIDE.md](USER_GUIDE.md)**。
 
 ## 技能联用：典型链路

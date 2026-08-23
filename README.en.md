@@ -54,6 +54,27 @@ bash scripts/install-global.sh # optional: the global plugin face → sessions o
 4. Say "implement X in parallel, TDD" — the convergence loop takes over: dual rings, breakers, rollback, run records, all automatic.
 5. (Optional) activate the three structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
 
+### The global plugin face (Node.js plugin, optional)
+
+What `install-global.sh` installs and mounts is the npm package **`@maskshell/solidforge`** (a zero-dependency Node.js plugin). The two install routes are equivalent:
+
+```bash
+# Route 1: the repo script (recommended — writes the profile patch layer and
+#          checks the preset's version stamp for staleness)
+bash scripts/install-global.sh web --with-persona
+
+# Route 2: install the npm package directly, then hand-write the patch entry
+npm install --prefix "$DSH_HOME" @maskshell/solidforge
+# append to $DSH_HOME/profiles/<profile>/cordis.patch.yml:
+#   - insert:
+#       - id: solidforge
+#         name: '@maskshell/solidforge'
+#         config:
+#           persona: true
+```
+
+Once installed, sessions of ANY preset get: the five skills (host-layer registration → `/` menu + model catalog), `/solidforge:<skill>` colon gestures (full names or abbreviations, deterministic pre-step injection of the rendered skill body), and the additive discipline section (`persona: true`). The `/solidforge`, `/arm-tools`, and `/solidforge-status` commands are provided by the solidforge PRESET row (the same package with `config: {commands: true, gestures: false, skills: false}`; the command registry layers by scope, so they are visible to solidforge sessions). Skill bodies are read live from the installed preset (honest degrade when absent); `install-global.sh` warns when the preset is stale (`.preset-stamp.json` version stamp). Uninstall: `npm uninstall --prefix "$DSH_HOME" @maskshell/solidforge` or `bash scripts/install-global.sh --revert`.
+
 Step-by-step onboarding: **[USER_GUIDE.en.md](USER_GUIDE.en.md)**.
 
 ## Combining the skills: typical chains
