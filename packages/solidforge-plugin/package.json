@@ -1,11 +1,15 @@
 {
   "name": "@maskshell/solidforge",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "SolidForge on the DeepSeek Harness \u2014 the globally installed plugin face: five skills in every session's catalog plus /solidforge:<skill> colon-gesture injection and the /solidforge, /arm-tools commands.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
   },
   "license": "Apache-2.0",
   "files": [
@@ -25,5 +29,14 @@
     "type": "git",
     "url": "git+https://github.com/maskshell/solidforge-dsh.git",
     "directory": "packages/solidforge-plugin"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-input-trigger"
+      ]
+    }
   }
 }

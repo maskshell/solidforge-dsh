@@ -257,3 +257,17 @@ re-activation burden is gone for solidforge sessions). Verified on a fresh
 boot of the current dsh: probe shows gatesRegistered=true, commandsRegistered
 =3, skillsRegistered=0, errors=[] with all six services visible. The dynamic
 plugins remain the LEGACY selective path — never both (double gates).
+
+## Persistent client half (B) — /solidforge:* menu completion (2026-08-23)
+
+The colon gesture lacked GUI completion (the menu only lists flat skill
+names); the persistent client half closes it. Two seams found the hard way,
+both now gated in check-release-metadata.py: (1) the package's exports map
+did not expose ./package.json — clientModules' resolveMeta does
+require.resolve('<pkg>/package.json') and got ERR_PACKAGE_PATH_NOT_EXPORTED,
+silently skipping the module; (2) install-global.sh did not copy
+lib/client.js. Fix: exports {'.', './client', './package.json'} + the copy
+line + the gate assertions. Verified on a fresh web-profile boot (3099): the
+served graph contains @maskshell/solidforge with the bundle route
+/plugins/@maskshell/solidforge/client.js. The 3080 process picks it up on
+its next restart (clientModules caches package metadata per process).

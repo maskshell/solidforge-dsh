@@ -91,6 +91,21 @@ def main() -> int:
     if readme.is_file() and "Apache-2.0" not in read_text(readme):
         failures.append("package README license footer does not say Apache-2.0")
 
+    # client-half manifest: the registry resolves <pkg>/package.json and the
+    # ./client export; both bit us (ERR_PACKAGE_PATH_NOT_EXPORTED + a missing
+    # shipped client.js) — the graph silently skips the module otherwise.
+    exports_map = pkg.get('exports')
+    if not isinstance(exports_map, dict) or './package.json' not in exports_map:
+        failures.append('exports must expose ./package.json (client-modules resolves it)')
+    if not isinstance(exports_map, dict) or './client' not in exports_map:
+        failures.append('exports must expose ./client (the persistent client half)')
+    dsh_decl = pkg.get('dsh')
+    client_decl = dsh_decl.get('client') if isinstance(dsh_decl, dict) else None
+    if not isinstance(client_decl, dict) or client_decl.get('platform') != 'web':
+        failures.append('dsh.client must declare platform: web')
+    if not (PKG_DIR / 'lib' / 'client.js').is_file():
+        failures.append('lib/client.js missing (must ship in the tarball)')
+
     # publish workflow posture: OIDC, no token secret
     workflow = ROOT / ".github" / "workflows" / "publish.yml"
     if not workflow.is_file():

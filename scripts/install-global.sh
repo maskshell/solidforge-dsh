@@ -131,6 +131,7 @@ fi
 mkdir -p "$PKG_DIR/lib"
 cp "$SRC/package.json" "$PKG_DIR/package.json"
 cp "$SRC/lib/index.js" "$PKG_DIR/lib/index.js"
+cp "$SRC/lib/client.js" "$PKG_DIR/lib/client.js"
 echo "== installed @maskshell/solidforge -> $PKG_DIR"
 
 if grep -q "$MARKER" "$PATCH_FILE"; then
