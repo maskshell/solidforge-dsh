@@ -245,3 +245,15 @@ dynamic plugins were gone from the process when the audit began — they are
 per-session activations and do not survive session resumptions; re-activated
 (sfgat-1 / sfrec-2 / sfhet-3). This is the documented per-session activation
 model, not a regression.
+
+## Gates moved to the preset row (2026-08-23)
+
+The structural gates migrated from session-owned dynamic plugins to the
+solidforge PRESET row (`config: {commands: true, gestures: false, skills:
+false, gates: true}`) — the preset scope sees tools/subprocess, so the same
+package registers the tool-event gates, run-record, and hetero-review tools
+there. They survive session resumptions (the recurring dynamic-plugin
+re-activation burden is gone for solidforge sessions). Verified on a fresh
+boot of the current dsh: probe shows gatesRegistered=true, commandsRegistered
+=3, skillsRegistered=0, errors=[] with all six services visible. The dynamic
+plugins remain the LEGACY selective path — never both (double gates).

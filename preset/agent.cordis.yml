@@ -225,25 +225,34 @@
 # ── global plugin face (same package, preset scope) ──────────────────────────
 
 # The @maskshell/solidforge package also mounts here (preset scope) to regain
-# the services the profile patch layer cannot see: `commands`. Skills stay
-# owned by the rows above (skills: false avoids a same-content scoped shadow);
-# gestures stay owned by the global (patch-layer) mount (gestures: false
-# avoids double injection). Gates remain the per-session dynamic plugins.
+# the services the profile patch layer cannot see: `commands`, `tools`,
+# `subprocess`. Skills stay owned by the rows above (skills: false avoids a
+# same-content scoped shadow); gestures stay owned by the global (patch-layer)
+# mount (gestures: false avoids double injection). Gates: true registers the
+# structural gate subsystems (tool-event gates, the rightness-invariant
+# run-record tool, the heterogeneous review tool) in the preset scope — they
+# fire for solidforge sessions only and survive session resumptions, unlike
+# the per-session dynamic plugins. DO NOT also activate the dynamic plugins
+# for a solidforge session (double gates).
 - id: solidforge-commands
   name: '@maskshell/solidforge'
   config:
     commands: true
     gestures: false
     skills: false
+    gates: true
 
-# ── structural enforcement (deliberately NOT a row here) ────────────────────
+# ── structural enforcement (the dynamic-plugin fallback) ────────────────────
 
 # The SolidForge dynamic plugins (loop-gates / run-record / hetero-review) are
-# NOT rows of this composition: `tool-cordis` registers PROCESS-GLOBAL Host
-# inspect providers, so including it here would collide with the `cordis` preset
-# the moment one deployment mounts both (one process, two presets). Instead the
-# plugin sources ship in this preset's `plugins/` dir and are activated with the
-# cordis toolset from a cordis-capable session of the same process — the same
-# boundary the `standard` preset keeps (no tool-cordis row). Without them the
-# loop still runs; the deterministic gates stay callable directly from the
+# the LEGACY per-session path, superseded by the gates: true switch on the row
+# above. They are NOT rows of this composition because they were session
+# activations over the cordis toolset; `tool-cordis` registers PROCESS-GLOBAL
+# Host inspect providers, so including it here would collide with the `cordis`
+# preset the moment one deployment mounts both (one process, two presets).
+# The plugin sources ship in this preset's `plugins/` dir for deployments that
+# prefer selective per-session gates (activate them from a cordis-capable
+# session of the same process — the same boundary the `standard` preset
+# keeps). Without them the loop still runs; the deterministic gates stay
+# callable directly from the
 # skills' `infra/` (advisory mode, honest per the persona).

@@ -51,7 +51,7 @@ bash scripts/install-global.sh # 可选：全局插件面 → 任何预设的会
    ```
 
 3. 对会话说「并行实现 X，TDD」，收敛循环接管——双环、断路器、回滚与运行记录全部自动。
-4. （可选）在 cordis 会话里激活三个结构化插件（见 [使用指南](USER_GUIDE.md) §激活插件）。
+4. 结构化门禁已随 solidforge 预设自带（预设行 `gates: true`）：edit/write 快速门、run-record 的 rightness 不变量、异源评审工具对 solidforge 会话自动生效——无需任何激活步骤。
 
 ### 全局插件面（Node.js 插件，可选）
 

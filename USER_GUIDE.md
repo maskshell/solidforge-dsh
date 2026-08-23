@@ -29,17 +29,13 @@ bash scripts/install-global.sh     # 可选：全局插件面 → 任何会话�
   - 冒号手势 `/solidforge:parallel-development` … `/solidforge:pas`（全名或缩写均可，pre-step 边界确定性注入技能正文）；
   - 追加式 `solidforge:discipline` 人格段（`--with-persona`；两轴纪律 + 缩写映射进任何预设的系统提示）。
   - 卸载：`bash scripts/install-global.sh --revert`。技能正文仍从预设目录实时读取（单一来源，无副本漂移）；预设未装时诚实降级。
-  - **注意**：补丁层的上下文看不到 `commands`/`tools`/`subprocess` 服务（loader 只桥接 `inject` 声明的服务）——`/solidforge`、`/arm-tools`、`/solidforge-status` 命令因此由 solidforge **预设行**提供（见下），门禁仍属三个动态插件。预设侧修复（门禁脚本等）走 `install.sh` 通道：它现在写 `.preset-stamp.json` 版本戳，`install-global.sh` 安装时会检查预设是否过期（仓库已有修复而部署未同步会显式警告），`/solidforge-status` 也报告 `presetDrifted`。
-- **会话级激活（完整形态）**：在 DSH 中新建会话时选择 **solidforge** preset。该会话额外获得 SolidForge 人格（缩写映射、honesty rules）、22 个角色代理的引导，以及 `/solidforge`、`/arm-tools`、`/solidforge-status` 三个命令（同一包以预设行挂载，`config: {commands: true}`；命令注册表按作用域分层，这些命令对 solidforge 会话可见）。
-- **结构化插件（可选但推荐）**：三个动态 Cordis 插件把门禁与不变量变成结构强制（代码在你的工作区之外，代理改不了）：
-  - `loop-gates` —— 每次 edit/write 触发快速门 / 蓝图守卫 / 终态计数器（`tools/pre-execute` deny + `tools/post-execute` block 反馈）；
-  - `run-record` —— `solidforge_run_record` 工具，强制 `rightness: human_confirm_required`；
-  - `hetero-review` —— `solidforge_hetero_review` 工具，一键出进程异源评审。
-  
-  激活方式：在一个带 cordis 工具集的会话（如 cordis preset 会话）里，对
-  `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js`（已烘焙绝对预设根路径）逐个
-  `cordis_define` + `cordis_run`。**为什么不在 preset 里自带**：会注册进程级 provider 的那一行（`tool-cordis`）与 cordis preset 在单进程多 preset 部署下必冲突——与 standard preset 同样刻意留白。
-- 不激活插件也能用：门禁脚本仍可从 `infra/` 直接调用（咨询模式），技能照常工作，只是失去逐工具调用的自动拦截。
+  - **注意**：补丁层的上下文看不到 `commands`/`tools`/`subprocess` 服务（loader 只桥接 `inject` 声明的服务）——`/solidforge`、`/arm-tools`、`/solidforge-status` 命令因此由 solidforge **预设行**提供（见下），结构化门禁同样由预设行以 `gates: true` 挂载。预设侧修复（门禁脚本等）走 `install.sh` 通道：它现在写 `.preset-stamp.json` 版本戳，`install-global.sh` 安装时会检查预设是否过期（仓库已有修复而部署未同步会显式警告），`/solidforge-status` 也报告 `presetDrifted`。
+- **会话级激活（完整形态）**：在 DSH 中新建会话时选择 **solidforge** preset。该会话额外获得 SolidForge 人格（缩写映射、honesty rules）、22 个角色代理的引导、三个命令与结构化门禁（同一包以预设行挂载，`config: {commands: true, gates: true}`；命令与工具按作用域分层，对 solidforge 会话可见）。
+- **结构化门禁（预设自带，solidforge 会话自动生效）**：门禁子系统由预设行以 `gates: true` 挂载（预设作用域可见 `tools`/`subprocess`）：
+  - 每次 edit/write 触发快速门 / 蓝图守卫 / 终态计数器（`tools/pre-execute` deny + `tools/post-execute` block 反馈）；
+  - `solidforge_run_record` 工具强制 `rightness: human_confirm_required`；
+  - `solidforge_hetero_review` 工具一键出进程异源评审。
+  它们随预设存在，**不随会话恢复消失**。旧的三动态插件会话级激活路径已降级为"选择性逐会话门禁"的 legacy 选项（`plugins/*.host.js` 在 cordis 会话里 define+run；**勿与预设行门禁同时启用**——会双倍拦截）。门禁脚本仍可从 `infra/` 直接调用（咨询模式）。
 
 ## 2. Arm 一个项目
 

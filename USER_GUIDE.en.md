@@ -27,15 +27,14 @@ bash scripts/install-global.sh     # optional: the global plugin face → every 
   - colon gestures `/solidforge:parallel-development` … `/solidforge:pas` (full names or abbreviations; deterministic pre-step injection of the rendered skill body);
   - the additive `solidforge:discipline` prompt section (`--with-persona`; two-axis discipline + abbreviation map in any preset's system prompt).
   - Uninstall: `bash scripts/install-global.sh --revert`. Skill bodies are still read live from the preset directory (single source, no copy drift); honest degrade when the preset is absent.
-  - **Note**: the patch layer's context cannot see the `commands`/`tools`/`subprocess` services (the loader only bridges services declared in `inject`) — `/solidforge`, `/arm-tools`, and `/solidforge-status` therefore come from the solidforge PRESET row (below); the gates stay with the three dynamic plugins.
-- **Session-level activation (the full shape)**: pick the **solidforge** preset when starting a session. The session additionally gets the SolidForge persona (abbreviation map, honesty rules), the 22-role-agent guidance, and the `/solidforge`, `/arm-tools`, `/solidforge-status` commands (the same package mounted as a preset row with `config: {commands: true}`; the command registry layers by scope, so these commands are visible to solidforge sessions).
-- **Structural plugins (optional, recommended)**: three dynamic Cordis plugins turn the gates and invariants into structural enforcement (their code lives outside your workspace — the agent cannot edit it):
+  - **Note**: the patch layer's context cannot see the `commands`/`tools`/`subprocess` services (the loader only bridges services declared in `inject`) — `/solidforge`, `/arm-tools`, and `/solidforge-status` therefore come from the solidforge PRESET row (below), along with the structural gates.
+- **Session-level activation (the full shape)**: pick the **solidforge** preset when starting a session. The session additionally gets the SolidForge persona (abbreviation map, honesty rules), the 22-role-agent guidance, the three commands, and the structural gates (the same package mounted as a preset row with `config: {commands: true, gates: true}`; commands and tools layer by scope, visible to solidforge sessions).
+- **Structural gates (bundled with the preset, automatic for solidforge sessions)**: the gate subsystems mount via the preset row's `gates: true` (the preset scope sees `tools`/`subprocess`):
   - `loop-gates` — fast gate / blueprint guard / terminal counters on every edit/write (`tools/pre-execute` deny + `tools/post-execute` block feedback);
   - `run-record` — the `solidforge_run_record` tool, forcing `rightness: human_confirm_required`;
   - `hetero-review` — the `solidforge_hetero_review` tool, one-call out-of-process heterogeneous review.
 
-  Activation: in a cordis-toolset session (e.g. the `cordis` preset), `cordis_define` + `cordis_run` each of `$DSH_HOME/.agent-presets/solidforge/plugins/*.host.js` (baked absolute preset root). **Why not bundled in the preset**: the row that would enable defining them in-preset (`tool-cordis`) registers process-global providers and collides with the `cordis` preset in a multi-preset process — the same deliberate omission as the `standard` preset.
-- Without the plugins everything still works: the gate scripts are directly callable from `infra/` (advisory mode).
+  They live with the preset and survive session resumptions. The three dynamic plugins are now the LEGACY selective per-session path (`plugins/*.host.js` via `cordis_define` + `cordis_run` in a cordis session) — do NOT run both, or the gates fire twice. The gate scripts remain directly callable from `infra/` (advisory mode).
 
 ## 2. Arm a project
 

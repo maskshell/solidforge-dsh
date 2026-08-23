@@ -52,7 +52,7 @@ bash scripts/install-global.sh # optional: the global plugin face → sessions o
    ```
 
 4. Say "implement X in parallel, TDD" — the convergence loop takes over: dual rings, breakers, rollback, run records, all automatic.
-5. (Optional) activate the three structural plugins from a cordis session — see [User Guide](USER_GUIDE.en.md) §Activating plugins.
+5. Structural gates ship with the solidforge preset (preset row `gates: true`): the edit/write fast gate, the run-record rightness invariant, and the hetero-review tool are automatic for solidforge sessions — no activation step.
 
 ### The global plugin face (Node.js plugin, optional)
 
