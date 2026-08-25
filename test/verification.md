@@ -281,3 +281,21 @@ decorates only the leading part. The stored message and the host-side
 injection are untouched (the injection firing proves the token stayed
 intact) — cosmetic, but misleading. Fix prepared upstream (one-line regex +
 unit test): docs/upstream/colon-token-decoration.patch; posted to #1101.
+
+## Public-surface vetting lesson (2026-08-24, internal operational control)
+
+The show-your-plugins post's first screenshot captured the real workspace
+name (dianplus) from the GUI sidebar — a public exposure of a private
+identifier that required crop/retake remediation. Two internal-control
+failures, both ours:
+
+1. The screenshot was taken from the LIVE 3080 session store without vetting
+   the frame for private identifiers before posting.
+2. The remediation loop (crop → retake → retake) was then NARRATED in the
+   public update comment, exposing the incident itself.
+
+Rule going forward (internal, not a public artifact): any capture destined
+for a public surface must be taken from an isolated/scrubbed environment
+(e.g. a throwaway DSH_HOME instance, sidebar collapsed, workspace names
+absent) and frame-vetted for identifiers BEFORE posting; remediation of an
+internal operational failure is recorded here, never in the public post.
