@@ -1,4 +1,4 @@
-# @maskshell/solidforge
+# solidforge
 
 SolidForge on the DeepSeek Harness — the globally installed plugin face. Mounted
 through a dsh profile's user patch layer, it gives sessions of **any preset**:
@@ -22,7 +22,7 @@ The package must be resolvable from the dsh profile and preset baseUrls:
 
 ```bash
 mkdir -p "$DSH_HOME/node_modules/@maskshell"
-npm install --prefix "$DSH_HOME" @maskshell/solidforge   # or copy the package there
+npm install --prefix "$DSH_HOME" solidforge   # or copy the package there
 ```
 
 Then mount it in the profile patch layer
@@ -31,7 +31,7 @@ Then mount it in the profile patch layer
 ```yaml
 - insert:
     - id: solidforge
-      name: '@maskshell/solidforge'
+      name: 'solidforge'
       config:
         persona: true
 ```

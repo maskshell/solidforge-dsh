@@ -1,6 +1,6 @@
 {
-  "name": "@maskshell/solidforge",
-  "version": "0.1.3",
+  "name": "solidforge",
+  "version": "0.1.4",
   "description": "SolidForge on the DeepSeek Harness \u2014 the globally installed plugin face: five skills in every session's catalog plus /solidforge:<skill> colon-gesture injection and the /solidforge, /arm-tools commands.",
   "type": "module",
   "main": "lib/index.js",

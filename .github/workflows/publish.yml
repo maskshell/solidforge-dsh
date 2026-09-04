@@ -1,9 +1,10 @@
 name: publish-npm
 
 # npm trusted publishing (OIDC): no tokens, no OTP. The npm package
-# @maskshell/solidforge trusts this repo + workflow path (configured once on
-# the npm website), so the registry validates the GitHub OIDC identity at
-# publish time. Trigger: manual dispatch, or a push of a v* tag.
+# (unscoped `solidforge`, formerly @maskshell/solidforge) trusts this repo +
+# workflow path (configured once on the npm website), so the registry
+# validates the GitHub OIDC identity at publish time. Trigger: manual
+# dispatch, or a push of a v* tag.
 #
 # IMPORTANT: version bumps happen in packages/solidforge-plugin/package.json;
 # tag the commit `v<version>` and push to publish.
@@ -32,16 +33,21 @@ jobs:
         working-directory: packages/solidforge-plugin
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if npm view "@maskshell/solidforge@$VERSION" version >/dev/null 2>&1; then
+          if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
             echo "already-published=true" >> "$GITHUB_OUTPUT"
-            echo "@maskshell/solidforge@$VERSION already exists on npm — skipping publish"
+            echo "${NAME}@${VERSION} already exists on npm — skipping publish"
           else
             echo "already-published=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Publish @maskshell/solidforge
+      - name: Publish (name/version read from package.json)
         if: steps.version-check.outputs.already-published != 'true'
         working-directory: packages/solidforge-plugin
         # No token: with id-token: write + trusted publishing configured on
         # npm, the CLI performs the OIDC exchange with the registry itself.
+        # The first publish after the 2026-09-04 rename to unscoped
+        # `solidforge` was manual (trusted-publisher pre-registration is
+        # unavailable for not-yet-published names); the guard above keeps
+        # tag-triggered runs idempotent from then on.
         run: npm publish --provenance --access public
