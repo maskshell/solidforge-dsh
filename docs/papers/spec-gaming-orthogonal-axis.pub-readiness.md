@@ -82,3 +82,13 @@ Citation grounding (psv-verified across prior passes); honesty discipline (COI d
 - P12. The frontmatter contains a multi-paragraph process/csr/psv log. [paper:L5–11]
 - P13. The paper states it presents no benchmark evaluation and names constructing one (§8.3) as the principal open problem. [paper:L43, paper:§8.3]
 - P14. §3.3 [paper:L86] contains "the agent harness forces heterogeneous oracles out of process precisely because in-process reviewers cannot differ in blind-spot set" (unqualified by oracle type). [paper:L86]
+
+## Fix-status addendum (2026-09-15, verified against the canonical .md)
+
+- F1 (blocker): APPLIED — both carriers qualified (§1(iv) and §3.3 now read "heterogeneous model-based oracle(s) … a deterministically-adjudicated fetched-source oracle is the in-process exception, §4.4"); the Abstract carries no unqualified instance.
+- F2: APPLIED — §8 item 8 ("Testability of the self-certification conjecture") added with the prescribed same-family-fresh-context vs cross-family divergence experiment.
+- F3: APPLIED — §3.2(ii) now flags the two-property reduction as "an analytical premise rather than a sourced reduction".
+- F4: APPLIED — §6 names the two cases: the Process/Outcome split (§4.2) and the cross-provider heterogeneous ring (§4.4).
+- F6: PARTIAL — authors set; frontmatter slimmed to a trails-pointer. Remaining submission-time: attach or re-run psv on the References list (current grounding rests on the 2026-07-31 record), and the Osmani-2026-blog-as-primary-citation judgment.
+- F5 (title/Abstract framing) and F7 (academic prior-art search): open — outcome-axis, human decisions.
+- The fixes were applied and re-converged post-review (spec-gaming-orthogonal-axis.loopx-reconvergence.json, 2 rounds). Per this review's own verdict ("position-paper tier: publishable after 1 blocker fix + 3 warning fixes"), all position-tier blockers are now cleared; what remains is submission-time provenance and the two human decisions above.

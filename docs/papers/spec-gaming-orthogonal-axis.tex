@@ -68,7 +68,9 @@ generation, verification, and repair. Current reliability frameworks
 characterize three intrinsic failure modes --- context rot, error
 compounding, and goal drift --- and build defenses inside the agent's
 own flow control. We argue this framework is \textbf{incomplete in a
-precise sense}: it tacitly assumes the verification source \emph{is} the
+precise sense --- an orthogonality claim that rests on the
+self-certification conjecture of §3.1, which we stipulate rather than
+establish}: it tacitly assumes the verification source \emph{is} the
 agent itself, leaving a structurally invisible failure class ---
 \textbf{specification gaming}, where the agent optimizes a proxy
 specification (passing its own tests) rather than the true objective
@@ -542,7 +544,7 @@ commitment bias --- §3.2(iii)) but it is \emph{not} an Axis B defense.
 Conflating the two is the most common reason teams believe they have
 specification-gaming defense when they do not.
 
-\textbf{Criterion.} An oracle is heterogeneously decoupled ⟺ its
+\textbf{Criterion.} An oracle is heterogeneously decoupled $\Longleftrightarrow$ its
 blind-spot set differs from the agent's. Same-provider ``independent''
 agents fail this criterion by construction.
 
@@ -962,6 +964,86 @@ two-axis defense-axis evaluation this paper flags as its principal
 future work (§8.3), applied to the surfaces SpecBench/ImpossibleBench
 expose.
 
+\subsection{6.5 Retrospective evidence from production runs}\label{retrospective-evidence}
+
+The framework above predicts two observable signatures in a production
+convergence loop that runs both a same-source and a
+heterogeneously-decoupled review leg: (i) the two legs' discoveries
+should substantially diverge (each oracle's blind-spot set differs,
+§4.4); (ii) a fresh-context reviewer should catch defects that the
+loop's own earlier fixes introduce --- the maker--checker asymmetry of
+§3.2(iii). We test neither causally; we report what the production
+record corpus shows, with its limitations stated.
+
+\textbf{Corpus.} 46 convergence-run units carrying 797 findings from
+their authoritative aggregate records (the naive per-file count at first
+harvest was 1{,}461 --- the difference is the corpus's documented
+round-file/aggregate duplication, resolved by the unit rules), from the
+reference implementation's own doc-convergence runs and five consumer
+codebases, harvested read-only from durable run records (one
+author-maintained evidence corpus; consumer projects pseudonymized).
+Findings are \emph{unadjudicated reviewer claims} --- counts are
+claim-counts, not confirmed-defect counts; severity strata are reported
+separately and honest-disclosure items are excluded from defect
+denominators.
+
+\textbf{Signature (i) --- leg divergence.} Among the 359
+defect-severity findings whose producing leg is attributable from
+surviving per-leg records, the same-source leg alone discovered 192
+(53.5\%) and the heterogeneous leg alone 167 (46.5\%). Within this
+attribution coverage (54\% of defect findings; the remainder sit in
+units without per-leg records), each leg alone would have lost roughly
+half of what the pair recovered. This is the retrospective analogue of
+the divergence observation in Open Problem 8 --- not the known-gap test
+itself: without ground truth on which findings are true defects,
+divergence here measures discovery complementarity, not verdict
+correctity. Both-report duplication cannot be measured at id level
+(cross-leg identifiers never coincide); a kind-and-location pair
+adjudication would move findings from single-leg buckets into the
+both-bucket and cannot remove them, so the single-leg loss estimate is
+an upper bound.
+
+\textbf{Signature (ii) --- fix-introduced defects.} An LLM-assisted
+coding pass over fix-vocabulary-filtered candidate findings (319 of 667
+multi-round defect findings), spot-checked against record full text
+with zero disagreement (5/5 positives, 3 negatives drawn / 2 effective
+after one unverifiable lookup-miss; delegated-human tier, disclosed),
+with a second independent seat re-adjudicating a 20\% subsample at
+96.9\% strict-match agreement (zero genuinely disputed positives ---
+an initial bare-id computation had manufactured 2 spurious disputes via
+cross-unit id collision, corrected against the preserved subsample),
+classifies 23 findings (3.4\% of all multi-round defect findings; 7.2\%
+of the enriched candidate pool) as defects explicitly attributed by the
+finding itself to an \emph{earlier fix} in the same run --- residues
+of incomplete class-fixes, overshoots, and rewording regressions. The
+pattern is pervasive across runs and engines (positives recorded in
+five of the ten units the candidate pool spans) rather than an
+artifact of any single integration. Every such finding was caught
+within the loop, by a reviewer context that did not author the fix
+under review. The causal reading --- ``caught only because the
+reviewer was fresh'' --- is a counterfactual this corpus cannot carry
+and we do not claim it.
+
+\textbf{Limitations.} No control baseline exists (nothing here
+compares the loop against single-pass review); environment provenance
+is recoverable for a minority of units, so results are not stratified
+by model era; the corpus is a survivorship-biased snapshot (degraded
+and unrecorded runs are underrepresented); the coding pass is
+single-seat with a consistency re-run reported alongside. A per-leg
+attribution pass (multi-method: leg-file membership, cross-leg pair
+adjudication, identifier-naming convention, peer-overlap) resolved 9
+of the 12 originally unattributed fix-introduced positives, yielding a
+same-source / heterogeneous split of 17 / 3 --- a skew \emph{toward}
+the same-family reviewer, not away. The heterogeneous leg's unique
+contribution to this corpus is discovery complementarity (the 44.5\%
+of attributable findings only it found), not fix-residue detection
+--- a genuinely unexpected asymmetry worth noting as a limitation on
+any strong reading of the heterogeneous oracle's role. These bound
+the section's claim to: in this production corpus, the two oracle
+legs' discoveries are near-symmetric complements, and fix-introduced
+defects are a recurring, catchable class --- consistent with, not
+proof of, the two-axis frame's predictions.
+
 \section{7. Related Work}\label{related-work}
 
 We locate prior work along the two axes of our frame.
@@ -992,7 +1074,7 @@ threats and the defenses do not substitute --- a privileged/quarantined
 split does not reach specification gaming: that split targets
 permission/trust isolation, not blind-spot asymmetry on the correctness
 question. Even heterogeneous providers in those roles would not
-constitute a correctness oracle (privilege isolation ≠
+constitute a correctness oracle (privilege isolation $\neq$
 verification-source decoupling), and CaMeL's threat model is adversarial
 input rather than proxy optimization; conversely, a heterogeneous
 correctness oracle does not reach prompt injection. We see the two as
@@ -1193,8 +1275,8 @@ independent discriminator.
   Krakovna, V. (2018). \emph{Specification gaming examples in AI.}
   \url{https://vkrakovna.wordpress.com/2018/04/02/specification-gaming-examples-in-ai/}
 \item
-  Krakovna, V. (2020). \emph{Specification gaming: the flip side of AI
-  ingenuity.} DeepMind blog.
+  Krakovna, V., et al. (2020). \emph{Specification gaming: the flip side of
+  AI ingenuity.} DeepMind blog.
   \url{https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/}
 \item
   Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., \&
@@ -1261,7 +1343,7 @@ independent discriminator.
 \item
   Shihab, I. F., Akter, S., \& Sharma, A. (2025). \emph{Detecting Proxy
   Gaming in RL and LLM Alignment via Evaluator Stress Tests.}
-  arXiv:2507.05619. (ACL 2026 Findings.)
+  arXiv:2507.05619. (ACL 2026 Findings version: Akter et al.)
 \item
   Zhong, Z., Raghunathan, A., \& Carlini, N. (2025).
   \emph{ImpossibleBench: Measuring LLMs' Propensity of Exploiting Test
