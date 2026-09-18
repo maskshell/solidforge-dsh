@@ -84,10 +84,15 @@ truthfully around the subprocess (ADR #39, ADR #40 (g)). See
 for the multi-round debate loop + cap + termination semantics.
 
 **Credential namespacing is per-substrate.** dsh-substrate profiles declare
-`_credential_env` (the DSH adapter's own `apiKeyEnv`, e.g. `PI_AI_API_KEY`) — the
-provider's native key IS the correct credential for its own DSH adapter. The
-`<NAME>_ANTHROPIC_AUTH_TOKEN` convention applies ONLY to claude-code-substrate
-profiles (it namespaces the credential to the Anthropic gateway).
+`_credential_env` (the DSH adapter's own `apiKeyEnv`) — since the SHARED-ENV
+ALIGNMENT (ADR #54), the shipped dsh profiles point it at the CC-convention vars
+(`BIGMODEL_ANTHROPIC_AUTH_TOKEN`, `MINIMAX_ANTHROPIC_AUTH_TOKEN`,
+`QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN`) from the one shared `.env.solidforge`
+that arms all three harnesses (upstream CC reads them by convention,
+solidforge-pi bridges them to its route env via its sf-providers extension). The
+`<NAME>_ANTHROPIC_AUTH_TOKEN` naming therefore applies to BOTH substrates — the
+claude-code substrate reads it via `_token_env`, the dsh substrate via
+`_credential_env` — one credential, one var, both substrates.
 
 **Provider profile + API key** (current post-consolidation shape):
 
@@ -101,12 +106,13 @@ profiles (it namespaces the credential to the Anthropic gateway).
   declared). The wrapper refuses a profile whose `_family` is the orchestrator's
   lineage (same-source), and honesty-notes same-family dual runs + undeclared
   families (never silent).
-- **Credential var is ROUTE-DERIVED**: `<UPPERCASE(route)>_API_KEY` — pi-ai's own
-  env convention (`zai-coding-cn` → `ZAI_CODING_CN_API_KEY`, `minimax-cn` →
-  `MINIMAX_CN_API_KEY`); `_credential_env` is only an escape hatch. The
-  claude-code substrate keeps the legacy `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN`
-  convention (namespaced to the Anthropic gateway — the provider's native key is
-  NEVER read by THAT substrate).
+- **Credential var**: the profile's `_credential_env` names the var the dsh
+  substrate reads (SHARED-ENV ALIGNMENT, ADR #54 — the shipped profiles point it
+  at the CC-convention `*_ANTHROPIC_AUTH_TOKEN` vars from the one shared
+  `.env.solidforge`, superseding the legacy route-derived `<ROUTE>_API_KEY`
+  convention). The claude-code substrate reads its `_token_env` var (convention:
+  `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN`, namespaced to the Anthropic
+  gateway — the provider's native key is NEVER read by THAT substrate).
 - The token is NOT in the profile. Set it in your shell, the arm-provisioned
   `.env.solidforge` (shell wins), or your app `.env` — the wrapper reads the
   three-tier DSH chain (`shell > project .env.solidforge > project .env >
@@ -118,8 +124,9 @@ profiles (it namespaces the credential to the Anthropic gateway).
   `export HETERO_PROFILE=<a,b>`. Default: UNSET = fail-fast arming prompt —
   never a silent fallback.
 - **Add a provider** (zero code change): `cp profiles/minimax-cn.json
-  profiles/<route>.json` + edit model/_family + set `<ROUTE>_API_KEY` in the
-  env chain → `hetero_review.py --profile <route>` works.
+  profiles/<route>.json` + edit model/_family/_credential_env + set the
+  `_credential_env` var in the env chain → `hetero_review.py --profile <route>`
+  works.
 - **Dual-/multi-different-family**: `--profile a,b` runs each backend
   independently and merges findings, each tagged with its `provider`.
   Pick two profiles NEITHER of which is the orchestrator's lineage — e.g. in a

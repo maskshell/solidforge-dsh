@@ -62,7 +62,8 @@ PROVIDER-TEMPLATE + TOKEN-INJECTION PATTERN:
   token-var convention — `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` (deepseek ->
                                `DEEPSEEK_ANTHROPIC_AUTH_TOKEN`, qwen3 ->
                                `QWEN3_ANTHROPIC_AUTH_TOKEN`). Override with the
-                               template's optional `_credential_env` for a non-convention name.
+                               template's optional `_token_env` (claude-code substrate)
+                               / `_credential_env` (dsh substrate) for a non-convention name.
   --profile <name[,name2...]> or $HETERO_PROFILE — select provider(s); comma-list
                                = dual-/multi-different-family (each backend runs independently,
                                findings merged + tagged with `provider`).
@@ -237,7 +238,8 @@ def _load_prior(prior_arg):
 # qwen3 -> QWEN3_ANTHROPIC_AUTH_TOKEN). The wrapper injects it as ANTHROPIC_AUTH_TOKEN
 # into a THROWAWAY temp settings file passed to `claude -p` (CC does NOT expand
 # ${VAR} itself — verified CC v2.1.201). A template may override the var name via an
-# optional `_credential_env` field; other `${VAR}` refs (non-token fields) still expand.
+# optional `_token_env` (claude-code substrate) / `_credential_env` (dsh substrate)
+# field; other `${VAR}` refs (non-token fields) still expand.
 # Selection: --profile <name[,name2...]> (multi = dual-/multi-different-family) or HETERO_PROFILE.
 
 
@@ -332,15 +334,24 @@ def _resolve_profile_path(name):
 def _resolve_token_var(name, template):
     """The env var holding the provider's auth token.
 
-    Override: the template's optional `_credential_env` field. Default (convention):
+    Override: the template's optional `_token_env` field (claude-code substrate —
+    the dsh substrate uses `_credential_env` via _prepare_dsh_home instead).
+    Default (convention):
     `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` — e.g. `deepseek` ->
     `DEEPSEEK_ANTHROPIC_AUTH_TOKEN`, `qwen3` -> `QWEN3_ANTHROPIC_AUTH_TOKEN`,
     `openai-compat` -> `OPENAI_COMPAT_ANTHROPIC_AUTH_TOKEN`. The convention lets a user
-    drop in `profiles/<name>.json` with ROUTING ONLY (no `_credential_env`, no `${...}`) and
+    drop in `profiles/<name>.json` with ROUTING ONLY (no `_token_env`, no `${...}`) and
     the wrapper resolves the token var from the filename — zero ceremony per provider.
     """
-    if template.get("_token_env"):
-        return template["_token_env"]
+    val = template.get("_token_env")
+    if val is not None:
+        if not str(val).strip():
+            sys.exit(
+                f"error: profile '{name}' declares an EMPTY `_token_env` — remove the "
+                f"field (the convention var is derived from the filename) or set it to "
+                f"the real var name."
+            )
+        return val
     sanitized = re.sub(r"[^A-Za-z0-9]", "_", name).upper()
     return f"{sanitized}_ANTHROPIC_AUTH_TOKEN"
 
@@ -352,7 +363,7 @@ def _materialize_profile(name):
 
     The template carries ONLY routing (BASE_URL + model aliases) — no `ANTHROPIC_AUTH_TOKEN`
     field, no `${...}` token ceremony. The wrapper injects the token from the
-    convention var (or `_credential_env` override); other `${VAR}` refs in the template
+    convention var (or `_token_env` override); other `${VAR}` refs in the template
     (e.g. a custom header) still expand. The real token never touches the committed
     profile."""
     src = _resolve_profile_path(name)
@@ -363,12 +374,17 @@ def _materialize_profile(name):
         token_var = _resolve_token_var(name, tmpl)
         token = os.environ.get(token_var, "")
         if not token:
+            overridden = bool(tmpl.get("_token_env"))
+            src_hint = (
+                " (declared by this profile's `_token_env`)" if overridden else ""
+            )
             sys.exit(
-                f"error: provider '{name}' needs the env var ${token_var}. The wrapper reads it "
+                f"error: provider '{name}' needs the env var ${token_var}{src_hint}. The wrapper reads it "
                 "from $SOLIDFORGE_PROJECT_DIR or <cwd>/.env.solidforge then <cwd>/.env (shell wins) — "
                 "if you cd'd into the skill dir, re-run from the PROJECT ROOT (where .env.solidforge "
                 "lives) via the ${SOLIDFORGE_PRESET_ROOT} absolute path. Convention: "
-                "<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN; override via the template's `_credential_env`. "
+                "<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN; override via the template's "
+                "`_token_env` (this claude-code substrate reads ONLY _token_env). "
                 "See model-routing.md."
             )
     env_block = _expand_env_values(tmpl.get("env", {}))
@@ -417,9 +433,23 @@ def _prepare_dsh_home(name, tmpl):
     # adapter is dormant until a settings section supplies profiles), while a
     # hand-declared route carries baseURL/api/models in `provider_profile`.
     providers_entry = dict(tmpl.get("provider_profile") or {})
+    # Credential var: `_credential_env` (the shipped dsh profiles declare it —
+    # SHARED-ENV ALIGNMENT ADR #54 points them at the CC-convention
+    # `*_ANTHROPIC_AUTH_TOKEN` vars from the one shared .env.solidforge).
+    # Fallback default: <UPPERCASE(route)>_API_KEY (pi-ai's own env convention,
+    # zai-coding-cn -> ZAI_CODING_CN_API_KEY, minimax-cn -> MINIMAX_CN_API_KEY) —
+    # kept for user-authored profiles that do not declare an override.
+    cred_env_val = tmpl.get("_credential_env")
+    if cred_env_val is not None and not str(cred_env_val).strip():
+        # no temp litter on the failure branch (mirrors the missing-token exit)
+        shutil.rmtree(home, ignore_errors=True)
+        sys.exit(
+            f"error: profile '{name}' declares an EMPTY `_credential_env` — remove "
+            f"the field (the fallback <UPPERCASE(route)>_API_KEY applies) or set it "
+            f"to the real var name."
+        )
     cred_env = str(
-        tmpl.get("_credential_env")
-        or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY"
+        cred_env_val or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY"
     )
     if cred_env:
         providers_entry.setdefault("apiKeyEnv", str(cred_env))
@@ -428,14 +458,6 @@ def _prepare_dsh_home(name, tmpl):
     with open(os.path.join(home, "settings.yaml"), "w", encoding="utf-8") as fh:
         json.dump(settings, fh, indent=2)
     env_block = {}
-    # Credential var is ROUTE-DERIVED by default: <UPPERCASE(route)>_API_KEY is
-    # pi-ai's own env convention (zai-coding-cn -> ZAI_CODING_CN_API_KEY,
-    # minimax-cn -> MINIMAX_CN_API_KEY). `_credential_env` is only an escape
-    # hatch for routes whose convention differs.
-    cred_env = str(
-        tmpl.get("_credential_env")
-        or f"{re.sub(r'[^A-Za-z0-9]', '_', name).upper()}_API_KEY"
-    )
     if cred_env:
         token = os.environ.get(str(cred_env), "")
         if not token:
@@ -444,7 +466,9 @@ def _prepare_dsh_home(name, tmpl):
                 f"error: profile '{name}' (route '{provider}') needs the "
                 f"credential env var ${cred_env}. Set it in your shell, "
                 f"<project>/.env.solidforge, <project>/.env, or <preset-root>/.env.solidforge "
-                f"(the three-tier DSH resolution). No token is stored in the committed profile."
+                f"(the three-tier DSH resolution). This dsh substrate reads ONLY the profile's "
+                f"`_credential_env` (fallback: <UPPERCASE(route)>_API_KEY). No token is stored "
+                f"in the committed profile."
             )
         env_block[str(cred_env)] = token
     return home, env_block
@@ -512,6 +536,16 @@ def _leg_plan(
     with open(src, "r", encoding="utf-8") as fh:
         tmpl = json.load(fh)
     if tmpl.get("substrate", "dsh") == "dsh":
+        if tmpl.get("_token_env"):
+            # cross-substrate field honesty (ADR #54): the dsh substrate reads
+            # ONLY _credential_env; a stray _token_env is silently ignored by the
+            # code, so name it explicitly instead of letting it mislead.
+            print(
+                f"warn: profile '{name}' (substrate dsh) declares `_token_env` "
+                f"({tmpl['_token_env']}) which this substrate ignores — the dsh "
+                f"substrate reads ONLY `_credential_env`. See design-decisions.md ADR #54.",
+                file=sys.stderr,
+            )
         home, env_block = _prepare_dsh_home(name, tmpl)
         return {
             "substrate": "dsh",
@@ -521,6 +555,18 @@ def _leg_plan(
             "tmp_path": None,
             "argv": None,
         }
+    if tmpl.get("_credential_env"):
+        # symmetric cross-substrate field honesty (ADR #54): the claude-code
+        # substrate reads ONLY _token_env; a stray _credential_env is silently
+        # dropped by the code, so name it explicitly instead of letting it
+        # mislead (during a credential rotation the two vars can hold different
+        # keys — the leg would silently use the unintended one).
+        print(
+            f"warn: profile '{name}' (substrate claude-code) declares `_credential_env` "
+            f"({tmpl['_credential_env']}) which this substrate ignores — the claude-code "
+            f"substrate reads ONLY `_token_env`. See design-decisions.md ADR #54.",
+            file=sys.stderr,
+        )
     tmp_path = _materialize_profile(name)
     argv = _claude_argv(
         tmp_path, model, schema_json, prompt, budget_usd, allowed_tools, observe_hooks
@@ -1081,7 +1127,9 @@ def main():
         "<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN (e.g. "
         "QWEN3_ANTHROPIC_AUTH_TOKEN) — the SOLE source (the suffix namespaces "
         "it to this substrate, NOT the provider's native <FILENAME>_API_KEY). "
-        "Override via the template's _token_env. The committed profile carries no secret.",
+        "Override via the template's `_token_env` (claude-code substrate) / "
+        "`_credential_env` (dsh substrate — SHARED-ENV ALIGNMENT ADR #54). "
+        "The committed profile carries no secret.",
     )
     ap.add_argument(
         "--model", default="opus", help="Tier/model alias resolved via the profile."

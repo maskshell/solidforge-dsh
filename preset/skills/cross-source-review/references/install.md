@@ -19,12 +19,12 @@ the invoking project provides at runtime is the different-family leg's token.
 The default provider needs NO token:
 
 - `claude` (default) needs NO token — `_native_auth: true`, the CLI's own credentials route the call
-- token-backed providers (qwen/bigmodel/minimax): set `<NAME>_ANTHROPIC_AUTH_TOKEN` in one of (setdefault; shell wins):
+- token-backed providers (qwen/minimax/zai-coding-cn): set the var the profile's `_token_env` / `_credential_env` names (`QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` / `MINIMAX_ANTHROPIC_AUTH_TOKEN` / `BIGMODEL_ANTHROPIC_AUTH_TOKEN`) in one of (setdefault; shell wins):
   1. the **preset-root** `.env.solidforge` (DSH site default — one config for every project using the preset; the preset root is the dir holding `agent.cordis.yml`)
   2. the invoking project's `.env` (a `KEY=VALUE` line)
   3. the project's `.env.solidforge` (arm-tools-provisioned; authoritative among files)
 
-**Sole source (namespace isolation)**: the wrapper reads ONLY `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` for a provider's token. The provider's native `<FILENAME>_API_KEY` (e.g. `QWEN_API_KEY`) is NEVER read — the `_ANTHROPIC_AUTH_TOKEN` suffix namespaces the credential to this substrate's Anthropic gateway, so it cannot collide with the native var (which may be set in the same env for a different tool/SDK, possibly a different key/quota). A project carrying both `QWEN_API_KEY` (its own native-SDK use) and `QWEN_ANTHROPIC_AUTH_TOKEN` (this substrate) is the intended state, not a smell. See the namespace-isolation ADR.
+**Sole source (namespace isolation)**: the wrapper reads ONLY the var the profile names — the `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` convention for claude-code-substrate profiles (`_token_env`), or the profile's `_credential_env` override (dsh substrate; SHARED-ENV ALIGNMENT ADR #54 points these at the CC-convention vars). The provider's native `<FILENAME>_API_KEY` (e.g. `QWEN_API_KEY`) is NEVER read — the `_ANTHROPIC_AUTH_TOKEN` suffix namespaces the credential to this substrate's Anthropic gateway, so it cannot collide with the native var (which may be set in the same env for a different tool/SDK, possibly a different key/quota). A project carrying both `QWEN_API_KEY` (its own native-SDK use) and `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` (this substrate) is the intended state, not a smell. See the namespace-isolation ADR.
 
 ## `.env` resolution (CWD-based — why csr is portable)
 
@@ -67,7 +67,7 @@ transient, and a global alias remap permanently sacrifices review depth on warm 
 
 ## Adding a custom third-party provider (zero code change)
 
-csr ships `infra/scripts/profiles/claude.json` + `qwen.json` (+ bigmodel/minimax). Add another provider by dropping a
+csr ships `infra/scripts/profiles/claude.json` + `qwen.json` (+ minimax). Add another provider by dropping a
 `profiles/<name>.json` (ROUTING ONLY — no secret) + setting its token var. csr resolves
 the profile against its OWN `profiles/` dir, INDEPENDENT from pd's (adding a csr profile
 does NOT affect pd).
@@ -94,19 +94,26 @@ gateway:
 
 ### Token-var naming rule
 
-The token var is derived BY CONVENTION from the profile filename:
-`<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN`. Non-alphanumeric chars in the filename
-collapse to `_` before uppercasing.
+For a **claude-code-substrate profile with no explicit override**, the token var
+is derived BY CONVENTION from the profile filename:
+`<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` (non-alphanumeric chars collapse to
+`_` before uppercasing). The dsh-substrate profiles instead read the var their
+`_credential_env` names (SHARED-ENV ALIGNMENT, ADR #54 — the CC-convention vars
+from the one shared `.env.solidforge`); an explicit `_token_env` /
+`_credential_env` always wins over the filename convention. The shipped
+profiles and the var each one reads:
 
 | profile filename | token env var |
 | --- | --- |
 | `claude.json` | none — `_native_auth: true` (the CLI's own credentials) |
-| `qwen.json` | `QWEN_ANTHROPIC_AUTH_TOKEN` |
-| `bigmodel.json` | `BIGMODEL_ANTHROPIC_AUTH_TOKEN` |
-| `openai-compat.json` | `OPENAI_COMPAT_ANTHROPIC_AUTH_TOKEN` |
+| `qwen.json` (claude-code) | `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` (via `_token_env` — the same var as the dsh `qwen-token-plan-cn.json`'s `_credential_env`) |
+| `minimax-cn.json` (dsh) | `MINIMAX_ANTHROPIC_AUTH_TOKEN` (via `_credential_env`) |
+| `zai-coding-cn.json` (dsh) | `BIGMODEL_ANTHROPIC_AUTH_TOKEN` (via `_credential_env`) |
+| `qwen-token-plan-cn.json` (dsh) | `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` (via `_credential_env`) |
 
-Override the var name via the profile's optional `_credential_env` field (rarely needed — e.g.
-a profile that must read a non-conventional var).
+Override the var name via the profile's optional `_token_env` field (claude-code
+substrate) or `_credential_env` field (dsh substrate) — rarely needed for a new
+profile; the shipped ones already declare their overrides.
 
 csr reads the token from shell / `.env` / `.env.solidforge`, INJECTS it as
 `ANTHROPIC_AUTH_TOKEN` into a throwaway chmod-600 temp settings file passed to
@@ -115,7 +122,9 @@ csr reads the token from shell / `.env` / `.env.solidforge`, INJECTS it as
 ### Use the new provider
 
 `HETERO_DOC_PROFILE=<name>` (or `--profile <name>` on the substrate CLI), with
-`<UPPERCASE_NAME>_ANTHROPIC_AUTH_TOKEN` set. Done — no code change.
+the var that profile names set (the `<UPPERCASE_NAME>_ANTHROPIC_AUTH_TOKEN`
+convention, or its `_token_env` / `_credential_env` override). Done — no code
+change.
 
 ## What needs no arming
 

@@ -1,7 +1,8 @@
 {
-  "_comment": "PLACEHOLDER (unarmed template) — DSH-native Qwen via the INSTALLED pi-ai CATALOG route `qwen-token-plan-cn` (Alibaba Token Plan, CN; openai-completions gateway). NOTE: this route is MULTI-FAMILY (it also serves glm/deepseek/kimi models), so `_family` names the PINNED MODEL's lineage (qwen), not the route. ARM ME: set your token in QWEN_TOKEN_PLAN_CN_API_KEY (route-derived, pi-ai convention) through the three-tier env chain; until armed the leg fail-fasts honestly. Model id is editable per generation (catalog currently ships qwen3.8-max-preview).",
+  "_comment": "PLACEHOLDER (unarmed template) — DSH-native Qwen via the INSTALLED pi-ai CATALOG route `qwen-token-plan-cn` (Alibaba Token Plan, CN; openai-completions gateway). NOTE: this route is MULTI-FAMILY (it also serves glm/deepseek/kimi models), so `_family` names the PINNED MODEL's lineage (qwen), not the route. ARM ME: `_credential_env` points at the CC-convention var QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN from the one shared .env.solidforge (SHARED-ENV ALIGNMENT 2026-08-25, ADR #54 — the SAME var the claude-code qwen.json reads via `_token_env`: same endpoint, one credential, one var) — instead of this route's legacy QWEN_TOKEN_PLAN_CN_API_KEY default; until armed the leg fail-fasts honestly. This dsh substrate reads ONLY `_credential_env`. Model id is editable per generation (catalog currently ships qwen3.8-max-preview).",
   "substrate": "dsh",
   "model": "qwen3.8-max-preview",
   "reasoning_effort": "high",
-  "_family": "qwen"
+  "_family": "qwen",
+  "_credential_env": "QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN"
 }

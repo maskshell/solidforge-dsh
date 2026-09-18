@@ -352,7 +352,21 @@ def check_provider_template_expansion():
     )
     # optional override via _token_env
     assert h._resolve_token_var("x", {"_token_env": "CUSTOM_VAR"}) == "CUSTOM_VAR"
-    print("  _resolve_token_var (convention + _token_env override): PASS")
+    # empty _token_env -> fail-fast (ADR #54: never a silent convention fallback)
+    try:
+        h._resolve_token_var("qwen", {"_token_env": ""})
+        raise AssertionError("empty _token_env must fail fast, not fall back")
+    except SystemExit as e:
+        assert "EMPTY `_token_env`" in str(e), str(e)
+    # null _token_env -> treated as NOT specified -> convention fallback
+    # (the regression the ADR #54 review caught: str(None)=="None" is truthy)
+    assert (
+        h._resolve_token_var("qwen", {"_token_env": None})
+        == "QWEN_ANTHROPIC_AUTH_TOKEN"
+    )
+    print(
+        "  _resolve_token_var (convention + override + empty/null fail/fallback): PASS"
+    )
 
     # recursive ${VAR} expansion still works for NON-token fields
     os.environ["HETERO_UNIT"] = "u-val"
@@ -363,8 +377,10 @@ def check_provider_template_expansion():
     del os.environ["HETERO_UNIT"]
     print("  _expand_env_values (recursive, non-token ${VAR}): PASS")
 
-    # materialize qwen with the CONVENTION var → token injected, routing preserved
-    os.environ["QWEN_ANTHROPIC_AUTH_TOKEN"] = "sk-conv-unit"
+    # materialize qwen with its declared _token_env var (SHARED-ENV ALIGNMENT
+    # ADR #54 — qwen.json overrides the convention var with
+    # QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN) → token injected, routing preserved
+    os.environ["QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN"] = "sk-conv-unit"
     tmp = h._materialize_profile("qwen")
     try:
         d = json.load(open(tmp))
@@ -375,10 +391,13 @@ def check_provider_template_expansion():
         )
     finally:
         os.unlink(tmp)
-    del os.environ["QWEN_ANTHROPIC_AUTH_TOKEN"]
-    print("  _materialize_profile (convention var injected + routing preserved): PASS")
+        # cleanup inside finally so an assertion failure cannot leak the var
+        os.environ.pop("QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN", None)
+    print("  _materialize_profile (_token_env var injected + routing preserved): PASS")
 
-    # missing token -> fail fast (non-zero), naming the CONVENTION var
+    # missing token -> fail fast (non-zero), naming the _token_env var AND the
+    # override field (the fail-fast message must say `_token_env`, never the stale
+    # `_credential_env`, so a user following the message adds the right field)
     r = _run(
         HETERO,
         [
@@ -394,14 +413,15 @@ def check_provider_template_expansion():
             tempfile.mkdtemp(),
         ],
         tempfile.mkdtemp(),
-        {**os.environ, "QWEN_ANTHROPIC_AUTH_TOKEN": ""},
+        {**os.environ, "QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN": ""},
     )
     out = r.stdout + r.stderr
-    assert r.returncode != 0 and "QWEN_ANTHROPIC_AUTH_TOKEN" in out, (
+    assert r.returncode != 0 and "QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN" in out, (
         r.returncode,
         out,
     )
-    print("  missing-token fail-fast (names the convention var): PASS")
+    assert "_token_env" in out and "_credential_env" not in out, out
+    print("  missing-token fail-fast (names the _token_env var + field): PASS")
 
 
 def check_family_guards():
@@ -498,6 +518,38 @@ def check_dsh_substrate_home_construction():
     finally:
         del os.environ["HET_ROUTE_API_KEY"]
     print("  _prepare_dsh_home (route-derived credential var): PASS")
+
+    # EMPTY _credential_env -> fail-fast (ADR #54: mirror the claude-code path —
+    # never silently substitute the route-derived fallback)
+    import contextlib as _ctx
+    import io as _io
+
+    with _ctx.redirect_stderr(_io.StringIO()):
+        try:
+            h._prepare_dsh_home("het-route", {**tmpl, "_credential_env": ""})
+            raise AssertionError("empty _credential_env must fail fast")
+        except SystemExit as e:
+            assert "EMPTY `_credential_env`" in str(e), str(e)
+    # NULL _credential_env -> treated as NOT specified -> route-derived fallback
+    os.environ["HET_ROUTE_API_KEY"] = "sk-null"
+    try:
+        home3, env3 = h._prepare_dsh_home(
+            "het-route", {**tmpl, "_credential_env": None}
+        )
+        try:
+            settings3 = json.load(open(os.path.join(home3, "settings.yaml")))
+            assert (
+                settings3["llm-pi-ai"]["providers"]["het-route"]["apiKeyEnv"]
+                == "HET_ROUTE_API_KEY"
+            )
+            assert env3["HET_ROUTE_API_KEY"] == "sk-null"
+        finally:
+            import shutil as _sh3
+
+            _sh3.rmtree(home3, ignore_errors=True)
+    finally:
+        del os.environ["HET_ROUTE_API_KEY"]
+    print("  _prepare_dsh_home (empty fail-fast + null fallback): PASS")
 
     # missing credential -> fail-fast naming the var (mirrors the claude path);
     # the throwaway home is cleaned up on the failure branch (no temp litter)

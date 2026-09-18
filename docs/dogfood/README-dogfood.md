@@ -118,8 +118,13 @@ harness. Heterogeneity is a different LLM, not a different harness. Fixed:
 > fail-fast arming prompt, no placeholder profile ships), the credential vars became
 > ROUTE-DERIVED (`ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY`, pi-ai's own
 > convention), and the armed profiles became the catalog routes `zai-coding-cn` /
-> `minimax-cn` (+ the `qwen-token-plan-cn` placeholder). Follow the CURRENT arming
-> steps in USER_GUIDE §5, not the historical ones above.
+> `minimax-cn` (+ the `qwen-token-plan-cn` placeholder). **TWICE-SUPERSEDED
+> (2026-08-25, ADR #54):** the SHARED-ENV ALIGNMENT then repointed the shipped
+> dsh profiles' `_credential_env` at the CC-convention vars
+> (`BIGMODEL_ANTHROPIC_AUTH_TOKEN` / `MINIMAX_ANTHROPIC_AUTH_TOKEN` /
+> `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN`) so one shared `.env.solidforge`
+> arms all three harnesses. Follow the CURRENT arming steps in USER_GUIDE §5,
+> not the historical ones above.
 
 
 ## Round 4 — dual-hetero re-run under the DSH-native substrate (post-adjudication)
@@ -196,7 +201,12 @@ convention (verified against pi-ai's env-api-keys table: zai-coding-cn →
 ZAI_CODING_CN_API_KEY, minimax-cn → MINIMAX_CN_API_KEY). The earlier
 family-named vars (ZHIPU_API_KEY / MINIMAX_API_KEY) were port inventions that
 broke the ecosystem convention; they are removed. `_credential_env` remains
-only as an escape hatch for routes whose convention differs. Multi-provider
+only as an escape hatch for routes whose convention differs. **SUPERSEDED for
+shipped profiles by ADR #54 SHARED-ENV ALIGNMENT (2026-08-25):**
+`_credential_env` is now the PRIMARY mechanism, pointing the shipped dsh
+profiles at the CC-convention `*_ANTHROPIC_AUTH_TOKEN` vars from the one
+shared `.env.solidforge`; `<ROUTE>_API_KEY` is the user-authored-profile
+fallback only. Multi-provider
 composition stays at the selector level (`HETERO_PROFILE=a,b`) — a profile is
 an atomic arming unit (one route + one model + one credential), 1:1 by
 construction, which is what keeps per-provider error attribution unambiguous.
@@ -223,4 +233,9 @@ are brands/platforms of one lineage), `claude.json` → `claude`,
 model alias stays editable inside the profile). A DSH-native Qwen PLACEHOLDER
 was added: `qwen-token-plan-cn.json` (pi-ai catalog gateway route — NOTE the
 route is multi-family, so its `_family` names the PINNED model's lineage);
-armed by setting `QWEN_TOKEN_PLAN_CN_API_KEY` (route-derived). All suites pass.
+armed by setting `QWEN_TOKEN_PLAN_CN_API_KEY` (route-derived). **(SUPERSEDED
+2026-08-25, ADR #54:** `qwen-token-plan-cn.json` now declares
+`_credential_env: QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` — the CC-convention
+var from the one shared `.env.solidforge`; the route-derived
+`QWEN_TOKEN_PLAN_CN_API_KEY` remains only the user-authored fallback.)
+All suites pass.
