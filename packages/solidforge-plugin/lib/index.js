@@ -495,6 +495,7 @@ export function apply(ctx, config = {}) {
     presetStamp: presetStamp(root) ?? null,
     presetDrifted: undefined,
     skillsRegistered: 0,
+    skillsVisible: null,
     systemPromptSeen: false,
     sectionRegistered: false,
     commandsRegistered: 0,
@@ -672,7 +673,33 @@ export function apply(ctx, config = {}) {
     probe.injectedSkills = ctx.skills !== undefined
     status.servicesSeen = probe
     const home = process.env.DSH_HOME ?? join(process.env.HOME ?? '', '.dsh')
-    writeFileSync(join(home, '.solidforge-status.json'), JSON.stringify(status, null, 2) + '\n', 'utf8')
+    const statusPath = join(home, '.solidforge-status.json')
+    const writeStatus = () =>
+      writeFileSync(statusPath, JSON.stringify(status, null, 2) + '\n', 'utf8')
+    writeStatus()
+    // Catalog-visibility probe (2026-09-18): a successful register() call is NOT
+    // proof that a catalog reader sees the skill — a same-name runtime entry is
+    // ignored, and each viewer's scope chain decides what it gets. Record what
+    // THIS context's list() actually returns (async; rewrites the file on
+    // resolution, since apply() is synchronous).
+    Promise.race([
+      ctx.skills.list({}),
+      new Promise((resolve) => {
+        setTimeout(() => resolve('TIMEOUT(5000ms)'), 5000)
+      }),
+    ])
+      .then((visible) => {
+        status.skillsVisible = Array.isArray(visible) ? visible.map((s) => s.name) : visible
+        writeStatus()
+      })
+      .catch((error) => {
+        status.skillsVisible = `ERR: ${error instanceof Error ? error.message : String(error)}`
+        try {
+          writeStatus()
+        } catch {
+          /* best effort — the synchronous write above already landed */
+        }
+      })
   } catch (error) {
     fail('status-file', error)
   }

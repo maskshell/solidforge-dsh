@@ -21,6 +21,15 @@ window.__ModuleLoader__.load({
       ['prior-art-search', 'pas', 'novelty collision detection (outcome axis)'],
     ]
 
+    // Service dependencies (Cordis `inject`): the client module system reads
+    // this export and holds `apply` until every named service exists. Without
+    // it the app runs apply immediately, `ctx.get('inputTriggers')` is undefined,
+    // and the source is silently never registered (DSH 0.1.5 contract —
+    // dsh-client-ui-skill / -commands both export inject the same way).
+    // NOTE: this is the SERVICE list; package-level bundle deps live in
+    // package.json `dsh.client.inject`.
+    exports.inject = ['inputTriggers']
+
     function apply(ctx) {
       const inputTriggers = ctx.get('inputTriggers')
       if (inputTriggers === undefined) return

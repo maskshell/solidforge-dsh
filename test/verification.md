@@ -352,3 +352,45 @@ the global plugin face on the next `install-global.sh` / dsh web restart.
 Also fixed in the same sweep: `scripts/check-release-metadata.py` still expected
 `@maskshell/solidforge` after the 0.1.4 unscoped rename (`solidforge`), leaving
 CI red on HEAD.
+
+## Second 0.1.5 contract break: the client bundle must export `inject` (2026-09-18)
+
+Symptom (user-reported, after the rename landed): the GUI `/` menu showed the DSH
+command group (`/solidforge`, `/solidforge-status`) but never our `solidforge`
+completion group. The boot graph proved the bundle WAS shipped —
+`window.__DSH_BOOT__.batches` ended with `solidforge/client.js&rev=efe0d61ae919`
+— so the failure had to be in the client half, not in packaging.
+
+Root cause: a 0.1.5 client plugin must export the Cordis **service** list as
+`inject` from the bundle itself (`dsh-client-ui-skill` exports
+`["inputTriggers","sessions","slots","locale","remote","remote.skills"]`,
+`dsh-client-ui-commands` the same shape). Our bundle exported only `apply`, so
+the module system called `apply` before the service existed,
+`ctx.get('inputTriggers')` returned `undefined`, and the guard
+`if (inputTriggers === undefined) return` skipped registration silently.
+Two distinct layers are easy to conflate here: `package.json`
+`dsh.client.inject` lists PACKAGE bundle dependencies; the bundle's exported
+`inject` lists SERVICES.
+
+Fix: `lib/client.js` exports `inject = ['inputTriggers']`. Verified end to end by
+the user: the `/` menu now lists all 10 candidates (`/solidforge:pd` …
+`/solidforge:<full-name>`), and the bundle rev advanced
+`efe0d61ae919` -> `c4a58ebc3c1a`, proving the server recomposed the graph with
+the new bundle.
+
+## Open: the GUI "skills" group is still empty (2026-09-18, UNRESOLVED)
+
+`skills.list()` merges `[global, ...chainLayers(scope)]` (`dsh-skill`
+`collectFresh`), so the plugin's global-layer registrations should be visible to
+every viewer — and the session system prompt does list all five skills. Yet the
+GUI group stays empty, and the preset `skill-filesystem` row's directory skills
+do not appear in a headless session either (verified with a probe skill plus a
+plain-string `customSkillDirs`, so it is not a `!!js` evaluation problem).
+
+A probe was added (`status.skillsVisible`) recording what the patch-layer
+context's own `skills.list({})` returns. Two obstacles to reading it: that call
+does not resolve from the patch layer (catalog discovery depends on remote
+initialization), and host-half module changes are NOT hot-reloaded (process-level
+module cache) — so the probe's value requires a dsh web restart. Impact is
+bounded: all three invocation paths already work (`/solidforge:<name>`
+completion, colon gestures, prompt abbreviations).
