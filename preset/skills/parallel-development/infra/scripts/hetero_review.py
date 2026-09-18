@@ -435,7 +435,7 @@ def _prepare_dsh_home(name, tmpl):
     providers_entry = dict(tmpl.get("provider_profile") or {})
     # Credential var: `_credential_env` (the shipped dsh profiles declare it —
     # SHARED-ENV ALIGNMENT ADR #54 points them at the CC-convention
-    # `*_ANTHROPIC_AUTH_TOKEN` vars from the one shared .env.solidforge).
+    # `*_ANTHROPIC_AUTH_TOKEN` vars from the shared three-harness var convention).
     # Fallback default: <UPPERCASE(route)>_API_KEY (pi-ai's own env convention,
     # zai-coding-cn -> ZAI_CODING_CN_API_KEY, minimax-cn -> MINIMAX_CN_API_KEY) —
     # kept for user-authored profiles that do not declare an override.

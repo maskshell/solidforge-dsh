@@ -87,7 +87,7 @@ for the multi-round debate loop + cap + termination semantics.
 `_credential_env` (the DSH adapter's own `apiKeyEnv`) — since the SHARED-ENV
 ALIGNMENT (ADR #54), the shipped dsh profiles point it at the CC-convention vars
 (`BIGMODEL_ANTHROPIC_AUTH_TOKEN`, `MINIMAX_ANTHROPIC_AUTH_TOKEN`,
-`QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN`) from the one shared `.env.solidforge`
+`QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN`) from the shared three-harness var convention
 that arms all three harnesses (upstream CC reads them by convention,
 solidforge-pi bridges them to its route env via its sf-providers extension). The
 `<NAME>_ANTHROPIC_AUTH_TOKEN` naming therefore applies to BOTH substrates — the

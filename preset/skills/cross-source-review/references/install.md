@@ -99,7 +99,7 @@ is derived BY CONVENTION from the profile filename:
 `<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN` (non-alphanumeric chars collapse to
 `_` before uppercasing). The dsh-substrate profiles instead read the var their
 `_credential_env` names (SHARED-ENV ALIGNMENT, ADR #54 — the CC-convention vars
-from the one shared `.env.solidforge`); an explicit `_token_env` /
+from the shared three-harness var convention); an explicit `_token_env` /
 `_credential_env` always wins over the filename convention. The shipped
 profiles and the var each one reads:
 

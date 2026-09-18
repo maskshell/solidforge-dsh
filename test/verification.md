@@ -77,8 +77,8 @@ replaced by the catalog routes `zai-coding-cn` / `minimax-cn` with route-derived
 credential vars `ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY`; `HETERO_PROFILE`
 now names those routes). **(SUPERSEDED 2026-08-25, ADR #54:** the shipped dsh
 profiles now read the CC-convention vars `BIGMODEL_ANTHROPIC_AUTH_TOKEN` /
-`MINIMAX_ANTHROPIC_AUTH_TOKEN` via `_credential_env` — one shared `.env.solidforge`
-arms all three harnesses; `<ROUTE>_API_KEY` remains the user-authored fallback.)
+`MINIMAX_ANTHROPIC_AUTH_TOKEN` via `_credential_env` — one env-file format shared by all
+three harnesses; `<ROUTE>_API_KEY` remains the user-authored fallback.)
 The historical names below document the evolution —
 current profiles/ dir ships claude.json, minimax-cn.json, qwen-token-plan-cn.json,
 qwen.json, zai-coding-cn.json. End-to-end smoke: both providers rc=0 via fresh
