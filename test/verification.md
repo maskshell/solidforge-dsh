@@ -381,11 +381,30 @@ the new bundle.
 ## Open: the GUI "skills" group is still empty (2026-09-18, UNRESOLVED)
 
 `skills.list()` merges `[global, ...chainLayers(scope)]` (`dsh-skill`
-`collectFresh`), so the plugin's global-layer registrations should be visible to
-every viewer — and the session system prompt does list all five skills. Yet the
-GUI group stays empty, and the preset `skill-filesystem` row's directory skills
-do not appear in a headless session either (verified with a probe skill plus a
-plain-string `customSkillDirs`, so it is not a `!!js` evaluation problem).
+`collectFresh`), so the plugin's global-layer registrations are visible to every
+viewer — and the session system prompt does list all five skills.
+
+**CORRECTION (same day, after the dsh web restart).** An earlier version of this
+finding claimed the preset `skill-filesystem` row's directory skills were not
+loading; that was inferred from a headless session (whose layer configuration
+differs) plus a probe skill that never appeared there. The inference was WRONG.
+The plugin's own `status.skillsVisible` probe — readable only after a restart,
+because host-half module changes are not hot-reloaded — reports the complete
+five-name catalog:
+
+```
+blueprint-crafting, cross-source-review, parallel-development,
+primary-source-verification, prior-art-search
+```
+
+and it reports it from a context whose `skillsRegistered` is **0** (the preset
+row, which registers nothing itself): the skills arrive through the other layers.
+Discovery, the preset `skill-filesystem` row and the catalog are therefore all
+intact — **the defect is confined to the client-side GUI group; no server-side
+data is missing.** What remains is a UI-side question (the client fetched
+`skills.list` once at load — the user observed no request when opening the menu —
+so the group may simply reflect a snapshot taken before registration settled, or
+a client-side filtering difference).
 
 A probe was added (`status.skillsVisible`) recording what the patch-layer
 context's own `skills.list({})` returns. Two obstacles to reading it: that call
