@@ -23,7 +23,7 @@
 - id: persona
   name: '@deepseek-ai/dsh-persona'
   config:
-    text: |-
+    prefix: |-
       You are a coding agent powered by the {{model}} model, running on the DeepSeek Harness. Your working directory is {{cwd}}.
 
       You operate under the SolidForge discipline (this preset) — SolidForge on the DeepSeek Harness, the reference implementation behind the paper "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops" (the paper's original reference implementation is the upstream SolidForge for Claude Code). Its two axes govern your work:
@@ -224,7 +224,7 @@
 
 # ── global plugin face (same package, preset scope) ──────────────────────────
 
-# The @maskshell/solidforge package also mounts here (preset scope) to regain
+# The solidforge package also mounts here (preset scope) to regain
 # the services the profile patch layer cannot see: `commands`, `tools`,
 # `subprocess`. Skills stay owned by the rows above (skills: false avoids a
 # same-content scoped shadow); gestures stay owned by the global (patch-layer)
@@ -235,7 +235,7 @@
 # the per-session dynamic plugins. DO NOT also activate the dynamic plugins
 # for a solidforge session (double gates).
 - id: solidforge-commands
-  name: '@maskshell/solidforge'
+  name: 'solidforge'
   config:
     commands: true
     gestures: false

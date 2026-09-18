@@ -1,6 +1,6 @@
 # Release checklist — publishing artifacts under the two-axis discipline
 
-The npm release of `@maskshell/solidforge` shipped with a wrong license
+The npm release of `solidforge` shipped with a wrong license
 declaration (MIT instead of Apache-2.0) because publishing was treated as a
 mechanical task instead of a disciplined artifact: no fetched-source check, no
 adversarial review, no frozen checklist. This file is the frozen blueprint
@@ -12,7 +12,7 @@ through the same gates as code.
 `scripts/check-release-metadata.py` must pass before ANY publish attempt. It
 asserts, mechanically:
 
-- package name `@maskshell/solidforge`, license `Apache-2.0`, semver version;
+- package name `solidforge`, license `Apache-2.0`, semver version;
 - `files` whitelist ships `lib`, `README.md`, `LICENSE`, `NOTICE`;
 - shipped `LICENSE`/`NOTICE` byte-identical to the repo root copies;
 - README license footer agrees with `package.json`;
@@ -63,7 +63,7 @@ a second source instead of by the consumer.
 
 ## Incident record
 
-- 2026-08-14: `@maskshell/solidforge@0.1.0` published with `license: MIT`
+- 2026-08-14: `solidforge@0.1.0` published with `license: MIT`
   while the repo/upstream are Apache-2.0. Root cause: no release gate
   existed; the claim went unverified and was caught by human review. Fixed in
   0.1.2 (Apache-2.0, LICENSE/NOTICE shipped); Gate 0 added as the

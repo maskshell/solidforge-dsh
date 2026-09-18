@@ -1,4 +1,4 @@
-// smoke.mjs — deterministic wiring test for @maskshell/solidforge's host half.
+// smoke.mjs — deterministic wiring test for solidforge's host half.
 // Self-contained: builds a fixture preset (five minimal SKILL.md files) under
 // a temp DSH_HOME, then exercises apply(ctx) with a mock context: skill
 // registration, colon-gesture injection, command registration, and the

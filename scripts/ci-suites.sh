@@ -48,7 +48,7 @@ run_suite blueprint-crafting \
 
 run_suite cross-source-review \
   convergence_policy_check.py findings_shape_check.py disconnect_check.py \
-  plugin_layout.py dogfood.py lint_self.py
+  hetero_doc_review_wiring.py plugin_layout.py dogfood.py lint_self.py
 
 run_suite primary-source-verification \
   coverage_policy_check.py fetched_quote_gate.py findings_shape_check.py \
@@ -94,6 +94,31 @@ if ! out=$("$PY" "$HERE/scripts/check-release-metadata.py" 2>&1); then
   echo "$out" | tail -6 | sed 's/^/      /'
 else
   echo "PASS: scripts/check-release-metadata.py"
+fi
+
+# stale credential-var doc gate (ADR #54: legacy <ROUTE>_API_KEY mentions must
+# be marked SUPERSEDED — the backstop for the enumeration drift the ADR #54
+# review caught three times)
+TOTAL=$((TOTAL + 1))
+if ! out=$("$PY" "$HERE/scripts/check-stale-credential-docs.py" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: scripts/check-stale-credential-docs.py"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: scripts/check-stale-credential-docs.py"
+fi
+
+# preset schema gate (2026-09-18 incident: DSH 0.1.5 renamed dsh-persona's config
+# `text` -> required `prefix`; the preset kept `text`, so every NEW session failed
+# to mount while existing sessions kept working — a user-visible GUI failure with
+# no repo-side signal). Validates every preset loader row against the installed
+# DSH Config schemas.
+TOTAL=$((TOTAL + 1))
+if ! out=$("$PY" "$HERE/scripts/check-preset-schema.py" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: scripts/check-preset-schema.py"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: scripts/check-preset-schema.py"
+  echo "$out" | tail -1 | sed 's/^/      /'
 fi
 
 echo

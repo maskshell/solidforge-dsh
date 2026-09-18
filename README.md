@@ -55,23 +55,23 @@ bash scripts/install-global.sh # 可选：全局插件面 → 任何预设的会
 
 ### 全局插件面（Node.js 插件，可选）
 
-`install-global.sh` 安装并挂载的是 npm 包 **`@maskshell/solidforge`**（Node.js 插件，零依赖）。两种装法等价：
+`install-global.sh` 安装并挂载的是 npm 包 **`solidforge`**（Node.js 插件，零依赖）。两种装法等价：
 
 ```bash
 # 方式一：仓库脚本（推荐——自动写 profile 补丁层，并检查预设是否过期）
 bash scripts/install-global.sh web --with-persona
 
 # 方式二：直接装 npm 包，再手写补丁条目
-npm install --prefix "$DSH_HOME" @maskshell/solidforge
+npm install --prefix "$DSH_HOME" solidforge
 # 在 $DSH_HOME/profiles/<profile>/cordis.patch.yml 追加：
 #   - insert:
 #       - id: solidforge
-#         name: '@maskshell/solidforge'
+#         name: 'solidforge'
 #         config:
 #           persona: true
 ```
 
-装好后**任何预设**的会话获得：五个技能（host 层注册 → `/` 菜单与模型目录）、`/solidforge:<skill>` 冒号手势（全名或缩写，pre-step 边界确定性注入技能正文）、追加式纪律段（`persona: true`）。`/solidforge`、`/arm-tools`、`/solidforge-status` 三个命令由 solidforge **预设行**提供（同一包以 `config: {commands: true, gestures: false, skills: false}` 挂载，命令按作用域分层，仅 solidforge 会话可见）。技能正文实时读取已安装的 preset（未装则诚实降级）；预设过期时 `install-global.sh` 会显式警告（`.preset-stamp.json` 版本戳）。卸载：`npm uninstall --prefix "$DSH_HOME" @maskshell/solidforge` 或 `bash scripts/install-global.sh --revert`。
+装好后**任何预设**的会话获得：五个技能（host 层注册 → `/` 菜单与模型目录）、`/solidforge:<skill>` 冒号手势（全名或缩写，pre-step 边界确定性注入技能正文）、追加式纪律段（`persona: true`）。`/solidforge`、`/arm-tools`、`/solidforge-status` 三个命令由 solidforge **预设行**提供（同一包以 `config: {commands: true, gestures: false, skills: false}` 挂载，命令按作用域分层，仅 solidforge 会话可见）。技能正文实时读取已安装的 preset（未装则诚实降级）；预设过期时 `install-global.sh` 会显式警告（`.preset-stamp.json` 版本戳）。卸载：`npm uninstall --prefix "$DSH_HOME" solidforge` 或 `bash scripts/install-global.sh --revert`。
 
 完整的循序渐进上手：**[USER_GUIDE.md](USER_GUIDE.md)**。
 
@@ -125,7 +125,7 @@ npm install --prefix "$DSH_HOME" @maskshell/solidforge
 | 22 个角色代理 | `preset/agents/*.agent.md` | 经 `subagent` 工具派发的角色提示语料 |
 | 确定性基础设施 | `preset/skills/*/infra/` | 纯 stdlib Python 门禁/状态机/schema + 测试套件 |
 | 结构化插件 | `plugins/*.host.js` | 工具事件门禁、rightness 不变量、异源评审工具（激活方式见使用指南） |
-| 全局插件面 | `packages/solidforge-plugin/` | `@maskshell/solidforge`：host 层技能、`/solidforge:<skill>` 冒号手势、追加式纪律段（`install-global.sh` 装进 profile 补丁层，任何预设可用）；`/solidforge`/`/arm-tools`/`/solidforge-status` 命令经 solidforge 预设行提供 |
+| 全局插件面 | `packages/solidforge-plugin/` | `solidforge`：host 层技能、`/solidforge:<skill>` 冒号手势、追加式纪律段（`install-global.sh` 装进 profile 补丁层，任何预设可用）；`/solidforge`/`/arm-tools`/`/solidforge-status` 命令经 solidforge 预设行提供 |
 | arm-tools | `preset/commands/arm-tools.md` | 项目侧供给（Layer 2） |
 
 ## 诚实声明

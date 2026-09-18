@@ -22,7 +22,7 @@ bash scripts/install.sh            # → $DSH_HOME/.agent-presets/solidforge/ (i
 bash scripts/install-global.sh     # optional: the global plugin face → every session (below)
 ```
 
-- **Global plugin face (optional, recommended)**: `install-global.sh` mounts `@maskshell/solidforge` into the web profile's user patch layer (`$DSH_HOME/profiles/web/cordis.patch.yml`, hot-reloaded); or `npm install --prefix "$DSH_HOME" @maskshell/solidforge` and write the patch entry by hand. Once installed, sessions of ANY preset get:
+- **Global plugin face (optional, recommended)**: `install-global.sh` mounts `solidforge` into the web profile's user patch layer (`$DSH_HOME/profiles/web/cordis.patch.yml`, hot-reloaded); or `npm install --prefix "$DSH_HOME" solidforge` and write the patch entry by hand. Once installed, sessions of ANY preset get:
   - the five skills (host-layer registration → the `/` menu and the model catalog, any preset);
   - colon gestures `/solidforge:parallel-development` … `/solidforge:pas` (full names or abbreviations; deterministic pre-step injection of the rendered skill body);
   - the additive `solidforge:discipline` prompt section (`--with-persona`; two-axis discipline + abbreviation map in any preset's system prompt).
@@ -82,8 +82,8 @@ Two fields, always separate:
 
 Heterogeneity = **same harness, different LLM, out of process**: the wrapper spawns a fresh, stateless `dsh --profile headless` subprocess whose throwaway `DSH_HOME` pins `agent-default-model` to a pi-ai catalog route of a **different model family**. Three steps:
 
-1. **Create a profile** (filename = route): `cp profiles/minimax-cn.json profiles/<route>.json`, edit `model` and `_family` (the model lineage, used by the same-source guard);
-2. **Fill the key**: the credential var is route-derived (`<UPPERCASE(route)>_API_KEY`, pi-ai's own convention), placed anywhere in the three-tier chain: `shell > <project>/.env.solidforge > <project>/.env > <preset-root>/.env.solidforge`;
+1. **Create a profile** (filename = route): `cp profiles/minimax-cn.json profiles/<route>.json`, edit `model` and `_family` (the model lineage, used by the same-source guard); **edit/remove `_credential_env`** (copying carries the alias along — leave it and the new route still reads the original var);
+2. **Fill the key**: the credential var is the profile's declared `_credential_env` (dsh substrate; the shipped profiles point it at the CC-convention vars `BIGMODEL_ANTHROPIC_AUTH_TOKEN` / `MINIMAX_ANTHROPIC_AUTH_TOKEN` / `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN` — one shared `.env.solidforge` arms all three harnesses, ADR #54) or `_token_env` (claude-code substrate), placed anywhere in the three-tier chain: `shell > <project>/.env.solidforge > <project>/.env > <preset-root>/.env.solidforge`;
 3. **Select**: `HETERO_PROFILE=<route-a>,<route-b>` (pd leg) and `HETERO_DOC_PROFILE` (csr leg, independent) in `.env.solidforge`.
 
 Built-in guards: a profile whose `_family` is the orchestrator's lineage (deepseek) is REFUSED; a dual run sharing one family gets an honest coverage note ("no blind-spot diversity"); an undeclared `_family` is noted ("guard inactive"). No provider configured → fail-fast with an arming prompt — **never a silent fallback**.
@@ -159,7 +159,7 @@ Abbreviation map (full names and abbreviations both trigger):
 
 - *"no heterogeneous provider configured"* — expected: the fail-fast default. Arm per §5, or consciously forgo heterogeneity.
 - *"/solidforge and /arm-tools don't resolve"* — they are PRESET-row commands, visible only in solidforge-preset sessions; the patch layer (install-global.sh) cannot provide commands (loader contract: the patch-layer context cannot see the commands service). Skills are unaffected (write the name/abbreviation or a colon gesture directly).
-- *"profile X (route Y) needs the credential env var $Z"* — the key is missing from the three-tier chain; the var name is route-derived (§5).
+- *"profile X (route Y) needs the credential env var $Z"* — the key is missing from the three-tier chain; `$Z` is the profile's declared `_credential_env` / `_token_env` var (the shipped profiles use the CC-convention names), §5.
 - *Hetero leg `hetero-subprocess-timeout`* — cold start is transient; raise `--timeout` or drop a tier per the docs — never remap the route alias to dodge it.
 - *A gate tool is missing* — that gate degrades with a coverage note, never fakes green; `--with-tools` fills the gaps.
 - *Test set must not shrink / hard-coded bypass* — the inner gates (AC→test-name mapping + extra conditions) block these; the blueprint guard blocks frozen-doc edits.

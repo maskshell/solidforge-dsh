@@ -75,7 +75,11 @@ User-provided keys armed two DSH-native heterogeneous profiles — then named
 `profiles/zhipu.json` and `profiles/minimax.json` (hand-declared pi-ai routes, later
 replaced by the catalog routes `zai-coding-cn` / `minimax-cn` with route-derived
 credential vars `ZAI_CODING_CN_API_KEY` / `MINIMAX_CN_API_KEY`; `HETERO_PROFILE`
-now names those routes). The historical names below document the evolution —
+now names those routes). **(SUPERSEDED 2026-08-25, ADR #54:** the shipped dsh
+profiles now read the CC-convention vars `BIGMODEL_ANTHROPIC_AUTH_TOKEN` /
+`MINIMAX_ANTHROPIC_AUTH_TOKEN` via `_credential_env` — one shared `.env.solidforge`
+arms all three harnesses; `<ROUTE>_API_KEY` remains the user-authored fallback.)
+The historical names below document the evolution —
 current profiles/ dir ships claude.json, minimax-cn.json, qwen-token-plan-cn.json,
 qwen.json, zai-coding-cn.json. End-to-end smoke: both providers rc=0 via fresh
 `dsh --profile headless` subprocesses — zero foreign harness. Live dual-hetero
@@ -299,3 +303,52 @@ for a public surface must be taken from an isolated/scrubbed environment
 (e.g. a throwaway DSH_HOME instance, sidebar collapsed, workspace names
 absent) and frame-vetted for identifiers BEFORE posting; remediation of an
 internal operational failure is recorded here, never in the public post.
+
+## DSH 0.1.5-rc.2 upgrade broke new-session creation — preset persona schema drift (2026-09-18)
+
+Symptom: clicking "New session" in the DSH web GUI produced no response. The
+browser surfaced `SessionCreateError: session create failed: agent-preset/invalid:
+preset "solidforge" failed to mount: failed to apply loader entry persona
+(@deepseek-ai/dsh-persona): invalid config: $.prefix missing required value`.
+
+Root cause: DSH 0.1.5-rc.2 renamed `@deepseek-ai/dsh-persona`'s config field
+`text` -> required `prefix` (`prefix: z.string().required()` in the 0.1.5
+schema). The preset still declared `config: {text: ...}`, so the preset refused
+to mount: **new sessions could not be created while already-loaded sessions kept
+working** — the preset is mounted per session, not per process, which is exactly
+why this looked like a frontend bug.
+
+Diagnosis trail (each of these was consistent with a broken page, and none of
+them was the cause): the web process had been restarted at 12:41 by the upgrade
+(0.1.1-rc.2 -> 0.1.5-rc.2); `~/.dsh/sessions/` had no new session directory for
+the day; the storages JSON and the browser's live connections were healthy; every
+package the preset references resolved against 0.1.5. The decisive evidence was
+the server-side error text, which existed only in the browser console.
+
+Fix: `preset/agent.cordis.yml` persona row `config.text` -> `config.prefix`. The
+installed copy at `$DSH_HOME/.agent-presets/solidforge/agent.cordis.yml` was
+sync'd in the same step so the running harness recovered immediately. Verified
+end to end: `dsh --profile headless "Reply with exactly: PRESET-MOUNT-OK"` ->
+`PRESET-MOUNT-OK`, exit 0.
+
+Gate added — the incident had NO repo-side signal, so the diagnosis was turned
+into a deterministic check: `scripts/check-preset-schema.py` validates every
+preset loader row against the installed DSH packages' `Config` d.ts (required
+fields present; no unknown keys; honest SKIP when no DSH install is resolvable,
+never a silent green). Wired into `scripts/ci-suites.sh`. Negative test
+performed: reverting `prefix` -> `text` makes it exit 1, naming both the missing
+required field and the renamed residue. `plugin_layout.py` additionally asserts
+the `prefix` field, so the skill's own Fast Gate catches it too.
+
+Second, independent 0.1.5 incompatibility found in the same sweep: the global
+plugin's client half declared `inject: ["@deepseek-ai/dsh-client-runtime", ...]`,
+but that package was REMOVED in 0.1.5 (no shipped client plugin injects it; only
+dsh-invariants' README mentions it historically). Effect: the client half waits
+forever, so the `/solidforge:` completion silently disappears. Fixed in
+`packages/solidforge-plugin/package.json` (inject -> `dsh-client-ui-input-trigger`
+only; the `inputTriggers` service name is unchanged in 0.1.5). It takes effect for
+the global plugin face on the next `install-global.sh` / dsh web restart.
+
+Also fixed in the same sweep: `scripts/check-release-metadata.py` still expected
+`@maskshell/solidforge` after the 0.1.4 unscoped rename (`solidforge`), leaving
+CI red on HEAD.

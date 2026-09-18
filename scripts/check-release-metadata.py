@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 PKG_DIR = ROOT / "packages" / "solidforge-plugin"
 
-EXPECTED_NAME = "@maskshell/solidforge"
+EXPECTED_NAME = "solidforge"
 EXPECTED_LICENSE = "Apache-2.0"
 REQUIRED_FILES = ["lib", "README.md", "LICENSE", "NOTICE"]
 

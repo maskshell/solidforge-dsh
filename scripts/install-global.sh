@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-global.sh — install the @maskshell/solidforge plugin into a dsh
+# install-global.sh — install the solidforge plugin into a dsh
 # profile's USER PATCH LAYER, making it available to every session of that
 # profile (no preset switching): skills enter the host layer of the registry,
 # /solidforge:<skill> colon gestures inject at the pre-step boundary, and
@@ -48,7 +48,7 @@ done
 DSH_HOME="${DSH_HOME:-$HOME/.dsh}"
 PROFILE_DIR="$DSH_HOME/profiles/$PROFILE"
 PATCH_FILE="$PROFILE_DIR/cordis.patch.yml"
-PKG_DIR="$DSH_HOME/node_modules/@maskshell/solidforge"
+PKG_DIR="$DSH_HOME/node_modules/solidforge"
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$HERE/packages/solidforge-plugin"
 MARKER="id: solidforge"
@@ -97,7 +97,7 @@ persona = sys.argv[2] == '1'
 gates = sys.argv[3] == '1'
 with open(path, 'r', encoding='utf-8') as f:
     text = f.read()
-lines = ["- insert:", "    - id: solidforge", "      name: '@maskshell/solidforge'"]
+lines = ["- insert:", "    - id: solidforge", "      name: 'solidforge'"]
 if persona or gates:
     lines.append("      config:")
     if persona:
@@ -132,7 +132,7 @@ mkdir -p "$PKG_DIR/lib"
 cp "$SRC/package.json" "$PKG_DIR/package.json"
 cp "$SRC/lib/index.js" "$PKG_DIR/lib/index.js"
 cp "$SRC/lib/client.js" "$PKG_DIR/lib/client.js"
-echo "== installed @maskshell/solidforge -> $PKG_DIR"
+echo "== installed solidforge -> $PKG_DIR"
 
 if grep -q "$MARKER" "$PATCH_FILE"; then
   strip_entry && echo "  replaced existing solidforge patch entry"

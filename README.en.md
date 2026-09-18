@@ -56,7 +56,7 @@ bash scripts/install-global.sh # optional: the global plugin face → sessions o
 
 ### The global plugin face (Node.js plugin, optional)
 
-What `install-global.sh` installs and mounts is the npm package **`@maskshell/solidforge`** (a zero-dependency Node.js plugin). The two install routes are equivalent:
+What `install-global.sh` installs and mounts is the npm package **`solidforge`** (a zero-dependency Node.js plugin). The two install routes are equivalent:
 
 ```bash
 # Route 1: the repo script (recommended — writes the profile patch layer and
@@ -64,16 +64,16 @@ What `install-global.sh` installs and mounts is the npm package **`@maskshell/so
 bash scripts/install-global.sh web --with-persona
 
 # Route 2: install the npm package directly, then hand-write the patch entry
-npm install --prefix "$DSH_HOME" @maskshell/solidforge
+npm install --prefix "$DSH_HOME" solidforge
 # append to $DSH_HOME/profiles/<profile>/cordis.patch.yml:
 #   - insert:
 #       - id: solidforge
-#         name: '@maskshell/solidforge'
+#         name: 'solidforge'
 #         config:
 #           persona: true
 ```
 
-Once installed, sessions of ANY preset get: the five skills (host-layer registration → `/` menu + model catalog), `/solidforge:<skill>` colon gestures (full names or abbreviations, deterministic pre-step injection of the rendered skill body), and the additive discipline section (`persona: true`). The `/solidforge`, `/arm-tools`, and `/solidforge-status` commands are provided by the solidforge PRESET row (the same package with `config: {commands: true, gestures: false, skills: false}`; the command registry layers by scope, so they are visible to solidforge sessions). Skill bodies are read live from the installed preset (honest degrade when absent); `install-global.sh` warns when the preset is stale (`.preset-stamp.json` version stamp). Uninstall: `npm uninstall --prefix "$DSH_HOME" @maskshell/solidforge` or `bash scripts/install-global.sh --revert`.
+Once installed, sessions of ANY preset get: the five skills (host-layer registration → `/` menu + model catalog), `/solidforge:<skill>` colon gestures (full names or abbreviations, deterministic pre-step injection of the rendered skill body), and the additive discipline section (`persona: true`). The `/solidforge`, `/arm-tools`, and `/solidforge-status` commands are provided by the solidforge PRESET row (the same package with `config: {commands: true, gestures: false, skills: false}`; the command registry layers by scope, so they are visible to solidforge sessions). Skill bodies are read live from the installed preset (honest degrade when absent); `install-global.sh` warns when the preset is stale (`.preset-stamp.json` version stamp). Uninstall: `npm uninstall --prefix "$DSH_HOME" solidforge` or `bash scripts/install-global.sh --revert`.
 
 Step-by-step onboarding: **[USER_GUIDE.en.md](USER_GUIDE.en.md)**.
 
@@ -127,7 +127,7 @@ Abbreviations: `pd`=parallel-development · `bc`=blueprint-crafting · `csr`=cro
 | 22 role agents | `preset/agents/*.agent.md` | Role-prompt corpus dispatched via the `subagent` tool |
 | Deterministic infra | `preset/skills/*/infra/` | stdlib-only Python gates/state machine/schemas + test suites |
 | Structural plugins | `plugins/*.host.js` | Tool-event gates, the rightness invariant, the hetero-review tool (activation: see the User Guide) |
-| Global plugin face | `packages/solidforge-plugin/` | `@maskshell/solidforge`: host-layer skills, `/solidforge:<skill>` colon gestures, the additive discipline section (`install-global.sh` mounts it into the profile patch layer; sessions of any preset); the `/solidforge` / `/arm-tools` / `/solidforge-status` commands are provided by the solidforge PRESET row |
+| Global plugin face | `packages/solidforge-plugin/` | `solidforge`: host-layer skills, `/solidforge:<skill>` colon gestures, the additive discipline section (`install-global.sh` mounts it into the profile patch layer; sessions of any preset); the `/solidforge` / `/arm-tools` / `/solidforge-status` commands are provided by the solidforge PRESET row |
 | arm-tools | `preset/commands/arm-tools.md` | Project-side provisioning (Layer 2) |
 
 ## Honest disclosure

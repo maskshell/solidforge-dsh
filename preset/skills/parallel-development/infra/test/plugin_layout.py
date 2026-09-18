@@ -117,6 +117,17 @@ def main():
         with open(comp, encoding="utf-8") as fh:
             comp_text = fh.read()
         check("dsh-persona" in comp_text, "composition carries the persona row")
+        # DSH 0.1.5 renamed the persona row's config field `text` -> required
+        # `prefix`; a stale `text` makes the whole preset refuse to mount (no new
+        # session can be created). Guarded here AND by scripts/check-preset-schema.py.
+        _persona_at = comp_text.find("@deepseek-ai/dsh-persona")
+        _persona_cfg = (
+            comp_text[_persona_at : _persona_at + 200] if _persona_at >= 0 else ""
+        )
+        check("prefix:" in _persona_cfg, "persona row uses the required `prefix` field")
+        check(
+            "text:" not in _persona_cfg, "persona row avoids the removed `text` field"
+        )
         check(
             "dsh-skill-filesystem" in comp_text, "composition carries skill-filesystem"
         )

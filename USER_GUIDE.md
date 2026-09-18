@@ -24,7 +24,7 @@ bash scripts/install-global.sh     # 可选：全局插件面 → 任何会话�
 
 然后：
 
-- **全局插件面（可选，推荐）**：`install-global.sh` 把 `@maskshell/solidforge` 装进 web profile 的用户补丁层（`$DSH_HOME/profiles/web/cordis.patch.yml`，HMR 热加载）；或 `npm install --prefix "$DSH_HOME" @maskshell/solidforge` 后手写补丁条目。装好后**任何预设的会话**都直接获得：
+- **全局插件面（可选，推荐）**：`install-global.sh` 把 `solidforge` 装进 web profile 的用户补丁层（`$DSH_HOME/profiles/web/cordis.patch.yml`，HMR 热加载）；或 `npm install --prefix "$DSH_HOME" solidforge` 后手写补丁条目。装好后**任何预设的会话**都直接获得：
   - 五个技能（host 层注册 → `/` 菜单与模型目录，任何预设可见）；
   - 冒号手势 `/solidforge:parallel-development` … `/solidforge:pas`（全名或缩写均可，pre-step 边界确定性注入技能正文）；
   - 追加式 `solidforge:discipline` 人格段（`--with-persona`；两轴纪律 + 缩写映射进任何预设的系统提示）。
@@ -85,8 +85,8 @@ Arm 会做（幂等，可 `--revert --apply` 撤销）：
 
 异源 = **同 Harness、异 LLM、出进程**：wrapper 起一个新鲜无状态的 `dsh --profile headless` 子进程，用一次性 `DSH_HOME` 把 `agent-default-model` 钉到一条**不同模型家族**的 pi-ai 目录路由。三步：
 
-1. **建 profile**（文件名 = 路由名）：`cp profiles/minimax-cn.json profiles/<路由>.json`，改 `model` 与 `_family`（模型谱系名，用于同源守卫）；
-2. **填密钥**：凭证变量名由路由派生（`<UPPERCASE(路由)>_API_KEY`，pi-ai 官方约定），放进三层 env 链任一层：`shell > <project>/.env.solidforge > <project>/.env > <preset-root>/.env.solidforge`；
+1. **建 profile**（文件名 = 路由名）：`cp profiles/minimax-cn.json profiles/<路由>.json`，改 `model` 与 `_family`（模型谱系名，用于同源守卫）；**改/删 `_credential_env`**（复制自带别名，不删则新路由仍读原变量）；
+2. **填密钥**：凭证变量名就是 profile 声明的 `_credential_env`（dsh substrate；随包发的 profile 指向 CC 约定名 `BIGMODEL_ANTHROPIC_AUTH_TOKEN` / `MINIMAX_ANTHROPIC_AUTH_TOKEN` / `QWEN_TOKEN_PLAN_CN_ANTHROPIC_AUTH_TOKEN`——三 harness 共享一份 `.env.solidforge`，ADR #54）或 `_token_env`（claude-code substrate），放进三层 env 链任一层：`shell > <project>/.env.solidforge > <project>/.env > <preset-root>/.env.solidforge`；
 3. **选择**：`HETERO_PROFILE=<路由a>,<路由b>`（pd 腿）与 `HETERO_DOC_PROFILE`（csr 腿，独立）写进 `.env.solidforge`。
 
 内置守卫：`_family` 是编排者谱系（deepseek）的 profile **直接拒绝**；双 profile 同族 → coverage 诚实注记"不加盲点多样性"；未声明 `_family` → 注记"守卫未生效"。未配置任何 provider → fail-fast 打印武装指引，**绝不静默回退**。
@@ -162,7 +162,7 @@ csr 的 ODP-5 判别器：短文档 / 本地引用为主的文档**不付 psv ga
 
 - *「no heterogeneous provider configured」*——正常：fail-fast 默认。按 §5 武装，或明确知道自己不需要异源。
 - *「/solidforge、/arm-tools 打不出来」*——它们是预设行命令，只在 **solidforge 预设**会话可见；补丁层（install-global.sh）不提供命令（loader 契约：补丁层 ctx 看不到 commands 服务）。技能本身不受影响（直接写名字/缩写/冒号手势即可）。
-- *「profile X (route Y) needs the credential env var $Z」*——三层链里没找到密钥；变量名是 route 派生的，见 §5。
+- *「profile X (route Y) needs the credential env var $Z」*——三层链里没找到密钥；`$Z` 是 profile 声明的 `_credential_env` / `_token_env` 变量名（随包发 profile 用 CC 约定名），见 §5。
 - *异源腿 `hetero-subprocess-timeout`*——冷启动瞬态；按文档提高 `--timeout` 或降档重试，**不要**改路由别名规避（暖调用深度受损）。
 - *门禁工具缺失*——对应门降级并如实报告（coverage 注记），绝不假装绿；`--with-tools` 补齐。
 - *测试集不许缩水 / 硬编码绕过*——内环门（AC→测试名映射 + 附加条件）会拦；蓝图守卫拦冻结文档编辑。

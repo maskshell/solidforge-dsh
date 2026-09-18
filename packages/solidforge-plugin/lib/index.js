@@ -1,4 +1,4 @@
-// @maskshell/solidforge — the globally installed plugin face of SolidForge on
+// solidforge — the globally installed plugin face of SolidForge on
 // the DeepSeek Harness. Mounted through the user patch layer of a dsh profile
 // (`$DSH_HOME/profiles/<name>/cordis.patch.yml`), so every session of that
 // profile gets it without preset switching.
@@ -459,7 +459,7 @@ function registerGates(ctx, presetRoot, warn) {
   return disposers
 }
 
-const DISCIPLINE_SECTION = `SolidForge discipline — added by the @maskshell/solidforge plugin (this session runs on a non-solidforge preset, or the preset plus this additive frame).
+const DISCIPLINE_SECTION = `SolidForge discipline — added by the solidforge plugin (this session runs on a non-solidforge preset, or the preset plus this additive frame).
 
 The SolidForge convergence discipline (the reference implementation of the paper "Specification Gaming as an Orthogonal Failure Axis in Autonomous Coding Loops"):
 - Axis A — flow-control completeness: convergence loops run deterministic gates (fast gate, architecture-contract gate) and adversarial review until the gates go green. Green gates mean process_converged, nothing more.
@@ -488,7 +488,7 @@ export function apply(ctx, config = {}) {
   const gestures = config.gestures !== false
   const skillsEnabled = config.skills !== false
   const status = {
-    package: '@maskshell/solidforge',
+    package: 'solidforge',
     config: { persona, gates },
     presetRoot: root,
     presetHashNow: presetHash(root),
@@ -600,7 +600,7 @@ export function apply(ctx, config = {}) {
     try {
     disposers.push(commandsService.register({
       name: 'solidforge-status',
-      description: 'Report the @maskshell/solidforge runtime state (services seen, config, registrations, errors)',
+      description: 'Report the solidforge runtime state (services seen, config, registrations, errors)',
       handler() {
         return { kind: 'success', text: JSON.stringify(status, null, 2) }
       },

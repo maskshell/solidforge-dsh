@@ -1,4 +1,4 @@
-// lib/client.js — the PERSISTENT client half of @maskshell/solidforge (B).
+// lib/client.js — the PERSISTENT client half of solidforge (B).
 // Registers a '/'-trigger input-trigger source listing the
 // /solidforge:<name> colon candidates so the GUI menu offers completion for
 // the gesture. The injection itself stays host-side (the patch-layer
@@ -8,7 +8,7 @@
 // the dsh client-module system serves this file as a bundle route for every
 // page that mounts the package.
 window.__ModuleLoader__.load({
-  id: '@maskshell/solidforge',
+  id: 'solidforge',
   factory: (require) => {
     var module = { exports: {} }
     var exports = module.exports
