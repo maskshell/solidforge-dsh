@@ -84,9 +84,10 @@ If upstream never adopts the grammar, a plugin can still honor
 `matchEnter` across registered sources in order, and the command source
 returns undefined for lines it cannot parse (`:` names), so a plugin-owned
 source can claim the line. **The SolidForge port now ships an even simpler
-mechanism**: the `@maskshell/solidforge` plugin (`packages/solidforge-plugin/`,
+mechanism**: the `solidforge` plugin (`packages/solidforge-plugin/`,
 mounted through the profile patch layer via `scripts/install-global.sh`,
-published to npm as [`@maskshell/solidforge`](https://www.npmjs.com/package/@maskshell/solidforge))
+published to npm as [`solidforge`](https://www.npmjs.com/package/solidforge) —
+unscoped since 0.1.4, formerly `@maskshell/solidforge`)
 registers a root-level `agent/pre-step` waterfall listener that expands
 whitespace-bounded `/solidforge:<name>` tokens (full names or abbreviations)
 into the rendered `<skill_content>` — the same gesture boundary
