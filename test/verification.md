@@ -441,7 +441,23 @@ that gate SKIPPED the unresolved name (its current SKIP path reports it as
 `unresolved` rather than failing) — worth tightening so a removed package is a
 hard failure, not a note.
 
-Note the `servicesSeen` in the patch-layer probe still reports
-`commands/tools/subprocess: false`. That is the long-standing patch-layer
-service blind spot (those services live in the preset scope), not a 0.2.0
-regression.
+CORRECTION (same session, found when the user typed `/solidforge-status` and the
+line reached the model instead of executing). The paragraph above originally read
+that the probe's `commands/tools/subprocess: false` was "the long-standing
+patch-layer service blind spot, not a 0.2.0 regression". That was WRONG about
+`commands`. 0.2.0 made `CommandRuntime` a `TypertRemoteService` whose docs say
+definitions are registered "through a command-injected child of an agent
+context"; this plugin injects only `['skills','systemPrompt']`, so the PRESET
+instance's `ctx.get('commands')` also returned undefined and the three commands
+were skipped silently (`commandsRegistered: 0`, `errors: []` — no failure to
+notice). Fixed by registering through `ctx.inject(['commands'], ...)`, which runs
+where the service exists and never fires on the patch-layer root (so no pending
+fiber is introduced). `tools`/`subprocess` remain the genuine patch-layer blind
+spot. Requires a dsh web restart (host-half module cache).
+
+A second, related gap surfaced in the same probe: `skillsRegistered: 5` and
+`skillsVisible` (all five names) were both present while the GUI still showed no
+skills group — but after the 0.2.0 restart the probe is written by the
+patch-layer instance, whose values overwrite the preset instance's. The probe
+cannot currently tell the two instances apart; a per-instance probe split is the
+obvious next improvement.
