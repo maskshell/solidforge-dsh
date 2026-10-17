@@ -197,6 +197,20 @@ def main() -> int:
         if not missing and not unknown and not required and not keys:
             pass
 
+    # A referenced @deepseek-ai package that no longer exists is a HARD failure:
+    # the loader cannot resolve the row, so the whole preset refuses to mount
+    # (this is exactly how 0.2.0's removal of `dsh-workflow-worker-thread` would
+    # have broken every new session had it shipped unnoticed; the earlier note-only
+    # behavior let that drift pass). Only report when at least one package DID
+    # resolve — otherwise the DSH install is simply absent and the SKIP applies.
+    if unresolved and checked > 0:
+        for name in sorted(unresolved):
+            failures.append(
+                f"preset row references {name!r}, which is NOT among the installed "
+                f"@deepseek-ai/* packages — the loader cannot mount it and the whole "
+                f"preset fails to mount (removed or renamed upstream?)"
+            )
+
     if failures:
         for f in failures:
             print("FAIL: " + f, file=sys.stderr)

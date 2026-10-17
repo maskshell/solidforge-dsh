@@ -413,3 +413,35 @@ initialization), and host-half module changes are NOT hot-reloaded (process-leve
 module cache) — so the probe's value requires a dsh web restart. Impact is
 bounded: all three invocation paths already work (`/solidforge:<name>`
 completion, colon gestures, prompt abbreviations).
+
+## DSH 0.2.0-rc.2 compatibility sweep (2026-10-18)
+
+0.1.5-rc.2 -> 0.2.0-rc.2 is a MAJOR bump, so the whole surface was re-checked
+rather than assumed:
+
+| Check | Result |
+|---|---|
+| Preset schema (19 loader rows vs installed `Config` d.ts) | PASS — `dsh-persona`'s `prefix` contract unchanged |
+| Preset package references (27 rows) | **1 BREAK** — see below |
+| Client-bundle contract (exported `inject` service list) | unchanged (working plugins still export it; `inputTriggers` still the service name; `dsh.client.inject` still read) |
+| Command grammar / namespace | unchanged — `COMMAND_NAME = /^[a-z][a-z0-9_-]*$/u`, so 0.2.0 STILL has no official namespace (the colon gesture remains required) |
+| `skills.register(skill)` | unchanged signature; `userInvocable` default true |
+| Host probe | `skillsRegistered: 5`, `skillsVisible` lists all five, `errors: []` |
+| Full CI (`scripts/ci-suites.sh`) | 58/58 |
+| headless preset mount | `COMPAT-OK` |
+
+**The break**: `@deepseek-ai/dsh-workflow-worker-thread` was REMOVED in 0.2.0.
+The workflow packages are now `dsh-workflow`, `dsh-workflow-ptc`,
+`dsh-tool-workflow` and `dsh-client-ui-workflow-run`. The preset row now mounts
+`@deepseek-ai/dsh-workflow-ptc`, whose `Config` carries the same `provider`
+field (default `spawn`) that the row already set — so the row's intent, not just
+its name, was preserved. A stale reference fails the whole preset mount, which
+is exactly the failure class the `check-preset-schema` gate exists to catch;
+that gate SKIPPED the unresolved name (its current SKIP path reports it as
+`unresolved` rather than failing) — worth tightening so a removed package is a
+hard failure, not a note.
+
+Note the `servicesSeen` in the patch-layer probe still reports
+`commands/tools/subprocess: false`. That is the long-standing patch-layer
+service blind spot (those services live in the preset scope), not a 0.2.0
+regression.
