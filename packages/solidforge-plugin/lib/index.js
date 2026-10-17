@@ -502,6 +502,17 @@ export function apply(ctx, config = {}) {
     gatesRegistered: false,
     errors: [],
   }
+  const statusPath = join(
+    process.env.DSH_HOME ?? join(process.env.HOME ?? '', '.dsh'),
+    '.solidforge-status.json',
+  )
+  const writeStatus = () => {
+    try {
+      writeFileSync(statusPath, JSON.stringify(status, null, 2) + '\n', 'utf8')
+    } catch {
+      /* best effort — a broken probe file must never break the plugin */
+    }
+  }
   const fail = (phase, error) => {
     const message = error instanceof Error ? error.message : String(error)
     status.errors.push({ phase, message })
@@ -596,8 +607,13 @@ export function apply(ctx, config = {}) {
     }
   }
 
-  const commandsService = ctx.get('commands')
-  if (commands !== undefined && commandsService !== undefined) {
+  // Command registration (0.2.0 contract): CommandRuntime is a TypertRemoteService
+  // reachable ONLY from a command-injected child of the agent context — a
+  // patch-layer root sees no `commands` service at all, so a bare ctx.get()
+  // silently registered nothing (that was the 0.2.0 command regression).
+  // ctx.inject() runs the callback exactly where the service exists: the preset
+  // instance registers the three commands, the patch layer simply never fires.
+  const registerCommandsWith = (commandsService) => {
     try {
     disposers.push(commandsService.register({
       name: 'solidforge-status',
@@ -644,9 +660,16 @@ export function apply(ctx, config = {}) {
     }))
     status.commandsRegistered += 1
 
+    writeStatus()
   } catch (error) {
-      fail('commands', error)
-    }
+    fail('commands', error)
+    writeStatus()
+  }
+  }
+  if (commands) {
+    const seenCommands = ctx.get('commands')
+    if (seenCommands !== undefined) registerCommandsWith(seenCommands)
+    else ctx.inject(['commands'], (commandCtx) => registerCommandsWith(commandCtx.commands))
   }
 
   // Structural gates (opt-in: gates:true covers every session of the profile).
@@ -672,10 +695,6 @@ export function apply(ctx, config = {}) {
     }
     probe.injectedSkills = ctx.skills !== undefined
     status.servicesSeen = probe
-    const home = process.env.DSH_HOME ?? join(process.env.HOME ?? '', '.dsh')
-    const statusPath = join(home, '.solidforge-status.json')
-    const writeStatus = () =>
-      writeFileSync(statusPath, JSON.stringify(status, null, 2) + '\n', 'utf8')
     writeStatus()
     // Catalog-visibility probe (2026-09-18): a successful register() call is NOT
     // proof that a catalog reader sees the skill — a same-name runtime entry is
