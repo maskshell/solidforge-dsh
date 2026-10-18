@@ -121,6 +121,18 @@ else
   echo "$out" | tail -1 | sed 's/^/      /'
 fi
 
+# profile <-> pi-ai catalog gate (2026-10-18: the installed catalog moved and two
+# shipped profiles pinned model ids it no longer offers — pi-ai resolves strictly,
+# so those heterogeneous legs would have failed at request time).
+TOTAL=$((TOTAL + 1))
+if ! out=$("$PY" "$HERE/scripts/check-profile-catalog.py" 2>&1); then
+  FAIL=$((FAIL + 1)); echo "FAIL: scripts/check-profile-catalog.py"
+  echo "$out" | tail -6 | sed 's/^/      /'
+else
+  echo "PASS: scripts/check-profile-catalog.py"
+  echo "$out" | tail -1 | sed 's/^/      /'
+fi
+
 echo
 echo "suites: $TOTAL run, $FAIL failed"
 [ "$FAIL" -eq 0 ]
