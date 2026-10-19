@@ -461,3 +461,62 @@ skills group — but after the 0.2.0 restart the probe is written by the
 patch-layer instance, whose values overwrite the preset instance's. The probe
 cannot currently tell the two instances apart; a per-instance probe split is the
 obvious next improvement.
+
+RESOLVED (2026-10-19): after a dsh web restart the user confirmed the GUI menu
+renders correctly — the empty skills group was a page snapshot taken before
+registration settled, not a catalog defect. The probe values above
+(`skillsRegistered: 5`, `skillsVisible` all five names) are the server-side truth.
+
+## DSH 0.2.0-rc.2 follow-up: commands, catalog drift, upstream parity, 0.1.6 (2026-10-19)
+
+Driven by user reports, not assumption.
+
+**Commands were silently unregistered.** The user typed `/solidforge-status` and
+the line reached the model instead of executing. Root cause: 0.2.0 turned
+`CommandRuntime` into a `TypertRemoteService` reachable only from "a
+command-injected child of an agent context"; this plugin injects only
+`['skills','systemPrompt']`, so even the PRESET instance's `ctx.get('commands')`
+returned undefined and all three commands were skipped with `errors: []` — no
+failure to notice. Fixed with `ctx.inject(['commands'], ...)`, the same shape
+0.2.0's own `dsh-plan-mode` and `dsh-permission-presets` use. Verified on a
+restarted harness: probe `commandsRegistered: 3`, and the user confirmed
+`/solidforge-status` executes.
+
+**Published 0.1.5 was already stale.** 0.1.5 was tagged at `ec8e280`, BEFORE the
+command fix, so npm's `latest` shipped a plugin whose commands never register on
+0.2.0. Released **0.1.6** (tag `v0.1.6`): trusted publishing + provenance,
+`publish-npm` and `deterministic-suites` both green, `dist-tags.latest = 0.1.6`.
+
+**Profile models had drifted from the installed catalog.** pi-ai resolves models
+strictly ("rejects unserviceable models before settings writes"), and the
+shipped profiles pinned ids the current catalog no longer offers:
+`zai-coding-cn` glm-5.2 -> **glm-5.3**; `qwen-token-plan-cn` qwen3.8-max-preview
+-> **qwen3.8-max**. Both legs would have failed at request time while the loop
+saw only a degraded leg. New gate `scripts/check-profile-catalog.py` checks each
+dsh-substrate profile's `model` against
+`@earendil-works/pi-ai/dist/providers/data/<route>.json` — the same generated
+catalog the adapter consumes — plus reasoning_effort-vs-reasoning consistency;
+honest SKIP when no pi-ai install resolves; negative-tested (pinning glm-5.2 back
+exits non-zero naming the route and the ids the catalog offers).
+
+**Upstream parity restored (two gaps).** The port had dropped upstream's
+project-layer profile override (`<project>/.llm-provider.<name>.json` shadows the
+bundled template, resolved from the SAME root as `.env.solidforge` so a profile
+and its token never come from different roots) and its profile-name validation
+(`os.path.join` concatenates a `..`-bearing member verbatim, so
+`--profile ../../etc/x` traversed). Restored in pd + csr; verified bundled /
+project-layer / traversal-rejection.
+
+**`.env.solidforge` cross-harness compatibility was VERIFIED, not assumed.**
+With a user-project `.env.solidforge` carrying the CC-convention names, BOTH
+upstream and this port read the same values — the first two resolution layers are
+byte-identical (`<project>/.env.solidforge` then `<project>/.env`, setdefault), and
+this port only adds a third, preset-root layer that cannot outrank them. Consistent
+with the design intent recorded in ADR #54: one var-name FORMAT, not one physical
+file.
+
+**Session-log corruption case (session-6d02ca79) — CLOSED.** The `/tmp` backup
+was purged with the temp directory, the session itself is retired, and no
+recovery material remains. Nothing further to investigate; the durable lesson
+(long sessions plus concurrent instances sharing the session store are a
+suspected trigger) stays in the harness notes.
