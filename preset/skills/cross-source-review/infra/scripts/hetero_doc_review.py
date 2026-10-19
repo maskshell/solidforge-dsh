@@ -482,13 +482,14 @@ def _prepare_dsh_home(name, tmpl):
     (§8 open problem 6), WITHOUT dragging in a foreign harness."""
     home = tempfile.mkdtemp(prefix=f"sf-dsh-hetero-{name}-")
     provider = str(tmpl.get("provider") or name)  # filename IS the route
-    src = _resolve_profile_path(name)
     # Project-layer profiles are untrusted repo input: allowed to choose route +
-    # model, never an arbitrary credential variable.
+    # model, never an arbitrary credential variable. No resolution is needed here
+    # — when the project-layer file exists it WINS by construction, and callers
+    # may also hand in an in-memory template with no file at all (tests/fixtures).
     project_path = os.path.join(
         _project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name)
     )
-    if os.path.abspath(src) == os.path.abspath(project_path):
+    if os.path.isfile(project_path):
         _reject_untrusted_credential_env(name, tmpl)
 
     am = {
