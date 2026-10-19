@@ -340,7 +340,9 @@ def _resolve_profile_path(name):
             "[A-Za-z0-9][A-Za-z0-9._-]* (a letter/digit, then letters/digits/./_/- "
             "— a single path component)."
         )
-    project_path = os.path.join(_project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name))
+    project_path = os.path.join(
+        _project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name)
+    )
     if os.path.exists(project_path):
         if not os.path.isfile(project_path):
             sys.exit(
