@@ -140,6 +140,8 @@ import tempfile
 SCHEMAS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "schemas")
 FINDINGS_SCHEMA = os.path.join(SCHEMAS_DIR, "doc-findings.schema.json")
 PROFILES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles")
+_PROJECT_PROFILE_TMPL = ".llm-provider.{name}.json"
+_PROFILE_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 # CC substrate errors that DEGRADE (recoverable — the different-family leg contributed nothing; the
 # same-family primary stands, per ADR #40 additive). Unknown subtypes + auth/invalid-args
@@ -319,13 +321,41 @@ def _expand_env_values(obj):
 
 
 def _resolve_profile_path(name):
-    p = os.path.join(PROFILES_DIR, f"{name}.json")
-    if not os.path.exists(p):
+    """Resolve a provider NAME to its profile file — the PROJECT layer OVERRIDES the
+    ported template (upstream `_resolve_profile` parity):
+      1. <project_root>/.llm-provider.<name>.json   (project layer; the SAME root
+         that roots .env.solidforge, so a profile and its token never come from
+         different roots)
+      2. <PROFILES_DIR>/<name>.json                 (ported default)
+      3. neither -> exit naming BOTH searched paths.
+
+    The name is validated BEFORE any join: os.path.join concatenates a `..`-bearing
+    member verbatim (no collapsing), so an unvalidated name would traverse out of
+    the chosen root. A project-layer path that exists but is not a regular file is
+    a loud exit — never a silent fall-through to the bundled template.
+    """
+    if _PROFILE_NAME_RE.fullmatch(name) is None:
         sys.exit(
-            f"error: unknown provider profile '{name}' (no {p}). "
-            "Committed templates live in infra/scripts/profiles/."
+            f"error: invalid provider name '{name}' — must fully match "
+            "[A-Za-z0-9][A-Za-z0-9._-]* (a letter/digit, then letters/digits/./_/- "
+            "— a single path component)."
         )
-    return p
+    project_path = os.path.join(_project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name))
+    if os.path.exists(project_path):
+        if not os.path.isfile(project_path):
+            sys.exit(
+                f"error: project-layer profile '{name}' exists but is NOT a regular "
+                f"file: {project_path} — remove or replace it (never silently "
+                "falling through to the bundled template)."
+            )
+        return project_path
+    bundled_path = os.path.join(PROFILES_DIR, f"{name}.json")
+    if not os.path.exists(bundled_path):
+        sys.exit(
+            f"error: unknown provider profile '{name}' (searched {project_path} and "
+            f"{bundled_path}). Committed templates live in infra/scripts/profiles/."
+        )
+    return bundled_path
 
 
 def _resolve_token_var(name, template):
