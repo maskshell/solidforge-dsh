@@ -520,3 +520,49 @@ was purged with the temp directory, the session itself is retired, and no
 recovery material remains. Nothing further to investigate; the durable lesson
 (long sessions plus concurrent instances sharing the session store are a
 suspected trigger) stays in the harness notes.
+
+## 0.2.0 `settings.yaml` deprecation silently broke every heterogeneous leg (2026-10-19)
+
+The end-to-end step of the new upgrade playbook caught what the offline gates
+could not: **every heterogeneous review leg failed** (`dsh-subprocess-error` on
+both routes, `findings_count: 0`). Reproduced by hand: `_prepare_dsh_home` wrote
+`<temp>/.dsh/settings.yaml` with `agent-default-model` + `llm-pi-ai`; 0.2.0's
+legacy import RENAMED it to `.imported` but did **not** apply
+`agent-default-model` — the subprocess still resolved the base default
+`deepseek-official` and died on its missing key.
+
+A lesson about how the mistake survived a spot-check: an earlier probe of the
+import used a settings value that happened to EQUAL the default
+(`deepseek-official`), so "the provider is correct" proved nothing. The import
+was never actually exercised with a differing value. Any future check of a
+migration must use a value that differs from the default.
+
+**Fix**: `_prepare_dsh_home` writes the profile PATCH LAYER
+(`profiles/headless/cordis.patch.yml`) with id-targeted `agent-default-model` and
+`llm-pi-ai` config overrides — the same mechanism a shipped profile is customized
+with — instead of the deprecated file. Verified end to end: a temp `DSH_HOME`
+resolves the pinned route/model, and a real three-leg review runs with
+`malformation: none` and both legs contributing findings.
+
+The wiring test asserted the OLD `settings.yaml` artifact, so it kept passing
+while the behaviour changed; it now reads the patch layer (this was the only
+blocker the review still raised in round 3).
+
+**Convergence over the fixes themselves** (the review loop ran on the fix diff):
+
+- **round 2** (pre-fix): 3 blockers, 17 warnings. Real bugs it caught: (a)
+  `_family_checks` resolved the BUNDLED path while the run resolved the project
+  layer first — the same-source guard could judge a different profile than the
+  one about to run; (b) the moved `writeStatus` swallowed its error in a bare
+  `catch`, removing the only trace of a broken probe file; (c) the restored
+  project-layer override loaded untrusted repo JSON silently.
+- **round 3** (post-fix): 1 blocker (the wiring-test drift above) + 22 advisory
+  warnings.
+- Fixes applied for these: `_family_checks` goes through the run's own resolver;
+  `writeStatus` records the error (capped) instead of discarding it; the project
+  layer prints an explicit "overridden by the project layer (untrusted repo
+  input)" note; the project-layer existence check is a single `os.path.lexists` +
+  `isfile` (TOCTOU narrowed); `check-profile-catalog` now fails cleanly on an
+  unreadable/malformed catalog JSON; `_catalog_verified` and the dogfood README
+  were updated to `glm-5.3`; the `--profile` help text documents the project
+  layer.

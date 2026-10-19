@@ -464,6 +464,15 @@ def check_family_guards():
     )
 
 
+def _read_profile_patch(home):
+    """Read the profile patch layer _prepare_dsh_home writes (0.2.0: the model
+    selection lives in a composition row, not the deprecated settings.yaml)."""
+    patch = json.load(
+        open(os.path.join(home, "profiles", "headless", "cordis.patch.yml"))
+    )
+    return {row["id"]: row["config"] for row in patch}
+
+
 def check_dsh_substrate_home_construction():
     """DSH-native substrate: _prepare_dsh_home builds a throwaway DSH_HOME whose
     settings.yaml pins agent-default-model to the profile's route + model, and the
@@ -482,7 +491,7 @@ def check_dsh_substrate_home_construction():
         home, env_block = h._prepare_dsh_home("het-route", tmpl)
         assert os.path.isdir(home)
         try:
-            settings = json.load(open(os.path.join(home, "settings.yaml")))
+            settings = _read_profile_patch(home)
             assert settings["agent-default-model"]["provider"] == "het-route"
             assert settings["agent-default-model"]["model"] == "het-model"
             assert settings["agent-default-model"]["reasoningEffort"] == "high"
@@ -505,7 +514,7 @@ def check_dsh_substrate_home_construction():
         )
         assert os.path.isdir(home2)
         try:
-            settings2 = json.load(open(os.path.join(home2, "settings.yaml")))
+            settings2 = _read_profile_patch(home2)
             assert (
                 settings2["llm-pi-ai"]["providers"]["het-route"]["apiKeyEnv"]
                 == "HET_ROUTE_API_KEY"
@@ -537,7 +546,7 @@ def check_dsh_substrate_home_construction():
             "het-route", {**tmpl, "_credential_env": None}
         )
         try:
-            settings3 = json.load(open(os.path.join(home3, "settings.yaml")))
+            settings3 = _read_profile_patch(home3)
             assert (
                 settings3["llm-pi-ai"]["providers"]["het-route"]["apiKeyEnv"]
                 == "HET_ROUTE_API_KEY"

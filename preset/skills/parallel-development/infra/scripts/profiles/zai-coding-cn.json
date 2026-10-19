@@ -3,7 +3,7 @@
   "substrate": "dsh",
   "model": "glm-5.3",
   "reasoning_effort": "high",
-  "_catalog_verified": "2026-08-14 vs pi.dev (https://pi.dev/models/zai-coding-cn/glm-5-2?name=glm): catalog entry inherited VERBATIM - api openai-completions, baseUrl https://open.bigmodel.cn/api/coding/paas/v4, reasoning:true, thinkingLevelMap {minimal:null, low/medium/high:high, max:max}, input [text], contextWindow 1000000, maxTokens 131072, compat supportsReasoningEffort:true / thinkingFormat:zai. This profile declares ONLY apiKeyEnv; every model fact is catalog-inherited, so it cannot drift from the official docs.",
+  "_catalog_verified": "2026-10-19 vs the installed pi-ai catalog (@earendil-works/pi-ai/dist/providers/data/zai-coding-cn.json): catalog entry inherited VERBATIM - api openai-completions, baseUrl https://open.bigmodel.cn/api/coding/paas/v4, reasoning:true, thinkingLevelMap {minimal:null, low/medium/high:high, max:max}, input [text], contextWindow 1000000, maxTokens 131072, compat supportsReasoningEffort:true / thinkingFormat:zai. This profile declares ONLY apiKeyEnv; every model fact is catalog-inherited, so it cannot drift from the official docs.",
   "_family": "glm",
   "_credential_env": "BIGMODEL_ANTHROPIC_AUTH_TOKEN"
 }

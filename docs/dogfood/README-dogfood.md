@@ -184,7 +184,7 @@ Human review caught three things, all fixed:
    WRONG endpoint/protocol (the anthropic-compatible endpoint exposes no effort
    levels), not a GLM property. FIXED with the official route: catalog
    `zai-coding-cn` (openai-completions,
-   `https://open.bigmodel.cn/api/coding/paas/v4`, model `glm-5.2` with
+   `https://open.bigmodel.cn/api/coding/paas/v4`, model `glm-5.3` with
    thinkingLevelMap) — smoke rc=0 WITH `reasoningEffort: high`.
 3. **Catalog routes over hand-declared ones**: `_prepare_dsh_home` now always
    emits the `llm-pi-ai` section (apiKeyEnv-only entries for catalog routes);

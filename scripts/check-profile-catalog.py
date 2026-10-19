@@ -48,7 +48,9 @@ def candidate_pi_ai_dirs() -> list[Path]:
     out.append(home / "node_modules" / "@earendil-works" / "pi-ai")
     npx = Path.home() / ".npm" / "_npx"
     if npx.is_dir():
-        out.extend(sorted(npx.glob("*/node_modules/@earendil-works/pi-ai"), reverse=True))
+        out.extend(
+            sorted(npx.glob("*/node_modules/@earendil-works/pi-ai"), reverse=True)
+        )
     return out
 
 
@@ -88,8 +90,15 @@ def main() -> int:
                 f"this route's models (removed or renamed upstream?)"
             )
             continue
-        catalog = json.loads(catalog_file.read_text(encoding="utf-8"))
-        models = {m["id"]: m for api in catalog.values() for m in api.values()}
+        try:
+            catalog = json.loads(catalog_file.read_text(encoding="utf-8"))
+            models = {m["id"]: m for api in catalog.values() for m in api.values()}
+        except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+            failures.append(
+                f"{path}: the '{route}' catalog file is unreadable/malformed ({exc}) - "
+                f"cannot verify the pinned model (never a silent pass)"
+            )
+            continue
         model = profile.get("model")
         checked += 1
         if model not in models:
@@ -98,7 +107,10 @@ def main() -> int:
                 f"(available: {', '.join(sorted(models)[:6])}…)"
             )
             continue
-        if profile.get("reasoning_effort") is not None and models[model].get("reasoning") is not True:
+        if (
+            profile.get("reasoning_effort") is not None
+            and models[model].get("reasoning") is not True
+        ):
             failures.append(
                 f"{path}: sets reasoning_effort={profile.get('reasoning_effort')!r} but "
                 f"the catalog marks model {model!r} as reasoning=false"

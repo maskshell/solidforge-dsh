@@ -509,8 +509,19 @@ export function apply(ctx, config = {}) {
   const writeStatus = () => {
     try {
       writeFileSync(statusPath, JSON.stringify(status, null, 2) + '\n', 'utf8')
-    } catch {
-      /* best effort — a broken probe file must never break the plugin */
+    } catch (error) {
+      // A broken probe file must never break the plugin, but the failure IS
+      // recorded — in memory AND on stderr: the file write just failed, so an
+      // in-memory entry alone would never be persisted (invisible diagnostic).
+      const message = error instanceof Error ? error.message : String(error)
+      if (status.errors.length < 20) {
+        status.errors.push({ phase: 'status-file', message })
+      }
+      try {
+        console.error(`solidforge: status-file write failed: ${message}`)
+      } catch {
+        /* stderr is unavailable too — nothing left to report to */
+      }
     }
   }
   const fail = (phase, error) => {
@@ -668,8 +679,21 @@ export function apply(ctx, config = {}) {
   }
   if (commands) {
     const seenCommands = ctx.get('commands')
-    if (seenCommands !== undefined) registerCommandsWith(seenCommands)
-    else ctx.inject(['commands'], (commandCtx) => registerCommandsWith(commandCtx.commands))
+    if (seenCommands !== undefined) {
+      registerCommandsWith(seenCommands)
+    } else {
+      try {
+        ctx.inject(['commands'], (commandCtx) =>
+          registerCommandsWith(commandCtx.commands),
+        )
+      } catch (error) {
+        // The dispatch itself must never escape: a throw here would abort
+        // apply() and take the whole plugin face (skills/persona/gestures) with
+        // it, not just the commands.
+        fail('commands', error)
+        writeStatus()
+      }
+    }
   }
 
   // Structural gates (opt-in: gates:true covers every session of the profile).

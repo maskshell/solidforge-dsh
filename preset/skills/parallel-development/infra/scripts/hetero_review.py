@@ -346,13 +346,21 @@ def _resolve_profile_path(name):
     project_path = os.path.join(
         _project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name)
     )
-    if os.path.exists(project_path):
-        if not os.path.isfile(project_path):
-            sys.exit(
-                f"error: project-layer profile '{name}' exists but is NOT a regular "
-                f"file: {project_path} — remove or replace it (never silently "
-                "falling through to the bundled template)."
-            )
+    if os.path.lexists(project_path) and not os.path.isfile(project_path):
+        sys.exit(
+            f"error: project-layer profile '{name}' exists but is NOT a regular "
+            f"file: {project_path} — remove or replace it (never silently "
+            "falling through to the bundled template)."
+        )
+    if os.path.isfile(project_path):
+        # Project-layer files are UNTRUSTED repo input that overrides a bundled
+        # template — announce the override (upstream returns source="project" for
+        # the same reason). Never silent.
+        print(
+            f"note: provider profile '{name}' is overridden by the project layer: "
+            f"{project_path} (untrusted repo input; the bundled template is shadowed)",
+            file=sys.stderr,
+        )
         return project_path
     bundled_path = os.path.join(PROFILES_DIR, f"{name}.json")
     if not os.path.exists(bundled_path):
@@ -388,6 +396,33 @@ def _resolve_token_var(name, template):
     return f"{sanitized}_ANTHROPIC_AUTH_TOKEN"
 
 
+def _reject_untrusted_credential_env(name, tmpl):
+    """A PROJECT-LAYER profile may not choose an arbitrary credential variable.
+
+    `<project>/.llm-provider.<name>.json` is untrusted repo input. Letting it name
+    the credential env var would let a repo read (and exfiltrate) any secret that
+    happens to be present in the launcher's environment. Repo-local profiles are
+    therefore limited to the route-convention names; anything else must move to
+    the bundled defaults (which are reviewed with the repo).
+    """
+    var = (
+        tmpl.get("_credential_env")
+        if tmpl.get("_credential_env") is not None
+        else tmpl.get("_token_env")
+    )
+    if var is None:
+        return
+    upper = re.sub(r"[^A-Za-z0-9]", "_", name).upper()
+    allowed = {f"{upper}_API_KEY", f"{upper}_ANTHROPIC_AUTH_TOKEN"}
+    if str(var) not in allowed:
+        sys.exit(
+            f"error: project-layer profile '{name}' may not point the credential at "
+            f"${var} - repo-local profiles are limited to the route convention vars "
+            f"({', '.join(sorted(allowed))}). Use the conventional name in the "
+            f"project's env, or ship the profile as a bundled default."
+        )
+
+
 def _materialize_profile(name):
     """Load profiles/<name>.json, resolve + read the token, expand any ${VAR} in the
     template, INJECT the token as ANTHROPIC_AUTH_TOKEN, write a throwaway chmod-600
@@ -401,6 +436,14 @@ def _materialize_profile(name):
     src = _resolve_profile_path(name)
     with open(src, "r", encoding="utf-8") as fh:
         tmpl = json.load(fh)
+    # Project-layer profiles are untrusted repo input: allowed to choose route +
+    # model, never an arbitrary credential variable.
+    project_path = os.path.join(
+        _project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name)
+    )
+    if os.path.abspath(src) == os.path.abspath(project_path):
+        _reject_untrusted_credential_env(name, tmpl)
+
     native_auth = bool(tmpl.get("_native_auth"))
     if not native_auth:
         token_var = _resolve_token_var(name, tmpl)
@@ -442,8 +485,8 @@ def _materialize_profile(name):
 def _prepare_dsh_home(name, tmpl):
     """DSH-NATIVE substrate: heterogeneity = a DIFFERENT LLM on the SAME harness.
 
-    Builds a throwaway DSH_HOME whose settings.yaml (JSON — a valid YAML document)
-    pins agent-default-model to the profile's provider route + model, and passes
+    Builds a throwaway DSH_HOME whose PROFILE PATCH LAYER pins agent-default-model
+    to the profile's provider route + model (0.2.0 deprecated `settings.yaml`), and passes
     the profile's credential env (the DSH adapter's apiKeyEnv) to the subprocess.
     The `dsh --profile headless "<prompt>"` subprocess is a fresh, stateless DSH
     session: same harness, different model family, out of process — the paper's
@@ -451,6 +494,15 @@ def _prepare_dsh_home(name, tmpl):
     (§8 open problem 6), WITHOUT dragging in a foreign harness."""
     home = tempfile.mkdtemp(prefix=f"sf-dsh-hetero-{name}-")
     provider = str(tmpl.get("provider") or name)  # filename IS the route
+    src = _resolve_profile_path(name)
+    # Project-layer profiles are untrusted repo input: allowed to choose route +
+    # model, never an arbitrary credential variable.
+    project_path = os.path.join(
+        _project_root_for_env(), _PROJECT_PROFILE_TMPL.format(name=name)
+    )
+    if os.path.abspath(src) == os.path.abspath(project_path):
+        _reject_untrusted_credential_env(name, tmpl)
+
     am = {
         "provider": provider,
         "model": str(tmpl.get("model", "")),
@@ -460,7 +512,12 @@ def _prepare_dsh_home(name, tmpl):
     # alike — omission defers to the adapter default instead of failing.
     if tmpl.get("reasoning_effort"):
         am["reasoningEffort"] = str(tmpl["reasoning_effort"])
-    settings = {"agent-default-model": am}
+    # 0.2.0: the default-model selection is a COMPOSITION row with config
+    # (`agent-default-model`), and the legacy `$DSH_HOME/settings.yaml` import
+    # no longer applies it (verified: the subprocess still resolved the base
+    # default `deepseek-official`). Write the profile PATCH LAYER instead — an
+    # id-targeted config override, the same mechanism a shipped profile is
+    # customized with.
     # Always emit the pi-ai section: a CATALOG route needs only apiKeyEnv (the
     # adapter is dormant until a settings section supplies profiles), while a
     # hand-declared route carries baseURL/api/models in `provider_profile`.
@@ -485,10 +542,17 @@ def _prepare_dsh_home(name, tmpl):
     )
     if cred_env:
         providers_entry.setdefault("apiKeyEnv", str(cred_env))
+    patch = [{"id": "agent-default-model", "config": am}]
     if providers_entry:
-        settings["llm-pi-ai"] = {"providers": {provider: providers_entry}}
-    with open(os.path.join(home, "settings.yaml"), "w", encoding="utf-8") as fh:
-        json.dump(settings, fh, indent=2)
+        patch.append(
+            {"id": "llm-pi-ai", "config": {"providers": {provider: providers_entry}}}
+        )
+    profile_dir = os.path.join(home, "profiles", "headless")
+    os.makedirs(profile_dir, exist_ok=True)
+    with open(
+        os.path.join(profile_dir, "cordis.patch.yml"), "w", encoding="utf-8"
+    ) as fh:
+        json.dump(patch, fh, indent=2)
     env_block = {}
     if cred_env:
         token = os.environ.get(str(cred_env), "")
@@ -524,9 +588,16 @@ def _family_checks(names, profiles_dir=None):
     errors, notes = [], []
     fams = {}
     for n in names:
-        src = os.path.join(profiles_dir or PROFILES_DIR, f"{n}.json")
-        if not os.path.exists(src):
-            continue  # _resolve_profile_path fail-fasts separately
+        if profiles_dir is not None:
+            # Explicit directory (tests / fixtures): resolve exactly there.
+            src = os.path.join(profiles_dir, f"{n}.json")
+            if not os.path.exists(src):
+                continue
+        else:
+            # Production: judge the profile that will actually RUN. Using the
+            # bundled path here would let a project-layer override slip a
+            # DIFFERENT profile past the same-source guard.
+            src = _resolve_profile_path(n)
         with open(src, "r", encoding="utf-8") as fh:
             tmpl = json.load(fh)
         fam = tmpl.get("_family")
@@ -1154,7 +1225,9 @@ def main():
         "--profile",
         default=os.environ.get("HETERO_PROFILE", ""),
         help="Provider NAME (or comma-list for dual-/multi-different-family), resolved against "
-        "profiles/<name>.json templates. Default: unset -> fail-fast arming prompt (no silent fallback). "
+        "the PROJECT layer first (<project>/.llm-provider.<name>.json, announced when it "
+        "wins), then the bundled profiles/<name>.json templates. Default: unset -> "
+        "fail-fast arming prompt (no silent fallback). "
         "The token is read at runtime from the convention var "
         "<UPPERCASE-FILENAME>_ANTHROPIC_AUTH_TOKEN (e.g. "
         "QWEN3_ANTHROPIC_AUTH_TOKEN) — the SOLE source (the suffix namespaces "
