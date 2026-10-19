@@ -571,6 +571,12 @@ export function apply(ctx, config = {}) {
       }
       const dispose = skills.register({
         name: parsed.name,
+        // 0.2.0 requires `source` (SkillSummary.source is non-optional and the
+        // loader rejects a non-string one: 'loaded skill "X" source must be a
+        // string'). A runtime registration is `'runtime'` by convention
+        // (RUNTIME_PROVIDER); omitting it made every solidforge skill fail to
+        // LOAD even though the catalog listed it.
+        source: 'runtime',
         description: parsed.description,
         content: parsed.content,
         resourceBase: { kind: 'directory', path: dir },
